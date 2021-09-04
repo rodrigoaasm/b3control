@@ -1,0 +1,7 @@
+{
+    "watch" : ["src"],
+    "ext" : "ts",
+    "execMap" : {
+       "ts" : "./node_modules/.bin/tsc && node ./build/server.js"
+    }
+}

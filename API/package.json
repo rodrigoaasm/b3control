@@ -1,0 +1,31 @@
+{
+    "name": "b3control-api",
+    "description": "B3Control-api is an API for an investment tracking system for the brazilian stock exchange.",
+    "scripts": {
+        "start": "./node_modules/.bin/tsc && node ./build/index.js",
+        "dev": "nodemon start",
+        "test": "jest --no-cache"
+    },
+    "devDependencies": {
+        "@types/jest": "^27.0.1",
+        "@types/node": "^14.14.10",
+        "@typescript-eslint/eslint-plugin": "^4.30.0",
+        "@typescript-eslint/parser": "^4.30.0",
+        "dotenv": "^10.0.0",
+        "eslint": "^7.32.0",
+        "eslint-config-airbnb-typescript": "^14.0.0",
+        "jest": "^27.1.0",
+        "nodemon": "^2.0.4",
+        "ts-jest": "^27.0.5",
+        "typescript": "^3.9.5",
+        "eslint-config-airbnb": "^18.2.1"
+    },
+    "dependencies": {
+        "@types/body-parser": "^1.19.0",
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "express": "^4.17.1",
+        "reflect-metadata": "^0.1.13",
+        "typeorm": "^0.2.37"
+    }
+}
