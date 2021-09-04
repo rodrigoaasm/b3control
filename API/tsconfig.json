@@ -6,6 +6,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "baseUrl": ".",
+    "paths": {
+      "@config/*": ["./src/main/config/*"]
+    }
   },
   "include": [
     "src/**/*.ts"

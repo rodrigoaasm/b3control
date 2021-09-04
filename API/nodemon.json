@@ -2,6 +2,6 @@
     "watch" : ["src"],
     "ext" : "ts",
     "execMap" : {
-       "ts" : "./node_modules/.bin/tsc && node ./build/server.js"
+       "ts" : "ts-node-dev -r tsconfig-paths/register ./src/index.ts"
     }
 }

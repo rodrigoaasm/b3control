@@ -1,10 +1,12 @@
-import * as express from 'express';
-import * as dotenv from 'dotenv';
-import { App } from './app';
+import { createConnection } from 'typeorm';
 
-dotenv.config();
-const app = new App(express());
+import config from '@config/orm';
+import { createApp } from './main/app';
 
-app.express.listen(4000, () => {
-  console.log('B3Control');
+createConnection(config).then(async () => {
+  const app = await createApp();
+
+  app.listen(4000, () => {
+    console.log('B3Control');
+  });
 });
