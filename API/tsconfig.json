@@ -7,11 +7,12 @@
     "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
-      "@config/*": ["./src/main/config/*"]
+      "@config/*": ["./src/main/config/*"],
     }
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "tests/**/*.spec.ts"
   ],
   "exclude": [
     "node_modules"
