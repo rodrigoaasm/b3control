@@ -8,6 +8,7 @@
     "baseUrl": ".",
     "paths": {
       "@config/*": ["./src/main/config/*"],
+      "@utils/*": ["./src/external/utils/*"]
     }
   },
   "include": [
