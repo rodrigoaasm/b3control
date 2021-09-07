@@ -4,8 +4,8 @@ import { OperationType } from './operation-type';
 export interface OperationEntity {
   id ?: number;
   value : number;
-  quatity : number;
+  quantity : number;
   type : OperationType;
-  stock : PaperEntity;
+  paper : PaperEntity;
   createdAt : Date;
 }

@@ -1,13 +1,15 @@
+import { IDateValidatorAdapter } from '@domain-ports/adapters/idate-validator-adapter';
 import { isValid, parseISO } from 'date-fns';
 
-function validate(date: any) {
-  let preparedDate = date;
-  if (!(date instanceof Date)) {
-    preparedDate = parseISO(date as string);
+export class DateValidatorUtil implements IDateValidatorAdapter {
+  // eslint-disable-next-line class-methods-use-this
+  validate(date: string | Date): boolean {
+    let preparedDate = date;
+    if (!(date instanceof Date)) {
+      preparedDate = parseISO(date as string);
+    }
+    return isValid(preparedDate);
   }
-  return isValid(preparedDate);
 }
 
-export default {
-  validate,
-};
+export default DateValidatorUtil;
