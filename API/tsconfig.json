@@ -7,15 +7,19 @@
     "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
-      "@config/*": ["./src/main/config/*"],
-      "@utils/*": ["./src/external/utils/*"],
       "@entities/*": ["./src/domain/entities/*"],
+      "@domain-ports/*": ["./src/domain/ports/*"],
+      "@usecases/*": ["./src/domain/usecases/*"],
+      "@config/*": ["./src/main/config/*"],
+      "@utils/*": ["./src/external/utils/*"],  
+      "@mocks/*": ["./tests/mocks/*"]
     }
   },
   "include": [
     "src/**/*.ts",
+    "tests/**/*.ts",
     "tests/**/*.spec.ts"
-  ],
+, "tests/mocks/operation-repository-mock.ts"  ],
   "exclude": [
     "node_modules"
   ]
