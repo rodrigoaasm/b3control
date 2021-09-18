@@ -4,7 +4,9 @@ import { IOperationRepository } from '@domain-ports/repositories/ioperation-repo
 import { IPaperRepository } from '@domain-ports/repositories/ipaper-repository';
 import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
 
-export class SubmitOperationUseCase {
+import { ISubmitOperationInput, ISubmitOperationUseCase } from './submit-operation-interfaces';
+
+export class SubmitOperationUseCase implements ISubmitOperationUseCase {
   constructor(
     private operationRepository: IOperationRepository,
     private paperRepository: IPaperRepository,
@@ -12,9 +14,10 @@ export class SubmitOperationUseCase {
   ) {
   }
 
-  public async submit({
-    value, quantity, type, paperCode, createdAt,
-  }) : Promise<OperationEntity> {
+  public async submit(submitOperationInput: ISubmitOperationInput) : Promise<OperationEntity> {
+    const {
+      value, quantity, type, paperCode, createdAt,
+    } = submitOperationInput;
     const paper = await this.paperRepository.findByCode(paperCode);
     if (!paper) throw new Error('Paper not found');
 

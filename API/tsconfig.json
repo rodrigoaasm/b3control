@@ -10,8 +10,10 @@
       "@entities/*": ["./src/domain/entities/*"],
       "@domain-ports/*": ["./src/domain/ports/*"],
       "@usecases/*": ["./src/domain/usecases/*"],
-      "@config/*": ["./src/main/config/*"],
+      "@controllers/*": ["./src/external/controllers/*"],
       "@utils/*": ["./src/external/utils/*"],  
+      "@external/*":["./src/external/*"],
+      "@config/*": ["./src/main/config/*"],
       "@mocks/*": ["./tests/mocks/*"]
     }
   },

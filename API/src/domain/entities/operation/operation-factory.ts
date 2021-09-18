@@ -16,7 +16,7 @@ export class OperationFactory implements IOperationFactory {
       throw new Error("It was not possible create the operation object!\n The value of the field 'value' is not accept");
     }
     if (!Number(quantity) || Number(quantity) < 0) {
-      throw new Error("It was not possible create the operation object!\n The value of the field 'qtd' is not accept");
+      throw new Error("It was not possible create the operation object!\n The value of the field 'quantity' is not accept");
     }
     if (type !== 'sale' && type !== 'buy') {
       throw new Error("It was not possible create the operation object!\n The type is invalid! Expect 'buy' or 'sale'.");
