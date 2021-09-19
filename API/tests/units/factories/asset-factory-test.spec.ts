@@ -1,9 +1,8 @@
-import { PaperFactory } from '@entities/paper/paper-factory';
-import { PaperCategory } from '@entities/paper/paper-category';
+import { AssetFactory, AssetCategory } from '@entities/asset/';
 
 describe('Paper Factory', () => {
   it('Should make a stock paper', async () => {
-    const paper = PaperFactory.getInstance(1, 'TEST11', 'Test', '', 'stock');
+    const paper = AssetFactory.getInstance(1, 'TEST11', 'Test', '', 'stock');
 
     expect(paper).toEqual({
       category: 'stock',
@@ -14,11 +13,11 @@ describe('Paper Factory', () => {
     });
   });
 
-  it('Should make a generic paper', async () => {
-    const paper = PaperFactory.getInstance(1, 'TEST11', 'Test', '', 'paper');
+  it('Should make a generic asset', async () => {
+    const asset = AssetFactory.getInstance(1, 'TEST11', 'Test', '', 'general');
 
-    expect(paper).toEqual({
-      category: 'paper',
+    expect(asset).toEqual({
+      category: 'general',
       id: 1,
       code: 'TEST11',
       social: 'Test',
@@ -30,7 +29,7 @@ describe('Paper Factory', () => {
     let error: Error;
 
     try {
-      PaperFactory.getInstance(undefined, 'TEST11', 'Test', '', 'stock');
+      AssetFactory.getInstance(undefined, 'TEST11', 'Test', '', 'stock');
     } catch (submitedError) {
       error = submitedError;
     }
@@ -42,7 +41,7 @@ describe('Paper Factory', () => {
     let error: Error;
 
     try {
-      PaperFactory.getInstance(1, undefined, 'Test', '', 'stock');
+      AssetFactory.getInstance(1, undefined, 'Test', '', 'stock');
     } catch (submitedError) {
       error = submitedError;
     }
@@ -54,7 +53,7 @@ describe('Paper Factory', () => {
     let error: Error;
 
     try {
-      PaperFactory.getInstance(1, 'TEST11', 'Test', '', 'etf' as PaperCategory);
+      AssetFactory.getInstance(1, 'TEST11', 'Test', '', 'etf' as AssetCategory);
     } catch (submitedError) {
       error = submitedError;
     }

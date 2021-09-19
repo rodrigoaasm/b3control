@@ -1,9 +1,9 @@
-import { PaperCategory } from './paper-category';
-import { PaperEntity } from './paper-entity';
+import { AssetCategory } from './asset-category';
+import { AssetEntity } from './asset-entity';
 
-export class PaperFactory {
+export class AssetFactory {
   static getInstance(id : number, code : string, social : string,
-    logo : string, category : PaperCategory): PaperEntity {
+    logo : string, category : AssetCategory): AssetEntity {
     if (!id) {
       throw new Error('It was not possible create the stock object!\n Stock id not found.');
     }
@@ -12,10 +12,10 @@ export class PaperFactory {
       throw new Error('It was not possible create the stock object!\n Stock code not found.');
     }
 
-    if (category !== 'stock' && category !== 'paper') {
+    if (category !== 'stock' && category !== 'general') {
       throw new Error("It was not possible create the stock object!\n The category is invalid! Expect 'stock' or 'papper'.");
     }
-    const paper = {
+    const asset = {
       id,
       code,
       social,
@@ -23,8 +23,8 @@ export class PaperFactory {
       category,
     };
 
-    return paper;
+    return asset;
   }
 }
 
-export default PaperFactory;
+export default AssetFactory;

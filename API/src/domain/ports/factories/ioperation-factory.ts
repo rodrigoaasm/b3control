@@ -1,8 +1,8 @@
 import { OperationEntity, OperationType } from '@entities/operation';
-import { PaperEntity } from '@entities/paper';
+import { AssetEntity } from '@entities/asset';
 
 export interface IOperationFactory {
   make(value : number, quantity : number, type : OperationType,
-    paper : PaperEntity, createdAt: Date | string, id ?: number | undefined)
+    paper : AssetEntity, createdAt: Date | string, id ?: number | undefined)
   : OperationEntity;
 }

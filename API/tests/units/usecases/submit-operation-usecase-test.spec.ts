@@ -1,9 +1,9 @@
-import { PaperCategory, PaperEntity } from '@entities/paper/';
+import { AssetCategory, AssetEntity } from '@entities/asset';
 import { SubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-usecase';
 import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
 
 import OperationRepositoryMock from '@mocks/operation-repository-mock';
-import PaperRepositoryMock from '@mocks/paper-repository-mock';
+import AssetRepositoryMock from '@mocks/asset-repository-mock';
 import { OperationType, OperationEntity } from '@entities/operation';
 
 class OperationFactoryMock implements IOperationFactory {
@@ -12,7 +12,7 @@ class OperationFactoryMock implements IOperationFactory {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  make(value: number, quantity: number, type: OperationType, paper: PaperEntity,
+  make(value: number, quantity: number, type: OperationType, paper: AssetEntity,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     createdAt: string | Date, id: number)
     : OperationEntity {
@@ -21,13 +21,13 @@ class OperationFactoryMock implements IOperationFactory {
       value: 15.95,
       quantity: 200,
       type: 'buy',
-      paper: {
+      asset: {
         id: 1,
         code: 'TEST11',
         social: 'Teste',
         logo: '',
-        category: 'stock' as PaperCategory,
-      } as PaperEntity,
+        category: 'stock' as AssetCategory,
+      } as AssetEntity,
       createdAt: this.date,
     };
   }
@@ -40,7 +40,7 @@ describe('Submit Operation Service', () => {
   beforeEach(() => {
     date = new Date();
     submitOperationService = new SubmitOperationUseCase(
-      new OperationRepositoryMock(), new PaperRepositoryMock(), new OperationFactoryMock(date),
+      new OperationRepositoryMock(), new AssetRepositoryMock(), new OperationFactoryMock(date),
     );
   });
 
@@ -49,7 +49,7 @@ describe('Submit Operation Service', () => {
       value: 15.95,
       quantity: 200,
       type: 'buy',
-      paperCode: 'TEST11',
+      assetCode: 'TEST11',
       createdAt: date,
     });
 
@@ -58,13 +58,13 @@ describe('Submit Operation Service', () => {
       value: 15.95,
       quantity: 200,
       type: 'buy',
-      paper: {
+      asset: {
         id: 1,
         code: 'TEST11',
         social: 'Teste',
         logo: '',
-        category: 'stock' as PaperCategory,
-      } as PaperEntity,
+        category: 'stock' as AssetCategory,
+      } as AssetEntity,
       createdAt: date,
     });
   });
@@ -77,7 +77,7 @@ describe('Submit Operation Service', () => {
         value: 15.95,
         quantity: 200,
         type: 'buy',
-        paperCode: 'TEST4',
+        assetCode: 'TEST4',
         createdAt: date,
       });
     } catch (submitedError) {

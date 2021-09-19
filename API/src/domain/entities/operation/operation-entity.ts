@@ -1,4 +1,4 @@
-import { PaperEntity } from '@entities/paper/paper-entity';
+import { AssetEntity } from '@entities/asset/asset-entity';
 import { OperationType } from './operation-type';
 
 export interface OperationEntity {
@@ -6,6 +6,6 @@ export interface OperationEntity {
   value : number;
   quantity : number;
   type : OperationType;
-  paper : PaperEntity;
+  asset : AssetEntity;
   createdAt : Date;
 }

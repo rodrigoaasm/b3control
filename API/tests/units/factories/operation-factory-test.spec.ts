@@ -1,15 +1,15 @@
 import { OperationFactory, OperationType } from '@entities/operation/';
-import { PaperCategory, PaperEntity } from '@entities/paper/';
+import { AssetCategory, AssetEntity } from '@entities/asset';
 import DateValidatorUtil from '@utils/date-validator-util';
 
 describe('Operation Factory', () => {
-  let stock: PaperEntity;
+  let stock: AssetEntity;
   let date: Date;
   let operationFactory: OperationFactory;
 
   beforeEach(() => {
     stock = {
-      category: 'stock' as PaperCategory,
+      category: 'stock' as AssetCategory,
       id: 1,
       code: 'TEST11',
       social: 'Test',
@@ -27,8 +27,8 @@ describe('Operation Factory', () => {
       value: 15.95,
       quantity: 200,
       type: 'buy',
-      paper: {
-        category: 'stock' as PaperCategory,
+      asset: {
+        category: 'stock' as AssetCategory,
         id: 1,
         code: 'TEST11',
         social: 'Test',
@@ -46,8 +46,8 @@ describe('Operation Factory', () => {
       value: 15.95,
       quantity: -200,
       type: 'sale',
-      paper: {
-        category: 'stock' as PaperCategory,
+      asset: {
+        category: 'stock' as AssetCategory,
         id: 1,
         code: 'TEST11',
         social: 'Test',
@@ -149,8 +149,8 @@ describe('Operation Factory', () => {
       value: 15.95,
       quantity: 200,
       type: 'buy',
-      paper: {
-        category: 'stock' as PaperCategory,
+      asset: {
+        category: 'stock' as AssetCategory,
         id: 1,
         code: 'TEST11',
         social: 'Test',

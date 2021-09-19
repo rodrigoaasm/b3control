@@ -4,7 +4,7 @@ export interface ISubmitOperationInput {
   value : number,
   quantity : number,
   type : 'buy' | 'sale',
-  paperCode : string,
+  assetCode : string,
   createdAt : string | Date
 }
 

@@ -1,6 +1,6 @@
 import { IDateValidatorAdapter } from '@domain-ports/adapters/idate-validator-adapter';
 import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
-import { PaperEntity } from '@entities/paper/paper-entity';
+import { AssetEntity } from '@entities/asset/';
 import { OperationEntity } from './operation-entity';
 import { OperationType } from './operation-type';
 
@@ -10,7 +10,7 @@ export class OperationFactory implements IOperationFactory {
   }
 
   make(value : number, quantity : number, type : OperationType,
-    paper : PaperEntity, createdAt: Date | string, id : number | undefined = undefined)
+    asset : AssetEntity, createdAt: Date | string, id : number | undefined = undefined)
     : OperationEntity {
     if (!Number(value) || Number(value) < 0) {
       throw new Error("It was not possible create the operation object!\n The value of the field 'value' is not accept");
@@ -21,7 +21,7 @@ export class OperationFactory implements IOperationFactory {
     if (type !== 'sale' && type !== 'buy') {
       throw new Error("It was not possible create the operation object!\n The type is invalid! Expect 'buy' or 'sale'.");
     }
-    if (!paper) {
+    if (!asset) {
       throw new Error('It was not possible create the operation object!\n Stock not found.');
     }
     if (!createdAt || !this.dateValidatorAdapter.validate(createdAt)) {
@@ -33,7 +33,7 @@ export class OperationFactory implements IOperationFactory {
       value: Number(value),
       quantity: type === 'sale' ? Number(quantity) * -1 : Number(quantity),
       type,
-      paper,
+      asset,
       createdAt: new Date(createdAt),
     };
 

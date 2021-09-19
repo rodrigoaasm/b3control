@@ -1,13 +1,13 @@
 import { OperationController } from '@controllers/operation-controller';
 import { OperationEntity } from '@entities/operation';
-import { PaperEntity } from '@entities/paper';
+import { AssetEntity } from '@entities/asset';
 import { ISubmitOperationInput, ISubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-interfaces';
 
 class SubmitOperationMock implements ISubmitOperationUseCase {
-  private paper: PaperEntity;
+  private asset: AssetEntity;
 
   constructor() {
-    this.paper = {
+    this.asset = {
       id: 1,
       code: 'TEST11',
       category: 'stock',
@@ -19,7 +19,7 @@ class SubmitOperationMock implements ISubmitOperationUseCase {
   async submit(submitOperationInput: ISubmitOperationInput): Promise<OperationEntity> {
     return {
       ...(submitOperationInput),
-      paper: this.paper,
+      asset: this.asset,
       createdAt: new Date(submitOperationInput.createdAt),
     };
   }
@@ -48,7 +48,7 @@ describe('Operation Controller', () => {
     expect(response.code).toEqual(201);
     expect(response.body).toEqual({
       createdAt: date,
-      paper: {
+      asset: {
         id: 1,
         code: 'TEST11',
         category: 'stock',
