@@ -2,7 +2,8 @@ import { AssetCategory } from './asset-category';
 import { AssetEntity } from './asset-entity';
 
 export class AssetFactory {
-  static getInstance(id : number, code : string, social : string,
+  // eslint-disable-next-line class-methods-use-this
+  static make(id : number, code : string, social : string,
     logo : string, category : AssetCategory): AssetEntity {
     if (!id) {
       throw new Error('It was not possible create the stock object!\n Stock id not found.');
@@ -13,7 +14,7 @@ export class AssetFactory {
     }
 
     if (category !== 'stock' && category !== 'general') {
-      throw new Error("It was not possible create the stock object!\n The category is invalid! Expect 'stock' or 'papper'.");
+      throw new Error("It was not possible create the stock object!\n The category is invalid! Expect 'stock' or 'general'.");
     }
     const asset = {
       id,

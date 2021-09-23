@@ -18,10 +18,10 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
     const {
       value, quantity, type, assetCode, createdAt,
     } = submitOperationInput;
-    const paper = await this.paperRepository.findByCode(assetCode);
-    if (!paper) throw new Error('Paper not found');
+    const asset = await this.paperRepository.findByCode(assetCode);
+    if (!asset) throw new Error('Asset not found');
 
-    const operation = this.operationFactory.make(value, quantity, type, paper, createdAt);
+    const operation = this.operationFactory.make(value, quantity, type, asset, createdAt);
     const submitedOperation = await this.operationRepository.save(operation);
     return submitedOperation;
   }

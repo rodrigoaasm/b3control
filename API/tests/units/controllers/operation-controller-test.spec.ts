@@ -34,7 +34,7 @@ describe('Operation Controller', () => {
     operationController = new OperationController(submitOperationMock);
   });
 
-  it('Should', async () => {
+  it('Should execute the submission successfully', async () => {
     const date = new Date();
 
     const response = await operationController.submit({
@@ -58,7 +58,7 @@ describe('Operation Controller', () => {
     });
   });
 
-  it('Should', async () => {
+  it('Should return an error response when there is any error', async () => {
     submitOperationMock.submit = jest.fn(() => { throw new Error('message'); });
 
     const response = await operationController.submit({

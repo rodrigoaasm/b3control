@@ -14,7 +14,8 @@
       "@utils/*": ["./src/external/utils/*"],  
       "@external/*":["./src/external/*"],
       "@config/*": ["./src/main/config/*"],
-      "@mocks/*": ["./tests/mocks/*"]
+      "@test-mocks/*": ["./tests/mocks/*"],
+      "@test-setup/*": ["./tests/setup/*"]
     }
   },
   "include": [

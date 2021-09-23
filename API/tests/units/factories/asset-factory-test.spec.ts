@@ -2,7 +2,7 @@ import { AssetFactory, AssetCategory } from '@entities/asset/';
 
 describe('Paper Factory', () => {
   it('Should make a stock paper', async () => {
-    const paper = AssetFactory.getInstance(1, 'TEST11', 'Test', '', 'stock');
+    const paper = AssetFactory.make(1, 'TEST11', 'Test', '', 'stock');
 
     expect(paper).toEqual({
       category: 'stock',
@@ -14,7 +14,7 @@ describe('Paper Factory', () => {
   });
 
   it('Should make a generic asset', async () => {
-    const asset = AssetFactory.getInstance(1, 'TEST11', 'Test', '', 'general');
+    const asset = AssetFactory.make(1, 'TEST11', 'Test', '', 'general');
 
     expect(asset).toEqual({
       category: 'general',
@@ -29,7 +29,7 @@ describe('Paper Factory', () => {
     let error: Error;
 
     try {
-      AssetFactory.getInstance(undefined, 'TEST11', 'Test', '', 'stock');
+      AssetFactory.make(undefined, 'TEST11', 'Test', '', 'stock');
     } catch (submitedError) {
       error = submitedError;
     }
@@ -41,7 +41,7 @@ describe('Paper Factory', () => {
     let error: Error;
 
     try {
-      AssetFactory.getInstance(1, undefined, 'Test', '', 'stock');
+      AssetFactory.make(1, undefined, 'Test', '', 'stock');
     } catch (submitedError) {
       error = submitedError;
     }
@@ -53,7 +53,7 @@ describe('Paper Factory', () => {
     let error: Error;
 
     try {
-      AssetFactory.getInstance(1, 'TEST11', 'Test', '', 'etf' as AssetCategory);
+      AssetFactory.make(1, 'TEST11', 'Test', '', 'etf' as AssetCategory);
     } catch (submitedError) {
       error = submitedError;
     }
