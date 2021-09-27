@@ -9,11 +9,13 @@
     "paths": {
       "@entities/*": ["./src/domain/entities/*"],
       "@domain-ports/*": ["./src/domain/ports/*"],
+      "@domain-error/*": ["./src/domain/error/*"],
       "@usecases/*": ["./src/domain/usecases/*"],
-      "@controllers/*": ["./src/external/controllers/*"],
+      "@controllers/*": ["src/application/controllers/*"],
       "@utils/*": ["./src/external/utils/*"],  
       "@external/*":["./src/external/*"],
-      "@config/*": ["./src/main/config/*"],
+      "@config/*": ["src/application/config/*"],
+      "@application/*": ["src/application/*"],
       "@test-mocks/*": ["./tests/mocks/*"],
       "@test-setup/*": ["./tests/setup/*"]
     }

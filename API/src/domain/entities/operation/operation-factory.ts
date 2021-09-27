@@ -1,3 +1,4 @@
+import { ConstructorEntityError } from '@domain-error/custom-error';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/idate-validator-adapter';
 import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
 import { AssetEntity } from '@entities/asset/';
@@ -13,19 +14,19 @@ export class OperationFactory implements IOperationFactory {
     asset : AssetEntity, createdAt: Date | string, id : number | undefined = undefined)
     : OperationEntity {
     if (!Number(value) || Number(value) < 0) {
-      throw new Error("It was not possible create the operation object!\n The value of the field 'value' is not accept");
+      throw ConstructorEntityError("It was not possible create the operation object!\n The value of the field 'value' is not accept");
     }
     if (!Number(quantity) || Number(quantity) < 0) {
-      throw new Error("It was not possible create the operation object!\n The value of the field 'quantity' is not accept");
+      throw ConstructorEntityError("It was not possible create the operation object!\n The value of the field 'quantity' is not accept");
     }
     if (type !== 'sale' && type !== 'buy') {
-      throw new Error("It was not possible create the operation object!\n The type is invalid! Expect 'buy' or 'sale'.");
+      throw ConstructorEntityError("It was not possible create the operation object!\n The type is invalid! Expect 'buy' or 'sale'.");
     }
     if (!asset) {
-      throw new Error('It was not possible create the operation object!\n Stock not found.');
+      throw ConstructorEntityError('It was not possible create the operation object!\n Stock not found.');
     }
     if (!createdAt || !this.dateValidatorAdapter.validate(createdAt)) {
-      throw new Error('It was not possible create the operation object!\n Date is invalid.');
+      throw ConstructorEntityError('It was not possible create the operation object!\n Date is invalid.');
     }
 
     const operation = {

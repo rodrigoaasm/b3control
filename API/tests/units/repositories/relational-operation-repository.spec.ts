@@ -1,14 +1,12 @@
-import {
-  Connection, createConnection, QueryRunner, getRepository, Repository,
-} from 'typeorm';
+import { Connection, createConnection, getRepository } from 'typeorm';
 
 import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
 import OperationRepository from '@external/datasource/relational/repositories/operation-repository';
 import { AssetEntity } from '@entities/asset';
 import { OperationType, OperationEntity } from '@entities/operation';
-import { OperationModel, OPERATION_TABLE_NAME } from '@external/datasource/relational/models/operation-model';
+import { OPERATION_TABLE_NAME, OperationModel } from '@external/datasource/relational/models/operation-model';
 import config from '@test-setup/typeorm-setup';
-import { AssetModel, ASSET_TABLE_NAME } from '@external/datasource/relational/models/asset-model';
+import { PostgresMockDataSetup } from '@test-setup/postgres-mock-data';
 
 class OperationFactoryMock implements IOperationFactory {
   // eslint-disable-next-line class-methods-use-this
@@ -28,40 +26,33 @@ class OperationFactoryMock implements IOperationFactory {
 
 describe('Relational - Operation Repository', () => {
   let connection: Connection;
-  let operationRepository: OperationRepository;
-  let operationRepositoryUtilTest: Repository<OperationModel>;
-  let assetRepositoryUtilTest: Repository<AssetModel>;
+  let setup: PostgresMockDataSetup;
   let date: Date;
-  let queryRunner: QueryRunner;
   let asset: any;
+  let operationRepository: OperationRepository;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     connection = await createConnection(config);
-    queryRunner = connection.createQueryRunner();
-    operationRepositoryUtilTest = getRepository(OperationModel);
-    assetRepositoryUtilTest = getRepository(AssetModel);
+    setup = new PostgresMockDataSetup(connection);
+    const assets = await setup.load();
+    [asset] = assets;
+  });
 
-    await queryRunner.query(`delete from ${OPERATION_TABLE_NAME}`);
-    await queryRunner.query(`delete from ${ASSET_TABLE_NAME}`);
-    asset = {
-      code: 'TEST11',
-      social: 'Teste',
-      logo: '',
-      category: 'stock',
-    };
-    asset = await assetRepositoryUtilTest.save(asset);
+  beforeEach(() => {
     date = new Date();
-
     operationRepository = new OperationRepository(new OperationFactoryMock());
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     try {
-      await queryRunner.query(`delete from ${OPERATION_TABLE_NAME}`);
-      await queryRunner.query(`delete from ${ASSET_TABLE_NAME}`);
+      await setup.clear();
       await connection.close();
-    // eslint-disable-next-line no-empty
+      // eslint-disable-next-line no-empty
     } catch (error) {}
+  });
+
+  afterEach(async () => {
+    await setup.queryRunner.query(`delete from ${OPERATION_TABLE_NAME}`);
   });
 
   it('Should insert the entry in the database', async () => {
@@ -76,7 +67,7 @@ describe('Relational - Operation Repository', () => {
     };
 
     const savedOperation = await operationRepository.save(operation);
-    const persistedOperation = await operationRepositoryUtilTest.findOne(
+    const persistedOperation = await getRepository(OperationModel).findOne(
       savedOperation.id, { relations: ['asset'] },
     );
 
@@ -220,28 +211,5 @@ describe('Relational - Operation Repository', () => {
     }
 
     expect(error.name).toBe('QueryFailedError');
-  });
-
-  it('Should throw an error when the connection was closed', async () => {
-    let error: Error;
-
-    await connection.close();
-    const operation = {
-      value: 15.95,
-      quantity: 200,
-      type: 'buy' as OperationType,
-      asset: {
-        ...asset,
-      } as AssetEntity,
-      createdAt: date,
-    };
-
-    try {
-      await operationRepository.save(operation);
-    } catch (e) {
-      error = e;
-    }
-
-    expect(error.name).toBe('TypeORMError');
   });
 });

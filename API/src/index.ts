@@ -1,12 +1,6 @@
-import { createConnection } from 'typeorm';
+import config from 'src/application/config/orm';
+import { createApp } from './application/app';
 
-import config from '@config/orm';
-import { createApp } from './main/app';
-
-createConnection(config).then(async () => {
-  const app = await createApp();
-
-  app.listen(4000, () => {
-    console.log('B3Control');
-  });
+createApp(config).then(() => {
+  console.log('B3 Control');
 });

@@ -1,7 +1,8 @@
-import { OperationController } from '@controllers/operation-controller';
+import { OperationController } from 'src/application/controllers/operation-controller';
 import { OperationEntity } from '@entities/operation';
 import { AssetEntity } from '@entities/asset';
 import { ISubmitOperationInput, ISubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-interfaces';
+import CustomError from '@domain-error/custom-error';
 
 class SubmitOperationMock implements ISubmitOperationUseCase {
   private asset: AssetEntity;
@@ -59,17 +60,19 @@ describe('Operation Controller', () => {
   });
 
   it('Should return an error response when there is any error', async () => {
-    submitOperationMock.submit = jest.fn(() => { throw new Error('message'); });
+    let error: CustomError;
+    submitOperationMock.submit = jest.fn(() => { throw new CustomError('FAKE_ERROR', 'message'); });
 
-    const response = await operationController.submit({
-      header: [],
-      params: [],
-      body: [],
-    });
+    try {
+      await operationController.submit({
+        header: [],
+        params: [],
+        body: [],
+      });
+    } catch (e) {
+      error = e;
+    }
 
-    expect(response.code).toEqual(500);
-    expect(response.body).toEqual({
-      error: 'message',
-    });
+    expect(error.status).toEqual('FAKE_ERROR');
   });
 });
