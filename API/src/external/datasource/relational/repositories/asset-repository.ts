@@ -1,6 +1,6 @@
 import { getRepository, Repository } from 'typeorm';
 
-import { IAssetRepository } from '@domain-ports/repositories/iasset-repository';
+import { IAssetRepository } from '@domain-ports/repositories/asset-repository-interface';
 import { AssetCategory, AssetEntity, AssetFactory } from '@entities/asset';
 import { AssetModel } from '../models';
 

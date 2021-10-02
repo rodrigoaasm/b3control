@@ -1,4 +1,4 @@
-import { IAssetRepository } from '@domain-ports/repositories/iasset-repository';
+import { IAssetRepository } from '@domain-ports/repositories/asset-repository-interface';
 import { AssetEntity } from '@entities/asset/';
 
 export default class AssetRepositoryMock implements IAssetRepository {

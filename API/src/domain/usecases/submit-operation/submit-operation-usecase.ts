@@ -1,9 +1,9 @@
 import { OperationEntity } from '@entities/operation/';
 import { BadRequestError, NotFoundError } from '@domain-error/custom-error';
 
-import { IOperationRepository } from '@domain-ports/repositories/ioperation-repository';
-import { IAssetRepository } from '@domain-ports/repositories/iasset-repository';
-import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
+import { IOperationRepository } from '@domain-ports/repositories/operation-repository-interface';
+import { IAssetRepository } from '@domain-ports/repositories/asset-repository-interface';
+import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 
 import { ISubmitOperationInput, ISubmitOperationUseCase } from './submit-operation-interfaces';
 

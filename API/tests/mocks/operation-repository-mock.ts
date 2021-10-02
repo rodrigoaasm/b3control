@@ -1,4 +1,4 @@
-import { IOperationRepository } from '@domain-ports/repositories/ioperation-repository';
+import { IOperationRepository } from '@domain-ports/repositories/operation-repository-interface';
 import { OperationEntity } from '@entities/operation/operation-entity';
 
 export default class OperationRepositoryMock implements IOperationRepository {

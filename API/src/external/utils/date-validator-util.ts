@@ -1,4 +1,4 @@
-import { IDateValidatorAdapter } from '@domain-ports/adapters/idate-validator-adapter';
+import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { isValid, parseISO } from 'date-fns';
 
 export class DateValidatorUtil implements IDateValidatorAdapter {

@@ -1,6 +1,6 @@
 import { AssetCategory, AssetEntity } from '@entities/asset';
 import { SubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-usecase';
-import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
+import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 
 import OperationRepositoryMock from '@test-mocks/operation-repository-mock';
 import AssetRepositoryMock from '@test-mocks/asset-repository-mock';

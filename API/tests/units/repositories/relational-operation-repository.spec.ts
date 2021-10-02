@@ -1,6 +1,6 @@
 import { Connection, createConnection, getRepository } from 'typeorm';
 
-import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
+import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 import OperationRepository from '@external/datasource/relational/repositories/operation-repository';
 import { AssetEntity } from '@entities/asset';
 import { OperationType, OperationEntity } from '@entities/operation';

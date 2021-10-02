@@ -1,6 +1,6 @@
 import { ConstructorEntityError } from '@domain-error/custom-error';
-import { IDateValidatorAdapter } from '@domain-ports/adapters/idate-validator-adapter';
-import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
+import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
+import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 import { AssetEntity } from '@entities/asset/';
 import { OperationEntity } from './operation-entity';
 import { OperationType } from './operation-type';

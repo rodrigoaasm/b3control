@@ -8,6 +8,9 @@ export interface ISubmitOperationInput {
   createdAt : string | Date
 }
 
+export interface ISubmitOperationOutput extends OperationEntity{
+}
+
 export interface ISubmitOperationUseCase {
-  submit(submitOperationInput: ISubmitOperationInput) : Promise<OperationEntity>;
+  submit(submitOperationInput: ISubmitOperationInput) : Promise<ISubmitOperationOutput>;
 }

@@ -1,5 +1,5 @@
-import { IOperationRepository } from '@domain-ports/repositories/ioperation-repository';
-import { IOperationFactory } from '@domain-ports/factories/ioperation-factory';
+import { IOperationRepository } from '@domain-ports/repositories/operation-repository-interface';
+import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 import { OperationEntity } from '@entities/operation';
 import { getRepository, Repository } from 'typeorm';
 import { OperationModel } from '@external/datasource/relational/models';
