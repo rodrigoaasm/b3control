@@ -1,7 +1,7 @@
 import {
   NotFoundError,
   BadRequestError,
-  ConstructorEntityError,
+  EntityError,
 } from '@domain-error/custom-error';
 
 describe('Custom Error', () => {
@@ -16,8 +16,8 @@ describe('Custom Error', () => {
         expect: 'BAD_REQUEST_ERROR',
       },
       {
-        error: ConstructorEntityError,
-        expect: 'CONSTRUCTOR_ENTITY_ERROR',
+        error: EntityError,
+        expect: 'ENTITY_ERROR',
       },
     ];
 

@@ -23,8 +23,9 @@
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts",
-    "tests/**/*.spec.ts"
-, "tests/mocks/operation-repository-mock.ts"  ],
+    "tests/**/*.spec.ts",
+    "tests/mocks/operation-repository-mock.ts" 
+  ],
   "exclude": [
     "node_modules"
   ]

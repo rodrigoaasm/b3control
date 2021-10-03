@@ -33,7 +33,7 @@ class OperationFactoryMock implements IOperationFactory {
   }
 }
 
-describe('Submit Operation Service', () => {
+describe('Submit Operation Use Case', () => {
   let submitOperationService : SubmitOperationUseCase;
   let date: Date;
 

@@ -17,3 +17,12 @@ CREATE TABLE operation (
 	CONSTRAINT operation_pkey PRIMARY KEY (id),
 	CONSTRAINT operation_assetid_fkey FOREIGN KEY (asset_id) REFERENCES public.asset(id)
 );
+
+CREATE TABLE public.asset_quote (
+	id 			serial NOT NULL,
+	asset_id 	int8 NOT NULL,
+	price 		numeric(10, 3) NOT NULL,
+	"date" 		timestamp NOT NULL,
+	CONSTRAINT 	assetquote_pkey PRIMARY KEY (id),
+	CONSTRAINT  assetquote_asset_id_fkey FOREIGN KEY ("asset_id") REFERENCES public.asset(id)
+);
