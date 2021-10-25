@@ -1,4 +1,4 @@
-import { IAplicationRequest, IAplicationResponse } from '@application/types';
+import { IApplicationRequest, IApplicationResponse } from '@application/types';
 import CustomError from '@domain-error/custom-error';
 import { ExpressRouterAdapter } from '@external/adapters/express-router-adapter';
 
@@ -37,10 +37,10 @@ describe('Express Router Adapter - routerAdapter()', () => {
 
   it('Should return a sucessful response, when aplicationMethod executes successfully', async () => {
     ExpressRouterAdapter.parseHTTPError = jest.fn(() => 500);
-    const aplicationMethod = async (request: IAplicationRequest) => ({
+    const aplicationMethod = async (request: IApplicationRequest) => ({
       code: 200,
       body: request.body,
-    } as IAplicationResponse);
+    } as IApplicationResponse);
 
     const route = await ExpressRouterAdapter.routerAdapter(aplicationMethod);
     const response = await route(fakeExpressrequest, fakeExpressResponse);
@@ -55,7 +55,7 @@ describe('Express Router Adapter - routerAdapter()', () => {
 
   it('Should return a custom error response, when applicationMethod throws a CustomError', async () => {
     ExpressRouterAdapter.parseHTTPError = jest.fn(() => 500);
-    const aplicationMethod = async (request: IAplicationRequest) => {
+    const aplicationMethod = async (request: IApplicationRequest) => {
       throw new CustomError('FAKE_ERROR', request.body.test);
     };
 
@@ -73,7 +73,7 @@ describe('Express Router Adapter - routerAdapter()', () => {
 
   it('Should return an unknown error response, when applicationMethod throws a Native Error ', async () => {
     ExpressRouterAdapter.parseHTTPError = jest.fn(() => 500);
-    const aplicationMethod = async (request: IAplicationRequest) => {
+    const aplicationMethod = async (request: IApplicationRequest) => {
       throw new Error(request.body.test);
     };
 

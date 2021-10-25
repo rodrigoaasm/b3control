@@ -1,7 +1,7 @@
 /* eslint-disable arrow-body-style */
-import CustomError from '@domain-error/custom-error';
 import { Request, Response } from 'express';
-import { IAplicationResponse } from 'src/application/types/aplication-response';
+import { IApplicationRequest, IApplicationResponse } from '@application/types';
+import CustomError from '@domain-error/custom-error';
 
 const HTTPError = {
   CONSTRUCTOR_ENTITY_ERROR: 400,
@@ -16,12 +16,13 @@ export class ExpressRouterAdapter {
 
   public static routerAdapter = async (routeFunc : Function) => {
     return async (expressRequest : Request, expressResponse : Response) => {
-      const aplicationRequest = {
+      const aplicationRequest: IApplicationRequest = {
         header: expressRequest.header,
         body: expressRequest.body,
+        params: expressRequest.params,
       };
 
-      let aplicationResponse : IAplicationResponse;
+      let aplicationResponse : IApplicationResponse;
       try {
         aplicationResponse = await routeFunc(aplicationRequest);
       } catch (error) {

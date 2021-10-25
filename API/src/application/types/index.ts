@@ -1,2 +1,2 @@
-export { IAplicationRequest } from './aplication-request';
-export { IAplicationResponse } from './aplication-response';
+export { IApplicationRequest } from './application-request';
+export { IApplicationResponse } from './application-response';

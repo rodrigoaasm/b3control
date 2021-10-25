@@ -1,4 +1,4 @@
-export interface IAplicationRequest{
+export interface IApplicationRequest{
   header : any;
   params: any;
   body : any;
