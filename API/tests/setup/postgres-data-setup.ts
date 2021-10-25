@@ -2,7 +2,7 @@ import { Connection, getRepository, QueryRunner } from 'typeorm';
 import { AssetModel, ASSET_TABLE_NAME } from '@external/datasource/relational/models/asset-model';
 import { OPERATION_TABLE_NAME } from '@external/datasource/relational/models/operation-model';
 
-export class PostgresMockDataSetup {
+export class PostgresDataSetup {
   public queryRunner: QueryRunner;
 
   constructor(private connection: Connection) {
@@ -37,5 +37,5 @@ export class PostgresMockDataSetup {
 }
 
 export default {
-  PostgresMockDataSetup,
+  PostgresDataSetup,
 };

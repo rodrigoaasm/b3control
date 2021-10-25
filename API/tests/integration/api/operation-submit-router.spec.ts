@@ -2,11 +2,11 @@ import * as request from 'supertest';
 
 import { createApp, IApp } from '@application/app';
 import config from '@test-setup/typeorm-setup';
-import { PostgresMockDataSetup } from '@test-setup/postgres-mock-data';
+import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
 
 describe('POST /operation/submit', () => {
   let app: IApp;
-  let postgresSetup: PostgresMockDataSetup;
+  let postgresSetup: PostgresDataSetup;
   const requestBody = {
     assetCode: 'TEST11',
     type: 'buy',
@@ -17,7 +17,7 @@ describe('POST /operation/submit', () => {
 
   beforeAll(async () => {
     app = await createApp(config);
-    postgresSetup = new PostgresMockDataSetup(app.database);
+    postgresSetup = new PostgresDataSetup(app.database);
     await postgresSetup.load();
   });
 
