@@ -2,28 +2,33 @@ import {
   NotFoundError,
   BadRequestError,
   EntityError,
+  ConstructorEntityError,
 } from '@domain-error/custom-error';
 
 describe('Custom Error', () => {
   it('Should return the error with its respective status ', () => {
     const tests = [
       {
-        error: NotFoundError,
+        build: NotFoundError,
         expect: 'NOT_FOUND_ERROR',
       },
       {
-        error: BadRequestError,
+        build: BadRequestError,
         expect: 'BAD_REQUEST_ERROR',
       },
       {
-        error: EntityError,
+        build: ConstructorEntityError,
+        expect: 'CONSTRUCTOR_ENTITY_ERROR',
+      },
+      {
+        build: EntityError,
         expect: 'ENTITY_ERROR',
       },
     ];
 
-    tests.forEach((test) => {
-      const error = test.error('error');
-      expect(error.status).toEqual(test.expect);
+    tests.forEach((ErrorType) => {
+      const error = ErrorType.build('error');
+      expect(error.status).toEqual(ErrorType.expect);
       expect(error.message).toEqual('error');
     });
   });

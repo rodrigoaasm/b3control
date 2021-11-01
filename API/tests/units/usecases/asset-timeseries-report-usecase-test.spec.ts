@@ -1,13 +1,30 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AssetTimeSeriesReportUseCase } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-usecase';
 import { ReportRepositoryMock } from '@test-mocks/report-repository-mock';
 import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IAssetReport, IAssetTimeSeriesReportOutput } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
+import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
+
+class DateValidatorUtilMock implements IDateValidatorAdapter {
+  isTimeInterval(begin: Date, end: Date): boolean {
+    return false;
+  }
+
+  validate(date: string | Date): boolean {
+    return true;
+  }
+}
 
 describe('Asset Timeseries Report UseCase', () => {
   let assetTimeseriesReportUsecase: AssetTimeSeriesReportUseCase;
+  let dateValidatorUtilMock: DateValidatorUtilMock;
 
   beforeEach(() => {
-    assetTimeseriesReportUsecase = new AssetTimeSeriesReportUseCase(new ReportRepositoryMock());
+    dateValidatorUtilMock = new DateValidatorUtilMock();
+    assetTimeseriesReportUsecase = new AssetTimeSeriesReportUseCase(
+      new ReportRepositoryMock(), dateValidatorUtilMock,
+    );
   });
 
   it('Should return formatted data, when repository returns data', async () => {
@@ -149,5 +166,24 @@ describe('Asset Timeseries Report UseCase', () => {
       assets: [],
       categories: [],
     } as IAssetTimeSeriesReportOutput);
+  });
+
+  it('Should throw a Bad Request Error, when the date validator returns false', async () => {
+    dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);
+    const filter: IReportInput = {
+      codes: [],
+      begin: new Date('2021-08-01T23:00:00.000Z'),
+      end: new Date('2021-01-01T23:00:00.000Z'),
+    };
+
+    let error;
+    try {
+      await assetTimeseriesReportUsecase.get(filter);
+    } catch (serviceError) {
+      error = serviceError;
+    }
+
+    expect(error.message).toEqual('The end date is greater than begin date.');
+    expect(error.status).toEqual('BAD_REQUEST_ERROR');
   });
 });
