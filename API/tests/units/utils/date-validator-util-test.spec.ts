@@ -25,4 +25,14 @@ describe('Date Validator Util', () => {
     const valid = dateValidatorUtil.validate(new Date('2021-09-01T13:00:01.000Z'));
     expect(valid).toBe(true);
   });
+
+  it("Should return true when the 'time interval' is valid. ", async () => {
+    const valid = dateValidatorUtil.isTimeInterval(new Date('2021-09-01T13:00:01.000Z'), new Date('2021-09-03T13:00:01.000Z'));
+    expect(valid).toBe(true);
+  });
+
+  it("Should return false when the 'time interval' is not valid. ", async () => {
+    const valid = dateValidatorUtil.isTimeInterval(new Date('2021-09-03T13:00:01.000Z'), new Date('2021-09-01T13:00:01.000Z'));
+    expect(valid).toBe(false);
+  });
 });
