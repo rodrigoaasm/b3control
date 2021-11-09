@@ -1,9 +1,5 @@
 import { ConnectionOptions } from 'typeorm';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import * as dotenv from 'dotenv';
 import entities from '@external/datasource/relational/models';
-
-dotenv.config();
 
 const connectionOptions : ConnectionOptions = {
   name: 'default',

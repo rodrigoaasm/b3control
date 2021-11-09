@@ -4,7 +4,9 @@
     "scripts": {
         "start": "ts-node -r tsconfig-paths/register ./build/index.js",
         "dev": "nodemon ts-node-dev -r tsconfig-paths/register ./src/index.ts",
-        "test": "jest --no-cache --coverage"
+        "test": "jest --coverage",
+        "unit-test": "jest ./tests/units --coverage",
+        "integration-test": "jest ./tests/integration --runInBand"
     },
     "devDependencies": {
         "@types/jest": "^27.0.1",

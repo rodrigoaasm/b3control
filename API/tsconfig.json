@@ -11,11 +11,11 @@
       "@domain-ports/*": ["./src/domain/ports/*"],
       "@domain-error/*": ["./src/domain/error/*"],
       "@usecases/*": ["./src/domain/usecases/*"],
-      "@controllers/*": ["src/application/controllers/*"],
+      "@controllers/*": ["./src/application/controllers/*"],
       "@utils/*": ["./src/external/utils/*"],  
       "@external/*":["./src/external/*"],
-      "@config/*": ["src/application/config/*"],
-      "@application/*": ["src/application/*"],
+      "@config/*": ["./src/application/config/*"],
+      "@application/*": ["./src/application/*"],
       "@test-mocks/*": ["./tests/mocks/*"],
       "@test-setup/*": ["./tests/setup/*"]
     }
@@ -24,7 +24,7 @@
     "src/**/*.ts",
     "tests/**/*.ts",
     "tests/**/*.spec.ts",
-    "tests/mocks/operation-repository-mock.ts" 
+    "tests/mocks/operation-repository-mock.ts"
   ],
   "exclude": [
     "node_modules"

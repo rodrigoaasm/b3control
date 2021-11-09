@@ -1,12 +1,12 @@
 import * as request from 'supertest';
 
-import { createApp, IApp } from '@application/app';
-import config from '@test-setup/typeorm-setup';
+import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
 
 describe('POST /operation/submit', () => {
   let app: IApp;
-  let postgresSetup: PostgresDataSetup;
+  let postgresDataSetup: PostgresDataSetup;
+
   const requestBody = {
     assetCode: 'TEST11',
     type: 'buy',
@@ -16,13 +16,16 @@ describe('POST /operation/submit', () => {
   };
 
   beforeAll(async () => {
-    app = await createApp(config);
-    postgresSetup = new PostgresDataSetup(app.database);
-    await postgresSetup.load();
+    postgresDataSetup = new PostgresDataSetup();
+    await postgresDataSetup.init();
+    await postgresDataSetup.up();
+    app = await createApp(postgresDataSetup.getConnection());
   });
 
   afterAll(async () => {
-    await postgresSetup.clear();
+    await postgresDataSetup.down();
+    await postgresDataSetup.getConnection().close();
+    app = null;
   });
 
   it('Should submit sucessfully', (done) => {
@@ -60,7 +63,7 @@ describe('POST /operation/submit', () => {
       .post('/operation/submit')
       .send({
         ...requestBody,
-        assetCode: 'TEST4',
+        assetCode: 'TEST8',
       })
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)

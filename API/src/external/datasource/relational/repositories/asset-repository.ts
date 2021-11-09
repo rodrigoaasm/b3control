@@ -1,4 +1,4 @@
-import { getRepository, Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 
 import { IAssetRepository } from '@domain-ports/repositories/asset-repository-interface';
 import { AssetCategory, AssetEntity, AssetFactory } from '@entities/asset';
@@ -7,8 +7,8 @@ import { AssetModel } from '../models';
 export class AssetRepository implements IAssetRepository {
   private repo: Repository<AssetModel>;
 
-  constructor() {
-    this.repo = getRepository(AssetModel);
+  constructor(connection: Connection) {
+    this.repo = connection.getRepository(AssetModel);
   }
 
   public async findByCode(code: string): Promise<AssetEntity> {
