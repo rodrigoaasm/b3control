@@ -35,7 +35,11 @@ export class ReportsRepository implements IReportsRepository {
 
     if (begin && end) {
       mainQuery = mainQuery.where('sq.date >= :startDate', { startDate: begin })
-        .andWhere('sq.date >= :endDate', { endDate: end });
+        .andWhere('sq.date <= :endDate', { endDate: end });
+    } else if (begin && !end) {
+      mainQuery = mainQuery.where('sq.date >= :startDate', { startDate: begin });
+    } else if (!begin && end) {
+      mainQuery = mainQuery.where('sq.date <= :endDate', { endDate: end });
     }
 
     if (codes.length > 0) {

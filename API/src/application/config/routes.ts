@@ -6,4 +6,11 @@ export default async (app : express.Express, internalDependencies) => {
     '/operation/submit',
     await ExpressRouterAdapter.routerAdapter(internalDependencies.operationController.submit),
   );
+
+  app.get(
+    '/report/stocktimeline/codes/:codes?/begin/:begin?/end/:end?',
+    await ExpressRouterAdapter.routerAdapter(
+      internalDependencies.reportsController.getStockTimeLine,
+    ),
+  );
 };

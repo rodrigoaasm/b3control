@@ -6,7 +6,6 @@ import { IOperationFactory } from '@domain-ports/factories/operation-factory-int
 import OperationRepositoryMock from '@test-mocks/operation-repository-mock';
 import AssetRepositoryMock from '@test-mocks/asset-repository-mock';
 import { OperationType, OperationEntity } from '@entities/operation';
-import { assert } from 'console';
 
 class OperationFactoryMock implements IOperationFactory {
   constructor(private date: Date) {
@@ -32,7 +31,7 @@ describe('Submit Operation Use Case', () => {
     );
   });
 
-  it('Should register a operation', async () => {
+  it('Should register an operation', async () => {
     const submitedOperation = await submitOperationService.submit({
       value: 15.95,
       quantity: 200,
@@ -53,7 +52,7 @@ describe('Submit Operation Use Case', () => {
     expect(submitedOperation.createdAt).toEqual(date);
   });
 
-  it('Should throw a error when the paper not found', async () => {
+  it('Should throw an error when the paper not found', async () => {
     let error: Error;
 
     try {
@@ -64,6 +63,18 @@ describe('Submit Operation Use Case', () => {
         assetCode: 'TEST4',
         createdAt: date,
       });
+    } catch (submitedError) {
+      error = submitedError;
+    }
+
+    expect(error.name).toBe('Error');
+  });
+
+  it('Should throw an error when required attributes are not entered', async () => {
+    let error: Error;
+
+    try {
+      await submitOperationService.submit({} as any);
     } catch (submitedError) {
       error = submitedError;
     }

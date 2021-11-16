@@ -11,7 +11,6 @@ export class OperationRepository implements IOperationRepository {
     this.repo = connection.getRepository(OperationModel);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async save(operation: OperationEntity): Promise<OperationEntity> {
     const entity: OperationModel = {
       asset: operation.asset,
