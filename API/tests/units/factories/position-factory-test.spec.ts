@@ -1,4 +1,4 @@
-import { AssetCategory, AssetEntity } from '@entities/asset';
+import { AssetEntity } from '@entities/asset';
 import { PositionFactory } from '@entities/position';
 import { DateValidatorUtil } from '@external/utils/date-validator-util';
 
@@ -8,14 +8,9 @@ describe('Position Factory', () => {
   let positionFactory: PositionFactory;
 
   beforeEach(() => {
-    stock = {
-      category: 'stock' as AssetCategory,
-      id: 1,
-      code: 'TEST11',
-      social: 'Test',
-      logo: '',
-    };
+    stock = new AssetEntity(1, 'TEST11', 'Test', '', 'stock');
     date = new Date();
+
     positionFactory = new PositionFactory(new DateValidatorUtil());
   });
 

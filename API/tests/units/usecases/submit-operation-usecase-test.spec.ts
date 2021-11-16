@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AssetCategory, AssetEntity } from '@entities/asset';
 import { SubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-usecase';
 import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
@@ -5,31 +6,18 @@ import { IOperationFactory } from '@domain-ports/factories/operation-factory-int
 import OperationRepositoryMock from '@test-mocks/operation-repository-mock';
 import AssetRepositoryMock from '@test-mocks/asset-repository-mock';
 import { OperationType, OperationEntity } from '@entities/operation';
+import { assert } from 'console';
 
 class OperationFactoryMock implements IOperationFactory {
   constructor(private date: Date) {
 
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  make(value: number, quantity: number, type: OperationType, paper: AssetEntity,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    createdAt: string | Date, id: number)
-    : OperationEntity {
-    return {
-      id: 1,
-      value: 15.95,
-      quantity: 200,
-      type: 'buy',
-      asset: {
-        id: 1,
-        code: 'TEST11',
-        social: 'Teste',
-        logo: '',
-        category: 'stock' as AssetCategory,
-      } as AssetEntity,
-      createdAt: this.date,
-    };
+  make(
+    value: number, quantity: number, type: OperationType,
+    paper: AssetEntity, createdAt: string | Date, id: number,
+  ): OperationEntity {
+    return new OperationEntity(1, 15.95, 200, 'buy', new AssetEntity(1, 'TEST11', '', '', 'stock'), this.date);
   }
 }
 
@@ -53,20 +41,16 @@ describe('Submit Operation Use Case', () => {
       createdAt: date,
     });
 
-    expect(submitedOperation).toEqual({
-      id: 1,
-      value: 15.95,
-      quantity: 200,
-      type: 'buy',
-      asset: {
-        id: 1,
-        code: 'TEST11',
-        social: 'Teste',
-        logo: '',
-        category: 'stock' as AssetCategory,
-      } as AssetEntity,
-      createdAt: date,
-    });
+    expect(submitedOperation.id).toEqual(1);
+    expect(submitedOperation.value).toEqual(15.95);
+    expect(submitedOperation.quantity).toEqual(200);
+    expect(submitedOperation.type).toEqual('buy');
+    expect(submitedOperation.asset.id).toEqual(1);
+    expect(submitedOperation.asset.code).toEqual('TEST11');
+    expect(submitedOperation.asset.social).toEqual('');
+    expect(submitedOperation.asset.logo).toEqual('');
+    expect(submitedOperation.asset.category).toEqual('stock');
+    expect(submitedOperation.createdAt).toEqual(date);
   });
 
   it('Should throw a error when the paper not found', async () => {

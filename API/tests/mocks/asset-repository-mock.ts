@@ -3,13 +3,7 @@ import { AssetEntity } from '@entities/asset/';
 
 export default class AssetRepositoryMock implements IAssetRepository {
   private items: AssetEntity [] = [
-    {
-      id: 1,
-      code: 'TEST11',
-      social: 'Teste',
-      logo: '',
-      category: 'stock',
-    },
+    new AssetEntity(1, 'TEST11', 'Teste', '', 'stock'),
   ];
 
   public findByCode(code: string): Promise<AssetEntity> {

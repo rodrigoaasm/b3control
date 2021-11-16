@@ -1,7 +1,7 @@
 import { Connection, Repository } from 'typeorm';
 
 import { IAssetRepository } from '@domain-ports/repositories/asset-repository-interface';
-import { AssetCategory, AssetEntity, AssetFactory } from '@entities/asset';
+import { AssetCategory, AssetEntity } from '@entities/asset';
 import { AssetModel } from '../models';
 
 export class AssetRepository implements IAssetRepository {
@@ -14,7 +14,7 @@ export class AssetRepository implements IAssetRepository {
   public async findByCode(code: string): Promise<AssetEntity> {
     const asset = await this.repo.findOne({ code });
 
-    return asset ? AssetFactory.make(
+    return asset ? new AssetEntity(
       asset.id, asset.code, asset.social, asset.logo, asset.category as AssetCategory,
     ) : null;
   }

@@ -14,7 +14,11 @@ export class OperationRepository implements IOperationRepository {
   // eslint-disable-next-line class-methods-use-this
   async save(operation: OperationEntity): Promise<OperationEntity> {
     const entity: OperationModel = {
-      ...operation,
+      asset: operation.asset,
+      type: operation.type,
+      value: operation.value,
+      quantity: operation.quantity,
+      createdAt: operation.createdAt,
     };
 
     const {

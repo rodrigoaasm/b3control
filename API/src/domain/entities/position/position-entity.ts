@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { ConstructorEntityError, EntityError } from '@domain-error/custom-error';
+import { EntityConstructionError, EntityError } from '@domain-error/custom-error';
 import { AssetEntity } from '@entities/asset';
 
 export class PositionEntity {
@@ -18,7 +18,7 @@ export class PositionEntity {
       this.price = price;
       this.date = date;
     } catch (error) {
-      throw ConstructorEntityError(error.message);
+      throw EntityConstructionError(error.message);
     }
   }
 
@@ -39,7 +39,7 @@ export class PositionEntity {
   }
 
   set quantity(quantity: number) {
-    if (!Number(quantity) || Number(quantity) < 0) {
+    if (Number.isNaN(Number(quantity)) || Number(quantity) < 0) {
       throw EntityError("It was not possible set a quantity in the position object!\n The value of the field 'quantity' is not accept");
     }
 

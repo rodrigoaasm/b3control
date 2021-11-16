@@ -8,21 +8,13 @@ class SubmitOperationMock implements ISubmitOperationUseCase {
   private asset: AssetEntity;
 
   constructor() {
-    this.asset = {
-      id: 1,
-      code: 'TEST11',
-      category: 'stock',
-      logo: '',
-      social: '',
-    };
+    this.asset = new AssetEntity(1, 'TEST11', 'Teste', '', 'stock');
   }
 
-  async submit(submitOperationInput: ISubmitOperationInput): Promise<OperationEntity> {
-    return {
-      ...(submitOperationInput),
-      asset: this.asset,
-      createdAt: new Date(submitOperationInput.createdAt),
-    };
+  async submit(input: ISubmitOperationInput): Promise<OperationEntity> {
+    return new OperationEntity(
+      1, input.value, input.quantity, input.type, this.asset, new Date(input.createdAt),
+    );
   }
 }
 
@@ -42,20 +34,28 @@ describe('Operation Controller', () => {
       header: [],
       params: [],
       body: {
+        date: '2021-01-01T13:00:00.000Z',
+        value: 20,
+        quantity: 100,
         createdAt: date,
+        type: 'buy',
       },
     });
 
     expect(response.code).toEqual(201);
     expect(response.body).toEqual({
-      createdAt: date,
-      asset: {
-        id: 1,
-        code: 'TEST11',
-        category: 'stock',
-        logo: '',
-        social: '',
+      _createdAt: date,
+      _asset: {
+        _id: 1,
+        _code: 'TEST11',
+        _category: 'stock',
+        _logo: '',
+        _social: 'Teste',
       },
+      _id: 1,
+      _quantity: 100,
+      _type: 'buy',
+      _value: 20,
     });
   });
 

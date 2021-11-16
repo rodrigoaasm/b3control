@@ -3,7 +3,7 @@ import { IReportsRepository } from '@domain-ports/repositories/reports-repositor
 import { PositionEntity } from '@entities/position';
 import { OperationModel, AssetModel, AssetQuoteModel } from '@external/datasource/relational/models/';
 import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
-import { AssetFactory } from '@entities/asset/asset-factory';
+import { AssetEntity } from '@entities/asset/asset-entity';
 
 export class ReportsRepository implements IReportsRepository {
   private connection : Connection;
@@ -46,7 +46,7 @@ export class ReportsRepository implements IReportsRepository {
     const datasetReports = await mainQuery.getRawMany();
 
     const positions = datasetReports.map((element : any) => {
-      const asset = AssetFactory.make(
+      const asset = new AssetEntity(
         element.asset_id,
         element.asset_code,
         element.asset_social,

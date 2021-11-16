@@ -1,13 +1,13 @@
 import { IReportsRepository } from '@domain-ports/repositories/reports-repository-interface';
-import { AssetEntity, AssetFactory } from '@entities/asset';
+import { AssetEntity } from '@entities/asset';
 import { PositionFactory } from '@entities/position';
 import { PositionEntity } from '@entities/position/position-entity';
 import DateValidatorUtil from '@utils/date-validator-util';
 
 const assets: Array<AssetEntity> = [
-  AssetFactory.make(1, 'TEST11', '', '', 'stock'),
-  AssetFactory.make(1, 'TEST4', '', '', 'stock'),
-  AssetFactory.make(1, 'TEST3', '', '', 'general'),
+  new AssetEntity(1, 'TEST11', '', '', 'stock'),
+  new AssetEntity(1, 'TEST4', '', '', 'stock'),
+  new AssetEntity(1, 'TEST3', '', '', 'general'),
 ];
 
 export class ReportRepositoryMock implements IReportsRepository {

@@ -4,7 +4,7 @@ import { IApplicationRequest, IApplicationResponse } from '@application/types';
 import CustomError from '@domain-error/custom-error';
 
 const HTTPError = {
-  CONSTRUCTOR_ENTITY_ERROR: 400,
+  ENTITY_CONSTRUCTION_ERROR: 400,
   NOT_FOUND_ERROR: 404,
   BAD_REQUEST_ERROR: 400,
 };

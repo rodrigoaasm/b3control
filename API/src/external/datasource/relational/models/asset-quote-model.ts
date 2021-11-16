@@ -18,8 +18,8 @@ export class AssetQuoteModel {
   public date : Date;
 
   @OneToOne(() => AssetModel)
-  @JoinColumn()
-  public stock : AssetModel;
+  @JoinColumn({ name: 'asset_id' })
+  public asset : AssetModel;
 }
 
 export default AssetQuoteModel;

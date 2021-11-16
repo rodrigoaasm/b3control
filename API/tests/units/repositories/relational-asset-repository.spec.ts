@@ -1,46 +1,40 @@
-import {
-  Connection, createConnection,
-} from 'typeorm';
-
-import config from '@test-setup/typeorm-setup';
 import { AssetRepository } from '@external/datasource/relational/repositories/asset-repository';
-import { PostgresMockDataSetup } from '@test-setup/postgres-mock-data';
+
+const mockParentRepository = {
+  findOne: jest.fn(),
+};
+
+const connectionMock = {
+  getRepository: () => mockParentRepository,
+};
 
 describe('Relational - Asset Repository', () => {
-  let connection: Connection;
-  let setup: PostgresMockDataSetup;
   let assetRepository: AssetRepository;
-  let asset: any;
-
-  beforeAll(async () => {
-    connection = await createConnection(config);
-    setup = new PostgresMockDataSetup(connection);
-
-    const assets = await setup.load();
-    [asset] = assets;
-  });
 
   beforeEach(async () => {
-    assetRepository = new AssetRepository();
-  });
-
-  afterAll(async () => {
-    try {
-      await setup.clear();
-      await connection.close();
-    // eslint-disable-next-line no-empty
-    } catch (error) {}
+    assetRepository = new AssetRepository(connectionMock as any);
   });
 
   it('Should retrieve the asset when the asset code exist in the database', async () => {
-    const retrievedAsset = await assetRepository.findByCode(asset.code);
+    const stock = {
+      id: 1,
+      code: 'TEST11',
+      social: 'Teste',
+      logo: '',
+      category: 'stock',
+    };
+    mockParentRepository.findOne.mockReturnValueOnce(stock);
+    const retrievedAsset = await assetRepository.findByCode(stock.code);
 
-    expect(retrievedAsset).toEqual({
-      ...asset,
-    });
+    expect(retrievedAsset.category).toEqual(stock.category);
+    expect(retrievedAsset.code).toEqual(stock.code);
+    expect(retrievedAsset.id).toEqual(stock.id);
+    expect(retrievedAsset.logo).toEqual(stock.logo);
+    expect(retrievedAsset.social).toEqual(stock.social);
   });
 
   it('Should retrieve the asset when the asset code exist in the database', async () => {
+    mockParentRepository.findOne.mockReturnValueOnce(undefined);
     const retrievedAsset = await assetRepository.findByCode('TEST4');
 
     expect(retrievedAsset).toBeNull();
