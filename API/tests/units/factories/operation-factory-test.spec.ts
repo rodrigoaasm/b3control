@@ -1,6 +1,10 @@
 import { OperationFactory } from '@entities/operation/';
 import { AssetCategory, AssetEntity } from '@entities/asset';
-import DateValidatorUtil from '@utils/date-validator-util';
+
+const mockDateValidatorUtil = {
+  validate: jest.fn(),
+  isTimeInterval: jest.fn(),
+};
 
 describe('Operation Factory', () => {
   let stock: AssetEntity;
@@ -11,10 +15,11 @@ describe('Operation Factory', () => {
     stock = new AssetEntity(1, 'TEST11', 'Test', '', 'stock');
     date = new Date();
 
-    operationFactory = new OperationFactory(new DateValidatorUtil());
+    operationFactory = new OperationFactory(mockDateValidatorUtil);
   });
 
   it('Should register a buy operation with the positive _value', async () => {
+    mockDateValidatorUtil.validate.mockReturnValueOnce(true);
     const operation = operationFactory.make(15.95, 200, 'buy', stock, date, 1);
 
     expect(operation).toEqual({
@@ -33,7 +38,8 @@ describe('Operation Factory', () => {
     });
   });
 
-  it("Should parse the date string for the date _type when the _value of the field '_createdAt' is a date string.", async () => {
+  it("Should parse the date string for the date _type when the value of the field '_createdAt' is a date string.", async () => {
+    mockDateValidatorUtil.validate.mockReturnValueOnce(true);
     const operation = operationFactory.make(15.95, 200, 'buy', stock, '2020-09-01T13:00:00.000Z', 1);
 
     expect(operation).toEqual({
@@ -54,6 +60,7 @@ describe('Operation Factory', () => {
 
   it('Should throw an error when _createdAt is invalid', async () => {
     let error;
+    mockDateValidatorUtil.validate.mockReturnValueOnce(false);
 
     try {
       operationFactory.make(15.95, 200, 'buy', stock, 'invalid', 1);

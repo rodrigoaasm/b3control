@@ -28,7 +28,7 @@ export class PositionEntity {
 
   set asset(asset: AssetEntity) {
     if (!asset) {
-      throw EntityError('It was not possible set an asset in the position object!\n Asset is invalid.');
+      throw EntityError('It was not possible set an asset in the position object!\n Asset is undefined.');
     }
 
     this._asset = asset;

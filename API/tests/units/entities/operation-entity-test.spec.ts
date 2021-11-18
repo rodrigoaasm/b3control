@@ -42,7 +42,7 @@ describe('Operation Entity', () => {
     expect(error.name).toBe('Error');
   });
 
-  it("Should throw an Error when the _value of the field '_value' is negative. ", async () => {
+  it("Should throw an Error when the value of the field '_value' is negative. ", async () => {
     let error: Error;
 
     try {
@@ -54,7 +54,7 @@ describe('Operation Entity', () => {
     expect(error?.name).toBe('Error');
   });
 
-  it("Should throw an Error when the _value of the field '_value' is not number. ", async () => {
+  it("Should throw an Error when the value of the field '_value' is not number. ", async () => {
     let error: Error;
 
     try {
@@ -66,7 +66,7 @@ describe('Operation Entity', () => {
     expect(error?.name).toBe('Error');
   });
 
-  it("Should throw an Error when the _value of the field '_quantity' is negative. ", async () => {
+  it("Should throw an Error when the value of the field '_quantity' is negative. ", async () => {
     let error: Error;
 
     try {
@@ -78,7 +78,7 @@ describe('Operation Entity', () => {
     expect(error?.name).toBe('Error');
   });
 
-  it("Should throw an Error when the _value of the field '_quantity' is not number. ", async () => {
+  it("Should throw an Error when the value of the field '_quantity' is not number. ", async () => {
     let error: Error;
 
     try {
@@ -90,7 +90,7 @@ describe('Operation Entity', () => {
     expect(error?.name).toBe('Error');
   });
 
-  it("Should throw an Error when the _value of the field '_type' is invalid. ", async () => {
+  it("Should throw an Error when the value of the field '_type' is invalid. ", async () => {
     let error: Error;
 
     try {
@@ -102,7 +102,7 @@ describe('Operation Entity', () => {
     expect(error?.name).toBe('Error');
   });
 
-  it("Should throw an Error when the _value of the field '_createdAt' is undefined. ", async () => {
+  it("Should throw an Error when the value of the field '_createdAt' is undefined. ", async () => {
     let error: Error;
 
     try {

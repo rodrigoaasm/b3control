@@ -56,7 +56,7 @@ describe('Position Entity', () => {
     expect(error.name).toBe('Error');
   });
 
-  it("Should throw an Error when the value of the field 'quote' is negative. ", async () => {
+  it("Should throw an Error when the value of the field 'price' is negative. ", async () => {
     let error: Error;
 
     try {
@@ -69,7 +69,7 @@ describe('Position Entity', () => {
     expect(error?.name).toBe('Error');
   });
 
-  it("Should throw an Error when the value of the field 'quote' is not number. ", async () => {
+  it("Should throw an Error when the value of the field 'price' is not number. ", async () => {
     let error: Error;
 
     try {

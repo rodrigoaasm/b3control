@@ -69,7 +69,7 @@ export class OperationEntity {
   }
 
   set value(value: number) {
-    if (!Number(value) || Number(value) < 0) {
+    if (Number.isNaN(Number(value)) || Number(value) < 0) {
       throw EntityError("It was not possible create the operation object!\n The value of the field 'value' is not accept");
     }
 
@@ -82,7 +82,7 @@ export class OperationEntity {
 
   set asset(asset: AssetEntity) {
     if (!asset) {
-      throw EntityError('It was not possible create the operation object!\n Stock not found.');
+      throw EntityError('It was not possible create the operation object!\n Asset is undefined.');
     }
 
     this._asset = asset;

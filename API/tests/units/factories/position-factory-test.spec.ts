@@ -1,6 +1,10 @@
 import { AssetEntity } from '@entities/asset';
 import { PositionFactory } from '@entities/position';
-import { DateValidatorUtil } from '@external/utils/date-validator-util';
+
+const mockDateValidatorUtil = {
+  validate: jest.fn(),
+  isTimeInterval: jest.fn(),
+};
 
 describe('Position Factory', () => {
   let stock: AssetEntity;
@@ -11,10 +15,11 @@ describe('Position Factory', () => {
     stock = new AssetEntity(1, 'TEST11', 'Test', '', 'stock');
     date = new Date();
 
-    positionFactory = new PositionFactory(new DateValidatorUtil());
+    positionFactory = new PositionFactory(mockDateValidatorUtil);
   });
 
   it('Should make a position', async () => {
+    mockDateValidatorUtil.validate.mockReturnValueOnce(true);
     const position = positionFactory.make(stock, 200, 10.000, date);
 
     expect(position.asset).toEqual(stock);
@@ -25,6 +30,7 @@ describe('Position Factory', () => {
   });
 
   it('Should make a position when the date is a ISO string date ', async () => {
+    mockDateValidatorUtil.validate.mockReturnValueOnce(true);
     const position = positionFactory.make(stock, 200, 10.000, date.toISOString());
 
     expect(position.asset).toEqual(stock);
@@ -36,6 +42,7 @@ describe('Position Factory', () => {
 
   it("Should throw an Error when the value of the field 'date' is undefined. ", async () => {
     let error: Error;
+    mockDateValidatorUtil.validate.mockReturnValueOnce(false);
 
     try {
       positionFactory.make(stock, 1000, 10.00, undefined);
