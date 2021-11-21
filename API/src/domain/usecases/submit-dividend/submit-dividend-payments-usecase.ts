@@ -20,7 +20,7 @@ export class SubmitDividendPaymentUseCase implements ISubmitDividendPaymentUseCa
     } = submitDividendPaymentInput;
 
     if (!(value && assetCode && createdAt)) {
-      throw BadRequestError('A required attributes was not found');
+      throw BadRequestError('Some required attribute was not found');
     }
 
     const asset = await this.assetRepository.findByCode(assetCode);

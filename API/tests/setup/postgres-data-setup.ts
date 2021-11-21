@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import {
   Connection,
   ConnectionOptions, createConnection, getRepository, QueryRunner, Repository,
@@ -7,6 +8,7 @@ import * as dotenv from 'dotenv';
 import { AssetModel, ASSET_TABLE_NAME } from '@external/datasource/relational/models/asset-model';
 import { OperationModel, OPERATION_TABLE_NAME } from '@external/datasource/relational/models/operation-model';
 import { AssetQuoteModel, ASSET_QUOTE_TABLE_NAME } from '@external/datasource/relational/models/asset-quote-model';
+import { DIVIDEND_PAYMENT_TABLE_NAME } from '@external/datasource/relational/models/dividend-payment-model';
 
 import entities from '@external/datasource/relational/models';
 
@@ -52,7 +54,10 @@ export class PostgresDataSetup {
     this.assetRepositoryTest = getRepository(AssetModel);
     this.operationRepositoryTest = getRepository(OperationModel);
     this.assetQuoteRepositoryTest = getRepository(AssetQuoteModel);
-    await this.down();
+    try {
+      await this.down();
+    } catch (error) {
+    }
 
     const listRegisteredAssets = await this.assetRepositoryTest.save(this.assets());
     listRegisteredAssets.forEach((asset) => {
@@ -64,12 +69,10 @@ export class PostgresDataSetup {
   }
 
   public async down(): Promise<void> {
-    try {
-      await this.queryRunner.query(`delete from ${ASSET_QUOTE_TABLE_NAME}`);
-      await this.queryRunner.query(`delete from ${OPERATION_TABLE_NAME}`);
-      await this.queryRunner.query(`delete from ${ASSET_TABLE_NAME}`);
-    // eslint-disable-next-line no-empty
-    } catch (error) {}
+    await this.queryRunner.query(`delete from ${DIVIDEND_PAYMENT_TABLE_NAME}`);
+    await this.queryRunner.query(`delete from ${ASSET_QUOTE_TABLE_NAME}`);
+    await this.queryRunner.query(`delete from ${OPERATION_TABLE_NAME}`);
+    await this.queryRunner.query(`delete from ${ASSET_TABLE_NAME}`);
   }
 
   public async finish(): Promise<void> {

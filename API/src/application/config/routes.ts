@@ -3,8 +3,13 @@ import { ExpressRouterAdapter } from '@external/adapters/express-router-adapter'
 
 export default async (app : express.Express, internalDependencies) => {
   app.post(
-    '/operation/submit',
+    '/operation',
     await ExpressRouterAdapter.routerAdapter(internalDependencies.operationController.submit),
+  );
+
+  app.post(
+    '/dividendpayment',
+    await ExpressRouterAdapter.routerAdapter(internalDependencies.dividendPaymentController.submit),
   );
 
   app.get(

@@ -28,10 +28,10 @@ CREATE TABLE public.asset_quote (
 );
 
 CREATE TABLE public.dividend_payment (
-	id 				serial NOT NULL,
-	asset_id 	int8 NOT NULL,
-	value 		numeric(10, 3) NOT NULL,
-	"date" 		timestamp NOT NULL,
+	id 					serial NOT NULL,
+	asset_id 		int8 NOT NULL,
+	value 			numeric(10, 3) NOT NULL,
+	created_at 	timestamp NOT NULL,
 	CONSTRAINT  dividend_payment_pkey PRIMARY KEY (id),
 	CONSTRAINT  dividend_payment_asset_id_fkey FOREIGN KEY ("asset_id") REFERENCES public.asset(id)
 );
