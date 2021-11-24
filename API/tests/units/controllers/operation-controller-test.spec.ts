@@ -34,7 +34,6 @@ describe('Operation Controller', () => {
       header: [],
       params: [],
       body: {
-        date: '2021-01-01T13:00:00.000Z',
         value: 20,
         quantity: 100,
         createdAt: date,

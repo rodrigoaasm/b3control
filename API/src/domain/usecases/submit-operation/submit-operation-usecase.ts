@@ -10,7 +10,7 @@ import { ISubmitOperationInput, ISubmitOperationUseCase } from './submit-operati
 export class SubmitOperationUseCase implements ISubmitOperationUseCase {
   constructor(
     private operationRepository: IOperationRepository,
-    private paperRepository: IAssetRepository,
+    private assetRepository: IAssetRepository,
     private operationFactory: IOperationFactory,
   ) {
   }
@@ -24,7 +24,7 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
       throw BadRequestError('A required attr was not found');
     }
 
-    const asset = await this.paperRepository.findByCode(assetCode);
+    const asset = await this.assetRepository.findByCode(assetCode);
     if (!asset) throw NotFoundError('Asset not found');
 
     const operation = this.operationFactory.make(value, quantity, type, asset, createdAt);
