@@ -1,12 +1,11 @@
 /* eslint-disable class-methods-use-this */
-/* eslint-disable max-classes-per-file */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// eslint-disable-next-line max-classes-per-file
 import { ReportsController } from '@controllers/reports-controller';
 import { ITimeSeriesReportOutput, ITimeSeriesReportUseCase } from '@usecases/reports/timeseries-report-interfaces';
 import { IReportInput } from '@usecases/reports/report-interfaces';
-import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
-import { IApplicationRequest, IApplicationResponse } from '@application/types';
+import { IApplicationRequest } from '@application/types';
 import { IPositionReport } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
+import { IReportInputHandler } from '@usecases/reports/report-input-handler-interface';
 
 class AssetTimeSeriesReportUseCaseMock implements ITimeSeriesReportUseCase<IPositionReport> {
   async get(filters: IReportInput): Promise<ITimeSeriesReportOutput<IPositionReport>> {
@@ -16,26 +15,20 @@ class AssetTimeSeriesReportUseCaseMock implements ITimeSeriesReportUseCase<IPosi
   }
 }
 
-class DateValidatorUtilMock implements IDateValidatorAdapter {
-  isTimeInterval(begin: Date, end: Date): boolean {
-    return true;
-  }
-
-  validate(date: string | Date): boolean {
-    return true;
-  }
+class ReportInputHandlerMock implements IReportInputHandler {
+  handle = jest.fn();
 }
 
 describe('Reports Controller', () => {
   let reportsController;
   let assetTimeSeriesReportUseCaseMock;
-  let dateValidatorUtilMock;
+  let reportInputHandlerMock;
 
   beforeEach(() => {
-    dateValidatorUtilMock = new DateValidatorUtilMock();
+    reportInputHandlerMock = new ReportInputHandlerMock();
     assetTimeSeriesReportUseCaseMock = new AssetTimeSeriesReportUseCaseMock();
     reportsController = new ReportsController(
-      assetTimeSeriesReportUseCaseMock, dateValidatorUtilMock,
+      assetTimeSeriesReportUseCaseMock, reportInputHandlerMock,
     );
   });
 
@@ -49,56 +42,12 @@ describe('Reports Controller', () => {
     const response = await reportsController.getStockTimeLine(request);
 
     expect(response.code).toEqual(200);
-    expect(response.body.filters.codes.length).toEqual(0);
   });
 
-  it('Should execute the listing successfully, when an asset code list is entered', async () => {
-    const request: IApplicationRequest = {
-      body: {},
-      header: {},
-      params: {
-        codes: 'TEST4,TEST3,TEST11',
-      },
-    };
-
-    const response = await reportsController.getStockTimeLine(request);
-
-    expect(response.code).toEqual(200);
-    expect(response.body.filters.codes.length).toEqual(3);
-  });
-
-  it('Should execute the listing successfully, when the begin date is valid', async () => {
-    const request: IApplicationRequest = {
-      body: {},
-      header: {},
-      params: {
-        begin: new Date(),
-      },
-    };
-
-    const response = await reportsController.getStockTimeLine(request);
-
-    expect(response.code).toEqual(200);
-    expect(response.body.filters.begin).toBeDefined();
-  });
-
-  it('Should execute the listing successfully, when the end date is valid', async () => {
-    const request: IApplicationRequest = {
-      body: {},
-      header: {},
-      params: {
-        end: new Date(),
-      },
-    };
-
-    const response = await reportsController.getStockTimeLine(request);
-
-    expect(response.code).toEqual(200);
-    expect(response.body.filters.end).toBeDefined();
-  });
-
-  it('Should throw a Bad Request Error, when the begin date is invalid', async () => {
-    dateValidatorUtilMock.validate = jest.fn().mockReturnValueOnce(false);
+  it('Should return an error when any of the filters is invalid', async () => {
+    reportInputHandlerMock.handle = jest.fn().mockImplementationOnce(() => {
+      throw new Error('filters invalid');
+    });
     const request: IApplicationRequest = {
       body: {},
       header: {},
@@ -109,33 +58,11 @@ describe('Reports Controller', () => {
 
     let error;
     try {
-      const response = await reportsController.getStockTimeLine(request);
+      await reportsController.getStockTimeLine(request);
     } catch (e) {
       error = e;
     }
 
-    expect(error.message).toEqual('The begin date is invalid.');
-    expect(error.status).toEqual('BAD_REQUEST_ERROR');
-  });
-
-  it('Should throw a Bad Request Error, when the end date is invalid', async () => {
-    dateValidatorUtilMock.validate = jest.fn().mockReturnValueOnce(false);
-    const request: IApplicationRequest = {
-      body: {},
-      header: {},
-      params: {
-        end: 'Invalid Date',
-      },
-    };
-
-    let error;
-    try {
-      const response = await reportsController.getStockTimeLine(request);
-    } catch (e) {
-      error = e;
-    }
-
-    expect(error.message).toEqual('The end date is invalid.');
-    expect(error.status).toEqual('BAD_REQUEST_ERROR');
+    expect(error.message).toEqual('filters invalid');
   });
 });
