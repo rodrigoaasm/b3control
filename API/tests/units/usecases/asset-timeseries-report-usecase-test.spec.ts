@@ -3,8 +3,9 @@
 import { AssetTimeSeriesReportUseCase } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-usecase';
 import { ReportRepositoryMock } from '@test-mocks/report-repository-mock';
 import { IReportInput } from '@usecases/reports/report-interfaces';
-import { IAssetReport, IAssetTimeSeriesReportOutput } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
+import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
+import { IPositionReport } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
 
 class DateValidatorUtilMock implements IDateValidatorAdapter {
   isTimeInterval(begin: Date, end: Date): boolean {
@@ -37,7 +38,7 @@ describe('Asset Timeseries Report UseCase', () => {
     const test11 = {
       name: 'TEST11',
       category: 'stock',
-      positions: [
+      itens: [
         {
           quantity: 200,
           price: 20,
@@ -57,12 +58,12 @@ describe('Asset Timeseries Report UseCase', () => {
           value: 2400,
         },
       ],
-    } as IAssetReport;
+    } as IAssetReport<IPositionReport>;
 
     const test4 = {
       name: 'TEST4',
       category: 'stock',
-      positions: [
+      itens: [
         {
           quantity: 150,
           price: 10,
@@ -76,12 +77,12 @@ describe('Asset Timeseries Report UseCase', () => {
           value: 1400,
         },
       ],
-    } as IAssetReport;
+    } as IAssetReport<IPositionReport>;
 
     const test3 = {
       name: 'TEST3',
       category: 'general',
-      positions: [
+      itens: [
         {
           quantity: 100,
           price: 10,
@@ -95,11 +96,11 @@ describe('Asset Timeseries Report UseCase', () => {
           value: 600,
         },
       ],
-    } as IAssetReport;
+    } as IAssetReport<IPositionReport>;
 
     const stockCategory = {
       name: 'stock',
-      positions: [
+      itens: [
         {
           quantity: 200,
           price: 20,
@@ -123,7 +124,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
     const generalCategory = {
       name: 'general',
-      positions: [
+      itens: [
         {
           quantity: 100,
           price: 10,
@@ -165,7 +166,7 @@ describe('Asset Timeseries Report UseCase', () => {
     expect(output).toEqual({
       assets: [],
       categories: [],
-    } as IAssetTimeSeriesReportOutput);
+    } as ITimeSeriesReportOutput<IPositionReport>);
   });
 
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {

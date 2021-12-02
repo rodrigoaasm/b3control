@@ -2,13 +2,14 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ReportsController } from '@controllers/reports-controller';
-import { IAssetTimeSeriesReportOutput, IAssetTimeSeriesReportUseCase } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
+import { ITimeSeriesReportOutput, ITimeSeriesReportUseCase } from '@usecases/reports/timeseries-report-interfaces';
 import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { IApplicationRequest, IApplicationResponse } from '@application/types';
+import { IPositionReport } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
 
-class AssetTimeSeriesReportUseCaseMock implements IAssetTimeSeriesReportUseCase {
-  async get(filters: IReportInput): Promise<IAssetTimeSeriesReportOutput> {
+class AssetTimeSeriesReportUseCaseMock implements ITimeSeriesReportUseCase<IPositionReport> {
+  async get(filters: IReportInput): Promise<ITimeSeriesReportOutput<IPositionReport>> {
     return {
       filters,
     } as any;
