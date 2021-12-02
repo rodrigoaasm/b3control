@@ -2,10 +2,13 @@ import { IReportsRepository } from '@domain-ports/repositories/reports-repositor
 import { PositionEntity } from '@entities/position/position-entity';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { BadRequestError } from '@domain-error/custom-error';
-import {
-  IAssetTimeSeriesReportUseCase, IAssetTimeSeriesReportOutput, IAssetReport, IAssetCategoryReport,
-} from './asset-timeseries-report-interface';
 import { IReportInput } from '../report-interfaces';
+import {
+  IAssetCategoryReport, IAssetReport, ITimeSeriesReportOutput,
+} from '../timeseries-report-interfaces';
+import {
+  IAssetTimeSeriesReportUseCase, IPositionReport,
+} from './asset-timeseries-report-interface';
 
 export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCase {
   constructor(
@@ -15,11 +18,11 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
   }
 
   private static handleAssetTimelines(
-    assetTimeseries: Map< string, IAssetReport>, position : PositionEntity,
+    assetTimeseries: Map< string, IAssetReport<IPositionReport>>, position : PositionEntity,
   ): void {
     if (assetTimeseries.has(position.asset.code)) {
       const assetPosition = assetTimeseries.get(position.asset.code);
-      assetPosition.positions.push({
+      assetPosition.itens.push({
         date: position.date,
         price: position.price,
         quantity: position.quantity,
@@ -29,7 +32,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
       assetTimeseries.set(position.asset.code, {
         name: position.asset.code,
         category: position.asset.category,
-        positions: [
+        itens: [
           {
             date: position.date,
             price: position.price,
@@ -42,11 +45,12 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
   }
 
   private static handleAssetCategoryTimeSeries(
-    assetCategoryTimeSeries: Map< string, IAssetCategoryReport>, position : PositionEntity,
+    assetCategoryTimeSeries: Map< string, IAssetCategoryReport<IPositionReport>>,
+    position : PositionEntity,
   ): void {
     if (assetCategoryTimeSeries.has(position.asset.category)) {
       const assetCategoryPosition = assetCategoryTimeSeries.get(position.asset.category);
-      const currentPosition = assetCategoryPosition.positions
+      const currentPosition = assetCategoryPosition.itens
         .find((element: PositionEntity) => element.date.getTime() === position.date.getTime());
 
       if (currentPosition) {
@@ -56,7 +60,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
         currentPosition.quantity += position.quantity;
         currentPosition.value += position.value;
       } else {
-        assetCategoryPosition.positions.push({
+        assetCategoryPosition.itens.push({
           date: position.date,
           price: position.price,
           quantity: position.quantity,
@@ -66,7 +70,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
     } else {
       assetCategoryTimeSeries.set(position.asset.category, {
         name: position.asset.category,
-        positions: [
+        itens: [
           {
             date: position.date,
             price: position.price,
@@ -78,7 +82,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
     }
   }
 
-  public async get(filters: IReportInput): Promise<IAssetTimeSeriesReportOutput> {
+  public async get(filters: IReportInput): Promise<ITimeSeriesReportOutput<IPositionReport>> {
     if (filters.begin && filters.end
       && !this.dateValidatorUtil.isTimeInterval(filters.begin, filters.end)) {
       throw BadRequestError('The end date is greater than begin date.');
@@ -88,8 +92,8 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
       filters.codes, filters.begin, filters.end,
     );
 
-    const assetTimeseries = new Map< string, IAssetReport>();
-    const assetCategoryTimeSeries = new Map< string, IAssetCategoryReport>();
+    const assetTimeseries = new Map< string, IAssetReport<IPositionReport> >();
+    const assetCategoryTimeSeries = new Map< string, IAssetCategoryReport<IPositionReport>>();
 
     result.forEach((position : PositionEntity) => {
       AssetTimeSeriesReportUseCase.handleAssetTimelines(assetTimeseries, position);

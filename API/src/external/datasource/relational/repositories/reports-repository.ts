@@ -63,6 +63,11 @@ export class ReportsRepository implements IReportsRepository {
 
     return positions;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  getDividendPayments(codes: string[], begin: Date, end: Date): Promise<any[]> {
+    throw new Error('Method not implemented.');
+  }
 }
 
 export default ReportsRepository;
