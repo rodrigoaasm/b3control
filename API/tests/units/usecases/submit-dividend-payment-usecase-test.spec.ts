@@ -3,7 +3,7 @@ import { AssetEntity } from '@entities/asset';
 
 import { IDividendPaymentFactory } from '@domain-ports/factories/dividend-payment-factory-interface';
 import { DividendPaymentEntity } from '@entities/dividend-payment';
-import SubmitDividendPaymentUseCase from '@usecases/submit-dividend/submit-dividend-payments-usecase';
+import { SubmitDividendPaymentUseCase } from '@usecases/submit-dividend/submit-dividend-payments-usecase';
 import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
 import AssetRepositoryMock from '@test-mocks/asset-repository-mock';
 

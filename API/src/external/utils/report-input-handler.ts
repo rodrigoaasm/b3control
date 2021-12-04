@@ -16,15 +16,18 @@ export class ReportInputHandler implements IReportInputHandler {
       throw BadRequestError('The end date is invalid.');
     }
 
+    const beginDate = params.begin ? new Date(params.begin) : undefined;
+    const endDate = params.end ? new Date(params.end) : undefined;
+
     if (params.begin && params.end
-      && !this.dateValidator.isTimeInterval(params.begin, params.end)) {
+      && !this.dateValidator.isTimeInterval(beginDate, endDate)) {
       throw BadRequestError('The end date is greater than begin date.');
     }
 
     return {
       codes: params.codes ? params.codes.split(',') : [],
-      begin: params.begin ? new Date(params.begin) : undefined,
-      end: params.end ? new Date(params.end) : undefined,
+      begin: beginDate,
+      end: endDate,
     };
   }
 }

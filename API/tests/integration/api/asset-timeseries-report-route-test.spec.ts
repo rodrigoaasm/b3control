@@ -3,7 +3,7 @@ import * as request from 'supertest';
 import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
 
-describe('POST /report/stocktimeline/...', () => {
+describe('GET /report/assettimeline/...', () => {
   let app: IApp;
   let postgresDataSetup: PostgresDataSetup;
 
@@ -31,8 +31,8 @@ describe('POST /report/stocktimeline/...', () => {
 
   function checkAssetCalculations(response: any, nAssetPositions: number): any {
     response.body.assets.forEach((asset: any) => {
-      expect(asset.positions.length).toEqual(nAssetPositions);
-      asset.positions.forEach((position: any) => {
+      expect(asset.itens.length).toEqual(nAssetPositions);
+      asset.itens.forEach((position: any) => {
         expect(position.value).toEqual(correctedValues.get(`${asset.name}-${position.date}`));
       });
     });
@@ -45,8 +45,8 @@ describe('POST /report/stocktimeline/...', () => {
     checkAssetCalculations(response, nAssetPositions);
     // Checks the categories
     response.body.categories.forEach((category: any) => {
-      expect(category.positions.length).toEqual(nCategoriesPositions);
-      category.positions.forEach((position: any) => {
+      expect(category.itens.length).toEqual(nCategoriesPositions);
+      category.itens.forEach((position: any) => {
         expect(position.value).toEqual(correctedValues.get(`${category.name}-${position.date}`));
       });
     });
@@ -67,7 +67,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with all data when no filter is entered', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/begin/end')
+      .get('/report/assettimeseries/codes/begin/end')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -84,7 +84,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with all data after a date when the begin date is entered ', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/begin/2020-02-01T13:00:00.000Z/end')
+      .get('/report/assettimeseries/codes/begin/2020-02-01T13:00:00.000Z/end')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -102,7 +102,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with a bad request http response when the begin date is invalid', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/begin/invalid/end')
+      .get('/report/assettimeseries/codes/begin/invalid/end')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -118,7 +118,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with all data before a date when the end date is entered', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/begin/end/2020-03-01T13:00:00.000Z')
+      .get('/report/assettimeseries/codes/begin/end/2020-03-01T13:00:00.000Z')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -136,7 +136,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with a bad request http response when the end date is invalid', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/begin/end/invalid')
+      .get('/report/assettimeseries/codes/begin/end/invalid')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -152,7 +152,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with all data within the time interval when a time interval is entered', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/begin/2020-02-01T13:00:00.000Z/end/2020-03-01T13:00:00.000Z')
+      .get('/report/assettimeseries/codes/begin/2020-02-01T13:00:00.000Z/end/2020-03-01T13:00:00.000Z')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -170,7 +170,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with a bad request http response when the time interval is invalid', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/begin/2020-02-01T13:00:00.000Z/end/2020-01-01T13:00:00.000Z')
+      .get('/report/assettimeseries/codes/begin/2020-02-01T13:00:00.000Z/end/2020-01-01T13:00:00.000Z')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -186,7 +186,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with just one asset when the code is entered', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/TEST11/begin/end')
+      .get('/report/assettimeseries/codes/TEST11/begin/end')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -203,7 +203,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with just one asset and its positions after a date when code and begin date are entered', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/TEST11/begin/2020-02-01T13:00:00.000Z/end')
+      .get('/report/assettimeseries/codes/TEST11/begin/2020-02-01T13:00:00.000Z/end')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -220,7 +220,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with just one asset and its positions before a date when code and end date are entered', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/TEST11/begin/end/2020-03-01T13:00:00.000Z')
+      .get('/report/assettimeseries/codes/TEST11/begin/end/2020-03-01T13:00:00.000Z')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -237,7 +237,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with just one asset and its positions within the time interval when a time interval and the code are entered', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/TEST11/begin/2020-02-02T13:00:00.000Z/end/2020-03-01T13:00:00.000Z')
+      .get('/report/assettimeseries/codes/TEST11/begin/2020-02-02T13:00:00.000Z/end/2020-03-01T13:00:00.000Z')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -254,7 +254,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with two assets when two codes are entered', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/TEST11,TEST4/begin/end')
+      .get('/report/assettimeseries/codes/TEST11,TEST4/begin/end')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -274,8 +274,8 @@ describe('POST /report/stocktimeline/...', () => {
 
         // Checks Categories calculations
         response.body.categories.forEach((category: any) => {
-          expect(category.positions.length).toEqual(3);
-          category.positions.forEach((position: any) => {
+          expect(category.itens.length).toEqual(3);
+          category.itens.forEach((position: any) => {
             expect(position.value).toEqual(correctedValuesForTwoCodesCase.get(`${category.name}-${position.date}`));
           });
         });
@@ -289,7 +289,7 @@ describe('POST /report/stocktimeline/...', () => {
 
   it('Should reply with empty response when the asset is not found', (done) => {
     request(app.api)
-      .get('/report/stocktimeline/codes/TEST8/begin/end')
+      .get('/report/assettimeseries/codes/TEST8/begin/end')
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)

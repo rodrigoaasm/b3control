@@ -2,15 +2,15 @@ import { IApplicationRequest, IApplicationResponse } from '@application/types';
 import { IAssetTimeSeriesReportUseCase } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
 import { IReportInputHandler } from '@usecases/reports/report-input-handler-interface';
 
-export class ReportsController {
+export class AssetTimeseriesReportController {
   constructor(
-    private assetTimeSeriesReportUseCase : IAssetTimeSeriesReportUseCase,
+    private assetTimeSeriesReportUseCase: IAssetTimeSeriesReportUseCase,
     private reportInputHandler: IReportInputHandler,
   ) {
 
   }
 
-  public getStockTimeLine = async (req : IApplicationRequest) : Promise<IApplicationResponse> => {
+  public getStockTimeseries = async (req : IApplicationRequest) : Promise<IApplicationResponse> => {
     const filters = this.reportInputHandler.handle(req.params);
     const result = await this.assetTimeSeriesReportUseCase.get(filters);
     return {
@@ -20,4 +20,4 @@ export class ReportsController {
   };
 }
 
-export default ReportsController;
+export default AssetTimeseriesReportController;

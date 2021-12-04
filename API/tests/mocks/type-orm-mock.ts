@@ -1,6 +1,10 @@
 class QueryBuilder {
   public rawManyReturnValue;
 
+  constructor() {
+    this.rawManyReturnValue = [];
+  }
+
   public setRawManyReturnValue = (returnValue) => {
     this.rawManyReturnValue = returnValue;
   };
@@ -8,6 +12,8 @@ class QueryBuilder {
   public select = (): QueryBuilder => this;
 
   public from = (): QueryBuilder => this;
+
+  public leftJoin = (): QueryBuilder => this;
 
   public where = (): QueryBuilder => this;
 
@@ -17,14 +23,20 @@ class QueryBuilder {
 
   public orderBy = (): QueryBuilder => this;
 
+  public addGroupBy = (): QueryBuilder => this;
+
   public getQuery = (): string => '';
 
   public getRawMany = (): any => this.rawManyReturnValue;
 }
 
-export const connectionMock = {
-  queryBuilder: new QueryBuilder(),
-  createQueryBuilder: (): QueryBuilder => connectionMock.queryBuilder,
+const createConnectionMock = (mockParentRepository: any): any => {
+  const connectionMock = {
+    queryBuilder: new QueryBuilder(),
+    createQueryBuilder: (): QueryBuilder => connectionMock.queryBuilder,
+    getRepository: () => mockParentRepository,
+  };
+  return connectionMock;
 };
 
-export default connectionMock;
+export default createConnectionMock;

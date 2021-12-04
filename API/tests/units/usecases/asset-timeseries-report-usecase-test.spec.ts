@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { AssetTimeSeriesReportUseCase } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-usecase';
-import { ReportRepositoryMock } from '@test-mocks/report-repository-mock';
+import { PositionRepositoryMock } from '@test-mocks/position-repository-mock';
 import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
@@ -24,7 +24,7 @@ describe('Asset Timeseries Report UseCase', () => {
   beforeEach(() => {
     dateValidatorUtilMock = new DateValidatorUtilMock();
     assetTimeseriesReportUsecase = new AssetTimeSeriesReportUseCase(
-      new ReportRepositoryMock(), dateValidatorUtilMock,
+      new PositionRepositoryMock(), dateValidatorUtilMock,
     );
   });
 

@@ -1,5 +1,5 @@
 import { Connection, Repository } from 'typeorm';
-import { DividendPaymentModel } from '@external/datasource/relational/models';
+import { AssetModel, DividendPaymentModel } from '@external/datasource/relational/models';
 import { IDividendPaymentRepository } from '@domain-ports/repositories/dividend-payment-repository-interface';
 import { DividendPaymentEntity } from '@entities/dividend-payment';
 import { IDividendPaymentFactory } from '@domain-ports/factories/dividend-payment-factory-interface';
@@ -7,7 +7,9 @@ import { IDividendPaymentFactory } from '@domain-ports/factories/dividend-paymen
 export class DividendPaymentRepository implements IDividendPaymentRepository {
   private repo: Repository<DividendPaymentModel>;
 
-  constructor(connection: Connection, private dividendPaymentFactory: IDividendPaymentFactory) {
+  constructor(
+    private connection: Connection, private dividendPaymentFactory: IDividendPaymentFactory,
+  ) {
     this.repo = connection.getRepository(DividendPaymentModel);
   }
 
@@ -25,6 +27,34 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
     return this.dividendPaymentFactory.make(
       value, payment.asset, createdAt, id,
     );
+  }
+
+  async getDividendPaymentsByMonth(codes: string[], begin: Date, end: Date): Promise<any[]> {
+    const beginDate = begin ? begin.toISOString() : new Date().toISOString();
+    const endDate = end ? end.toISOString() : new Date().toISOString();
+
+    let mainQuery = this.connection.createQueryBuilder()
+      .select([
+        'a.code as code',
+        'a.category as category',
+        'a.social as social',
+        'series.month as month',
+        'coalesce(sum("dp"."value"),0) as value',
+      ])
+      .from(AssetModel, 'a')
+      .innerJoin(
+        `(select generate_series(timestamp '${beginDate}', timestamp '${endDate}', interval  '1 month') as month)`, 'series', 'true',
+      )
+      .leftJoin(DividendPaymentModel, 'dp', 'a.id = dp.asset_id  and dp.created_at >= series.month  and dp.created_at < (series.month + interval \'1 months\')');
+
+    if (codes.length > 0) {
+      mainQuery = mainQuery.where('a.code in (:...codes)', { codes });
+    }
+
+    mainQuery = mainQuery.addGroupBy('a.code, a.category, a.social, series.month')
+      .orderBy('a.code, series.month', 'ASC');
+
+    return mainQuery.getRawMany();
   }
 }
 

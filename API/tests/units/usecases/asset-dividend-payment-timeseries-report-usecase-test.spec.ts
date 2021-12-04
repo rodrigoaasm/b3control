@@ -1,11 +1,11 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ReportRepositoryMock } from '@test-mocks/report-repository-mock';
 import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { DividendPaymentTimeSeriesReportUseCase } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-usecase';
 import { IDividendPaymentReport } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-interface';
 import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
+import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
 
 class DateValidatorUtilMock implements IDateValidatorAdapter {
   isTimeInterval(begin: Date, end: Date): boolean {
@@ -24,7 +24,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
   beforeEach(() => {
     dateValidatorUtilMock = new DateValidatorUtilMock();
     dividendReportUsecase = new DividendPaymentTimeSeriesReportUseCase(
-      new ReportRepositoryMock(), dateValidatorUtilMock,
+      new DividendPaymentRepositoryMock(), dateValidatorUtilMock,
     );
   });
 

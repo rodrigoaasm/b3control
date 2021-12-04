@@ -1,4 +1,4 @@
-import { IReportsRepository } from '@domain-ports/repositories/reports-repository-interface';
+import { IDividendPaymentRepository } from '@domain-ports/repositories/dividend-payment-repository-interface';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { BadRequestError } from '@domain-error/custom-error';
 import { IReportInput } from '../report-interfaces';
@@ -12,7 +12,7 @@ import {
 export class DividendPaymentTimeSeriesReportUseCase
 implements IDividendPaymentsTimeSeriesReportUseCase {
   constructor(
-    private reportsRepository : IReportsRepository,
+    private dividendPaymentRepository : IDividendPaymentRepository,
     private dateValidatorUtil: IDateValidatorAdapter,
   ) {
   }
@@ -25,7 +25,7 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
       throw BadRequestError('The end date is greater than begin date.');
     }
 
-    const result = await this.reportsRepository.getDividendPayments(
+    const result = await this.dividendPaymentRepository.getDividendPaymentsByMonth(
       filters.codes, filters.begin, filters.end,
     );
 

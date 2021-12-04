@@ -3,22 +3,24 @@ import { Connection } from 'typeorm';
 import { OperationFactory } from '@entities/operation/operation-factory';
 import { OperationRepository } from '@external/datasource/relational/repositories/operation-repository';
 import { AssetRepository } from '@external/datasource/relational/repositories/asset-repository';
-import { ReportsRepository } from '@external/datasource/relational/repositories/reports-repository';
+import { PositionRepository } from '@external/datasource/relational/repositories/position-repository';
 import { SubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-usecase';
 import { AssetTimeSeriesReportUseCase } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-usecase';
 import { OperationController } from 'src/application/controllers/operation-controller';
-import { ReportsController } from '@controllers/reports-controller';
+import { AssetTimeseriesReportController } from '@controllers/asset-timeseries-report-controller';
 import { DateValidatorUtil } from '@utils/date-validator-util';
 import { PositionFactory } from '@entities/position';
 import { DividendPaymentFactory } from '@entities/dividend-payment';
-import DividendPaymentRepository from '@external/datasource/relational/repositories/dividend-payment-repository';
-import SubmitDividendPaymentUseCase from '@usecases/submit-dividend/submit-dividend-payments-usecase';
-import DividendPaymentController from '@controllers/dividend-payment-controller';
+import { DividendPaymentRepository } from '@external/datasource/relational/repositories/dividend-payment-repository';
+import { SubmitDividendPaymentUseCase } from '@usecases/submit-dividend/submit-dividend-payments-usecase';
+import { DividendPaymentController } from '@controllers/dividend-payment-controller';
+import { ReportInputHandler } from '@utils/report-input-handler';
 
 export class InternalDependenciesFactory {
   public static make(connection: Connection) {
     // Utils
     const dateValidatorUtil = new DateValidatorUtil();
+    const reportInputHandler = new ReportInputHandler(dateValidatorUtil);
 
     // Factories
     const operationFactory = new OperationFactory(dateValidatorUtil);
@@ -28,7 +30,7 @@ export class InternalDependenciesFactory {
     // Repositories
     const operationRepository = new OperationRepository(connection, operationFactory);
     const assetRepository = new AssetRepository(connection);
-    const reportsRepository = new ReportsRepository(connection, positionFactory);
+    const positionRepository = new PositionRepository(connection, positionFactory);
     const dividendPaymentRepository = new DividendPaymentRepository(
       connection, dividendPaymentFactory,
     );
@@ -38,7 +40,7 @@ export class InternalDependenciesFactory {
       operationRepository, assetRepository, operationFactory,
     );
     const assetTimeSeriesReportUseCase = new AssetTimeSeriesReportUseCase(
-      reportsRepository, dateValidatorUtil,
+      positionRepository, dateValidatorUtil,
     );
     const submitDividendPaymentUseCase = new SubmitDividendPaymentUseCase(
       dividendPaymentRepository, assetRepository, dividendPaymentFactory,
@@ -46,14 +48,14 @@ export class InternalDependenciesFactory {
 
     // Controllers
     const operationController = new OperationController(submitOperationUseCase);
-    const reportsController = new ReportsController(
-      assetTimeSeriesReportUseCase, dateValidatorUtil,
+    const assetTimeseriesReportController = new AssetTimeseriesReportController(
+      assetTimeSeriesReportUseCase, reportInputHandler,
     );
     const dividendPaymentController = new DividendPaymentController(submitDividendPaymentUseCase);
 
     return {
       operationController,
-      reportsController,
+      assetTimeseriesReportController,
       dividendPaymentController,
     };
   }

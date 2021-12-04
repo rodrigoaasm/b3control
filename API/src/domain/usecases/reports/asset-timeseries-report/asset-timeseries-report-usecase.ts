@@ -1,4 +1,4 @@
-import { IReportsRepository } from '@domain-ports/repositories/reports-repository-interface';
+import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { PositionEntity } from '@entities/position/position-entity';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { BadRequestError } from '@domain-error/custom-error';
@@ -12,7 +12,7 @@ import {
 
 export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCase {
   constructor(
-    private reportsRepository : IReportsRepository,
+    private positionRepository : IPositionRepository,
     private dateValidatorUtil: IDateValidatorAdapter,
   ) {
   }
@@ -88,7 +88,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
       throw BadRequestError('The end date is greater than begin date.');
     }
 
-    const result = await this.reportsRepository.getAssetTimeseries(
+    const result = await this.positionRepository.getAssetTimeseries(
       filters.codes, filters.begin, filters.end,
     );
 

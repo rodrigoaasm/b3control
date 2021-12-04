@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 // eslint-disable-next-line max-classes-per-file
-import { ReportsController } from '@controllers/reports-controller';
+import { AssetTimeseriesReportController } from '@controllers/asset-timeseries-report-controller';
 import { ITimeSeriesReportOutput, ITimeSeriesReportUseCase } from '@usecases/reports/timeseries-report-interfaces';
 import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IApplicationRequest } from '@application/types';
@@ -19,7 +19,7 @@ class ReportInputHandlerMock implements IReportInputHandler {
   handle = jest.fn();
 }
 
-describe('Reports Controller', () => {
+describe('Asset Timeseries Report Controller', () => {
   let reportsController;
   let assetTimeSeriesReportUseCaseMock;
   let reportInputHandlerMock;
@@ -27,7 +27,7 @@ describe('Reports Controller', () => {
   beforeEach(() => {
     reportInputHandlerMock = new ReportInputHandlerMock();
     assetTimeSeriesReportUseCaseMock = new AssetTimeSeriesReportUseCaseMock();
-    reportsController = new ReportsController(
+    reportsController = new AssetTimeseriesReportController(
       assetTimeSeriesReportUseCaseMock, reportInputHandlerMock,
     );
   });
@@ -39,7 +39,7 @@ describe('Reports Controller', () => {
       params: {},
     };
 
-    const response = await reportsController.getStockTimeLine(request);
+    const response = await reportsController.getStockTimeseries(request);
 
     expect(response.code).toEqual(200);
   });
@@ -58,7 +58,7 @@ describe('Reports Controller', () => {
 
     let error;
     try {
-      await reportsController.getStockTimeLine(request);
+      await reportsController.getStockTimeseries(request);
     } catch (e) {
       error = e;
     }

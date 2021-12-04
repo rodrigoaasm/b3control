@@ -13,9 +13,9 @@ export default async (app : express.Express, internalDependencies) => {
   );
 
   app.get(
-    '/report/stocktimeline/codes/:codes?/begin/:begin?/end/:end?',
+    '/report/assettimeseries/codes/:codes?/begin/:begin?/end/:end?',
     await ExpressRouterAdapter.routerAdapter(
-      internalDependencies.reportsController.getStockTimeLine,
+      internalDependencies.assetTimeseriesReportController.getStockTimeseries,
     ),
   );
 };

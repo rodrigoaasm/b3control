@@ -1,11 +1,13 @@
 import { Connection } from 'typeorm';
-import { IReportsRepository } from '@domain-ports/repositories/reports-repository-interface';
+import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { PositionEntity } from '@entities/position';
-import { OperationModel, AssetModel, AssetQuoteModel } from '@external/datasource/relational/models/';
+import {
+  OperationModel, AssetModel, AssetQuoteModel,
+} from '@external/datasource/relational/models/';
 import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
 import { AssetEntity } from '@entities/asset/asset-entity';
 
-export class ReportsRepository implements IReportsRepository {
+export class PositionRepository implements IPositionRepository {
   private connection : Connection;
 
   constructor(connection: Connection, private positionFactory: IPositionFactory) {
@@ -43,7 +45,7 @@ export class ReportsRepository implements IReportsRepository {
     }
 
     if (codes.length > 0) {
-      mainQuery = mainQuery.andWhere('s.code in (:...code)', { code: codes });
+      mainQuery = mainQuery.andWhere('s.code in (:...codes)', { codes });
     }
 
     mainQuery = mainQuery.orderBy('s.id, sq.date', 'ASC');
@@ -63,11 +65,6 @@ export class ReportsRepository implements IReportsRepository {
 
     return positions;
   }
-
-  // eslint-disable-next-line class-methods-use-this
-  getDividendPayments(codes: string[], begin: Date, end: Date): Promise<any[]> {
-    throw new Error('Method not implemented.');
-  }
 }
 
-export default ReportsRepository;
+export default PositionRepository;
