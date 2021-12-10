@@ -21,7 +21,7 @@ export class ReportInputHandler implements IReportInputHandler {
 
     if (params.begin && params.end
       && !this.dateValidator.isTimeInterval(beginDate, endDate)) {
-      throw BadRequestError('The end date is greater than begin date.');
+      throw BadRequestError('The begin date is greater than end date.');
     }
 
     return {

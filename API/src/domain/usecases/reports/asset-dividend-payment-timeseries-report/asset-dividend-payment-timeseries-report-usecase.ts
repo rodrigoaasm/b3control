@@ -1,12 +1,14 @@
 import { IDividendPaymentRepository } from '@domain-ports/repositories/dividend-payment-repository-interface';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { BadRequestError } from '@domain-error/custom-error';
-import { IReportInput } from '../report-interfaces';
+import { IDateHandlerAdapter } from '@domain-ports/adapters/date-handler-adapter-interface';
 import {
   IAssetCategoryReport, IAssetReport, ITimeSeriesReportOutput,
 } from '../timeseries-report-interfaces';
 import {
-  IDividendPaymentsTimeSeriesReportUseCase, IDividendPaymentReport,
+  IDividendPaymentsTimeSeriesReportUseCase,
+  IDividendPaymentReport,
+  IDividendPaymentsTimeSeriesReportInput,
 } from './asset-dividend-payment-timeseries-report-interface';
 
 export class DividendPaymentTimeSeriesReportUseCase
@@ -14,24 +16,28 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
   constructor(
     private dividendPaymentRepository : IDividendPaymentRepository,
     private dateValidatorUtil: IDateValidatorAdapter,
+    private dateHandlerUtil: IDateHandlerAdapter,
   ) {
   }
 
   public async get(
-    filters: IReportInput,
+    filters: IDividendPaymentsTimeSeriesReportInput,
   ): Promise<ITimeSeriesReportOutput<IDividendPaymentReport>> {
-    if (filters.begin && filters.end
-      && !this.dateValidatorUtil.isTimeInterval(filters.begin, filters.end)) {
+    const { codes, beginMonth, endMonth } = filters;
+
+    const beginDate = beginMonth ? this.dateHandlerUtil.parse(beginMonth, 'YYYY-MM') : new Date();
+    const endDate = endMonth ? this.dateHandlerUtil.parse(endMonth, 'YYYY-MM') : new Date();
+    if (!this.dateValidatorUtil.isTimeInterval(beginDate, endDate)) {
       throw BadRequestError('The end date is greater than begin date.');
     }
+    endDate.setMonth(endDate.getMonth() + 1); // more one month for end date
 
     const result = await this.dividendPaymentRepository.getDividendPaymentsByMonth(
-      filters.codes, filters.begin, filters.end,
+      codes, beginDate, endDate,
     );
 
     const assetTimeseries = new Map< string, IAssetReport<IDividendPaymentReport>>();
     const categoryTimeseries = new Map< string, IAssetCategoryReport<IDividendPaymentReport>>();
-
     result.forEach((monthlyValue : any) => {
       DividendPaymentTimeSeriesReportUseCase
         .handleAssetDividendTimelines(assetTimeseries, monthlyValue);
@@ -50,7 +56,7 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
   ): void {
     if (assetTimeseries.has(monthlyValue.code)) {
       const assetPosition = assetTimeseries.get(monthlyValue.code);
-      assetPosition.itens.push({
+      assetPosition.items.push({
         date: monthlyValue.month,
         value: monthlyValue.value,
       });
@@ -58,7 +64,7 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
       assetTimeseries.set(monthlyValue.code, {
         name: monthlyValue.code,
         category: monthlyValue.category,
-        itens: [
+        items: [
           {
             date: monthlyValue.month,
             value: monthlyValue.value,
@@ -74,13 +80,13 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
   ): void {
     if (categoryTimeseries.has(monthlyValue.category)) {
       const assetCategoryPosition = categoryTimeseries.get(monthlyValue.category);
-      const currentItem = assetCategoryPosition.itens
+      const currentItem = assetCategoryPosition.items
         .find((element: any) => element.date.getTime() === monthlyValue.month.getTime());
 
       if (currentItem) {
         currentItem.value += monthlyValue.value;
       } else {
-        assetCategoryPosition.itens.push({
+        assetCategoryPosition.items.push({
           date: monthlyValue.month,
           value: monthlyValue.value,
         });
@@ -88,7 +94,7 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
     } else {
       categoryTimeseries.set(monthlyValue.category, {
         name: monthlyValue.category,
-        itens: [
+        items: [
           {
             date: monthlyValue.month,
             value: monthlyValue.value,

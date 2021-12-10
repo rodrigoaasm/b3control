@@ -31,8 +31,8 @@ describe('GET /report/assettimeline/...', () => {
 
   function checkAssetCalculations(response: any, nAssetPositions: number): any {
     response.body.assets.forEach((asset: any) => {
-      expect(asset.itens.length).toEqual(nAssetPositions);
-      asset.itens.forEach((position: any) => {
+      expect(asset.items.length).toEqual(nAssetPositions);
+      asset.items.forEach((position: any) => {
         expect(position.value).toEqual(correctedValues.get(`${asset.name}-${position.date}`));
       });
     });
@@ -45,8 +45,8 @@ describe('GET /report/assettimeline/...', () => {
     checkAssetCalculations(response, nAssetPositions);
     // Checks the categories
     response.body.categories.forEach((category: any) => {
-      expect(category.itens.length).toEqual(nCategoriesPositions);
-      category.itens.forEach((position: any) => {
+      expect(category.items.length).toEqual(nCategoriesPositions);
+      category.items.forEach((position: any) => {
         expect(position.value).toEqual(correctedValues.get(`${category.name}-${position.date}`));
       });
     });
@@ -175,7 +175,7 @@ describe('GET /report/assettimeline/...', () => {
       .expect('Content-Type', /json/)
       .expect(400)
       .then((response) => {
-        expect(response.body.message).toEqual('The end date is greater than begin date.');
+        expect(response.body.message).toEqual('The begin date is greater than end date.');
         expect(response.body.status).toEqual('BAD_REQUEST_ERROR');
         done();
       })
@@ -274,8 +274,8 @@ describe('GET /report/assettimeline/...', () => {
 
         // Checks Categories calculations
         response.body.categories.forEach((category: any) => {
-          expect(category.itens.length).toEqual(3);
-          category.itens.forEach((position: any) => {
+          expect(category.items.length).toEqual(3);
+          category.items.forEach((position: any) => {
             expect(position.value).toEqual(correctedValuesForTwoCodesCase.get(`${category.name}-${position.date}`));
           });
         });

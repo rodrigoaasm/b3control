@@ -38,7 +38,7 @@ describe('Asset Timeseries Report UseCase', () => {
     const test11 = {
       name: 'TEST11',
       category: 'stock',
-      itens: [
+      items: [
         {
           quantity: 200,
           price: 20,
@@ -63,7 +63,7 @@ describe('Asset Timeseries Report UseCase', () => {
     const test4 = {
       name: 'TEST4',
       category: 'stock',
-      itens: [
+      items: [
         {
           quantity: 150,
           price: 10,
@@ -82,7 +82,7 @@ describe('Asset Timeseries Report UseCase', () => {
     const test3 = {
       name: 'TEST3',
       category: 'general',
-      itens: [
+      items: [
         {
           quantity: 100,
           price: 10,
@@ -100,7 +100,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
     const stockCategory = {
       name: 'stock',
-      itens: [
+      items: [
         {
           quantity: 200,
           price: 20,
@@ -124,7 +124,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
     const generalCategory = {
       name: 'general',
-      itens: [
+      items: [
         {
           quantity: 100,
           price: 10,

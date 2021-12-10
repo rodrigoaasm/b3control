@@ -8,7 +8,7 @@ import * as dotenv from 'dotenv';
 import { AssetModel, ASSET_TABLE_NAME } from '@external/datasource/relational/models/asset-model';
 import { OperationModel, OPERATION_TABLE_NAME } from '@external/datasource/relational/models/operation-model';
 import { AssetQuoteModel, ASSET_QUOTE_TABLE_NAME } from '@external/datasource/relational/models/asset-quote-model';
-import { DIVIDEND_PAYMENT_TABLE_NAME } from '@external/datasource/relational/models/dividend-payment-model';
+import { DividendPaymentModel, DIVIDEND_PAYMENT_TABLE_NAME } from '@external/datasource/relational/models/dividend-payment-model';
 
 import entities from '@external/datasource/relational/models';
 
@@ -24,6 +24,8 @@ export class PostgresDataSetup {
   private operationRepositoryTest: Repository<OperationModel>;
 
   private assetQuoteRepositoryTest: Repository<AssetQuoteModel>;
+
+  private dividendPaymentRepositoryTest: Repository<DividendPaymentModel>;
 
   private registeredAssets: Map<string, AssetModel>;
 
@@ -54,6 +56,8 @@ export class PostgresDataSetup {
     this.assetRepositoryTest = getRepository(AssetModel);
     this.operationRepositoryTest = getRepository(OperationModel);
     this.assetQuoteRepositoryTest = getRepository(AssetQuoteModel);
+    this.dividendPaymentRepositoryTest = getRepository(DividendPaymentModel);
+
     try {
       await this.down();
     } catch (error) {
@@ -66,6 +70,7 @@ export class PostgresDataSetup {
 
     await this.operationRepositoryTest.save(this.operations());
     await this.assetQuoteRepositoryTest.save(this.assetQuotes());
+    await this.dividendPaymentRepositoryTest.save(this.dividendPayments());
   }
 
   public async down(): Promise<void> {
@@ -210,6 +215,36 @@ export class PostgresDataSetup {
         asset: this.registeredAssets.get('TEST3'),
         date: new Date('2020-03-30T17:00:00.000Z'),
         price: 8.00,
+      },
+    ];
+  }
+
+  private dividendPayments(): Array<Omit<DividendPaymentModel, 'id'>> {
+    return [
+      {
+        asset: this.registeredAssets.get('TEST3'),
+        createdAt: new Date('2021-01-12T15:00:00.000Z'),
+        value: 5.00,
+      },
+      {
+        asset: this.registeredAssets.get('TEST11'),
+        createdAt: new Date('2021-01-17T15:00:00.000Z'),
+        value: 7.00,
+      },
+      {
+        asset: this.registeredAssets.get('TEST11'),
+        createdAt: new Date('2021-02-17T15:00:00.000Z'),
+        value: 7.00,
+      },
+      {
+        asset: this.registeredAssets.get('TEST3'),
+        createdAt: new Date('2021-03-12T15:00:00.000Z'),
+        value: 5.00,
+      },
+      {
+        asset: this.registeredAssets.get('TEST11'),
+        createdAt: new Date('2021-01-17T15:00:00.000Z'),
+        value: 7.00,
       },
     ];
   }

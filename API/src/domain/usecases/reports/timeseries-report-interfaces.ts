@@ -4,12 +4,12 @@ import { IReportInput, IReportOutput, IReportUseCase } from './report-interfaces
 export interface IAssetReport<T> {
   name : string,
   category : AssetCategory,
-  itens : Array<T>
+  items : Array<T>
 }
 
 export interface IAssetCategoryReport<T> {
   name : string,
-  itens : Array<T>
+  items : Array<T>
 }
 
 export interface ITimeSeriesReportOutput<T> extends IReportOutput{

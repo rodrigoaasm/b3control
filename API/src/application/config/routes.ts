@@ -18,4 +18,11 @@ export default async (app : express.Express, internalDependencies) => {
       internalDependencies.assetTimeseriesReportController.getStockTimeseries,
     ),
   );
+
+  app.get(
+    '/report/dividendpayments/codes/:codes?/begin/:begin?/end/:end?',
+    await ExpressRouterAdapter.routerAdapter(
+      internalDependencies.dividendPaymentTimeseriesController.getDividendPaymentTimeseries,
+    ),
+  );
 };

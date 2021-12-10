@@ -22,7 +22,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
   ): void {
     if (assetTimeseries.has(position.asset.code)) {
       const assetPosition = assetTimeseries.get(position.asset.code);
-      assetPosition.itens.push({
+      assetPosition.items.push({
         date: position.date,
         price: position.price,
         quantity: position.quantity,
@@ -32,7 +32,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
       assetTimeseries.set(position.asset.code, {
         name: position.asset.code,
         category: position.asset.category,
-        itens: [
+        items: [
           {
             date: position.date,
             price: position.price,
@@ -50,7 +50,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
   ): void {
     if (assetCategoryTimeSeries.has(position.asset.category)) {
       const assetCategoryPosition = assetCategoryTimeSeries.get(position.asset.category);
-      const currentPosition = assetCategoryPosition.itens
+      const currentPosition = assetCategoryPosition.items
         .find((element: PositionEntity) => element.date.getTime() === position.date.getTime());
 
       if (currentPosition) {
@@ -60,7 +60,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
         currentPosition.quantity += position.quantity;
         currentPosition.value += position.value;
       } else {
-        assetCategoryPosition.itens.push({
+        assetCategoryPosition.items.push({
           date: position.date,
           price: position.price,
           quantity: position.quantity,
@@ -70,7 +70,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
     } else {
       assetCategoryTimeSeries.set(position.asset.category, {
         name: position.asset.category,
-        itens: [
+        items: [
           {
             date: position.date,
             price: position.price,
@@ -85,7 +85,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
   public async get(filters: IReportInput): Promise<ITimeSeriesReportOutput<IPositionReport>> {
     if (filters.begin && filters.end
       && !this.dateValidatorUtil.isTimeInterval(filters.begin, filters.end)) {
-      throw BadRequestError('The end date is greater than begin date.');
+      throw BadRequestError('The begin date is greater than end date.');
     }
 
     const result = await this.positionRepository.getAssetTimeseries(

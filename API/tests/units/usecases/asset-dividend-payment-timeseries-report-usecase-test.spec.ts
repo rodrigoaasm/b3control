@@ -1,11 +1,13 @@
+/* eslint-disable max-classes-per-file */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { DividendPaymentTimeSeriesReportUseCase } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-usecase';
-import { IDividendPaymentReport } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-interface';
+import { IDividendPaymentReport, IDividendPaymentsTimeSeriesReportInput } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-interface';
 import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
 import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
+import { IDateHandlerAdapter } from '@domain-ports/adapters/date-handler-adapter-interface';
 
 class DateValidatorUtilMock implements IDateValidatorAdapter {
   isTimeInterval(begin: Date, end: Date): boolean {
@@ -17,28 +19,39 @@ class DateValidatorUtilMock implements IDateValidatorAdapter {
   }
 }
 
+class DateHandlerUtilMock implements IDateHandlerAdapter {
+  parse(dateString: string, format: string): Date {
+    return new Date(`${dateString}-01T00:00:00.000`);
+  }
+}
+
 describe('Dividend Payments Timeseries Report UseCase', () => {
   let dividendReportUsecase: DividendPaymentTimeSeriesReportUseCase;
   let dateValidatorUtilMock: DateValidatorUtilMock;
+  let dateHandlerUtilMock: DateHandlerUtilMock;
 
   beforeEach(() => {
     dateValidatorUtilMock = new DateValidatorUtilMock();
+    dateHandlerUtilMock = new DateHandlerUtilMock();
     dividendReportUsecase = new DividendPaymentTimeSeriesReportUseCase(
-      new DividendPaymentRepositoryMock(), dateValidatorUtilMock,
+      new DividendPaymentRepositoryMock(), dateValidatorUtilMock, dateHandlerUtilMock,
     );
   });
 
-  it('Should return data', async () => {
-    const filter: IReportInput = {
+  it('Should return all data', async () => {
+    dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
+    const filter: IDividendPaymentsTimeSeriesReportInput = {
       codes: undefined,
       begin: undefined,
       end: undefined,
+      beginMonth: '2021-01',
+      endMonth: '2021-03',
     };
 
     const test11 = {
       name: 'TEST11',
       category: 'stock',
-      itens: [
+      items: [
         {
           date: new Date('2021-01-31T00:00:00.000Z'),
           value: 5,
@@ -57,7 +70,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
     const test4 = {
       name: 'TEST4',
       category: 'stock',
-      itens: [
+      items: [
         {
           date: new Date('2021-01-31T00:00:00.000Z'),
           value: 7,
@@ -76,7 +89,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
     const test3 = {
       name: 'TEST3',
       category: 'general',
-      itens: [
+      items: [
         {
           date: new Date('2021-01-31T00:00:00.000Z'),
           value: 0,
@@ -94,7 +107,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
 
     const stockCategory = {
       name: 'stock',
-      itens: [
+      items: [
         {
           date: new Date('2021-01-31T00:00:00.000Z'),
           value: 12,
@@ -112,7 +125,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
 
     const generalCategory = {
       name: 'general',
-      itens: [
+      items: [
         {
           date: new Date('2021-01-31T00:00:00.000Z'),
           value: 0,
@@ -144,6 +157,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
   });
 
   it('Should return an empty dataset, when the repository does not return anything', async () => {
+    dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
     const filter: IReportInput = {
       codes: ['notexits'],
       begin: undefined,
@@ -156,6 +170,26 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
       categories: [],
     } as ITimeSeriesReportOutput<IDividendPaymentReport>);
   });
+
+  // it('Should return only data of the current
+  //  month, when the month time interval was not entered', async () => {
+  //   dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
+
+  //   const filter: IReportInput = {
+  //     codes: undefined,
+  //     begin: undefined,
+  //     end: undefined,
+  //   };
+  //   const output = await dividendReportUsecase.get(filter);
+
+  //   output.forEach(element => {
+
+  //   });
+  //   expect(output).toEqual({
+  //     assets: [],
+  //     categories: [],
+  //   } as ITimeSeriesReportOutput<IDividendPaymentReport>);
+  // });
 
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {
     dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);

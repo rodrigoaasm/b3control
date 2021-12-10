@@ -22,6 +22,9 @@ export default class DividendPaymentRepositoryMock implements IDividendPaymentRe
       code: this.assets[0].code, category: this.assets[0].category, month: new Date('2021-03-30T00:00:00.000Z'), value: 5.00,
     },
     {
+      code: this.assets[0].code, category: this.assets[0].category, month: new Date(), value: 5.00,
+    },
+    {
       code: this.assets[1].code, category: this.assets[1].category, month: new Date('2021-01-31T00:00:00.000Z'), value: 7.00,
     },
     {
@@ -31,6 +34,9 @@ export default class DividendPaymentRepositoryMock implements IDividendPaymentRe
       code: this.assets[1].code, category: this.assets[1].category, month: new Date('2021-03-30T00:00:00.000Z'), value: 7.00,
     },
     {
+      code: this.assets[1].code, category: this.assets[1].category, month: new Date(), value: 7.00,
+    },
+    {
       code: this.assets[2].code, category: this.assets[2].category, month: new Date('2021-01-31T00:00:00.000Z'), value: 0.00,
     },
     {
@@ -38,6 +44,9 @@ export default class DividendPaymentRepositoryMock implements IDividendPaymentRe
     },
     {
       code: this.assets[2].code, category: this.assets[2].category, month: new Date('2021-03-30T00:00:00.000Z'), value: 0.00,
+    },
+    {
+      code: this.assets[2].code, category: this.assets[2].category, month: new Date(), value: 0.00,
     },
   ];
 

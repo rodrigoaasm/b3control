@@ -30,9 +30,6 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
   }
 
   async getDividendPaymentsByMonth(codes: string[], begin: Date, end: Date): Promise<any[]> {
-    const beginDate = begin ? begin.toISOString() : new Date().toISOString();
-    const endDate = end ? end.toISOString() : new Date().toISOString();
-
     let mainQuery = this.connection.createQueryBuilder()
       .select([
         'a.code as code',
@@ -43,7 +40,7 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
       ])
       .from(AssetModel, 'a')
       .innerJoin(
-        `(select generate_series(timestamp '${beginDate}', timestamp '${endDate}', interval  '1 month') as month)`, 'series', 'true',
+        `(select generate_series(timestamp '${begin.toISOString()}', timestamp '${end.toISOString()}', interval  '1 month') as month)`, 'series', 'true',
       )
       .leftJoin(DividendPaymentModel, 'dp', 'a.id = dp.asset_id  and dp.created_at >= series.month  and dp.created_at < (series.month + interval \'1 months\')');
 
@@ -54,7 +51,12 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
     mainQuery = mainQuery.addGroupBy('a.code, a.category, a.social, series.month')
       .orderBy('a.code, series.month', 'ASC');
 
-    return mainQuery.getRawMany();
+    const raws = await mainQuery.getRawMany();
+
+    return raws.map((raw) => ({
+      ...raw,
+      value: Number(raw.value),
+    }));
   }
 }
 

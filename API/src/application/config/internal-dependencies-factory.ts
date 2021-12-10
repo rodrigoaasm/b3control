@@ -15,11 +15,15 @@ import { DividendPaymentRepository } from '@external/datasource/relational/repos
 import { SubmitDividendPaymentUseCase } from '@usecases/submit-dividend/submit-dividend-payments-usecase';
 import { DividendPaymentController } from '@controllers/dividend-payment-controller';
 import { ReportInputHandler } from '@utils/report-input-handler';
+import { DividendPaymentTimeSeriesReportUseCase } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-usecase';
+import { DividendPaymentTimeseriesController } from '@controllers/dividend-payment-timeseries-report-controller';
+import DateHandlerUtil from '@utils/date-handler-util';
 
 export class InternalDependenciesFactory {
   public static make(connection: Connection) {
     // Utils
     const dateValidatorUtil = new DateValidatorUtil();
+    const dateHandlerUtil = new DateHandlerUtil();
     const reportInputHandler = new ReportInputHandler(dateValidatorUtil);
 
     // Factories
@@ -45,6 +49,9 @@ export class InternalDependenciesFactory {
     const submitDividendPaymentUseCase = new SubmitDividendPaymentUseCase(
       dividendPaymentRepository, assetRepository, dividendPaymentFactory,
     );
+    const dividendPaymentTimeSeriesReportUseCase = new DividendPaymentTimeSeriesReportUseCase(
+      dividendPaymentRepository, dateValidatorUtil, dateHandlerUtil,
+    );
 
     // Controllers
     const operationController = new OperationController(submitOperationUseCase);
@@ -52,11 +59,15 @@ export class InternalDependenciesFactory {
       assetTimeSeriesReportUseCase, reportInputHandler,
     );
     const dividendPaymentController = new DividendPaymentController(submitDividendPaymentUseCase);
+    const dividendPaymentTimeseriesController = new DividendPaymentTimeseriesController(
+      dividendPaymentTimeSeriesReportUseCase, reportInputHandler,
+    );
 
     return {
       operationController,
       assetTimeseriesReportController,
       dividendPaymentController,
+      dividendPaymentTimeseriesController,
     };
   }
 }
