@@ -40,7 +40,7 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
       ])
       .from(AssetModel, 'a')
       .innerJoin(
-        `(select generate_series(timestamp '${begin.toISOString()}', timestamp '${end.toISOString()}', interval  '1 month') as month)`, 'series', 'true',
+        `(select generate_series(timestamp '${begin.toDateString()}', timestamp '${end.toDateString()}', interval  '1 month') as month)`, 'series', 'true',
       )
       .leftJoin(DividendPaymentModel, 'dp', 'a.id = dp.asset_id  and dp.created_at >= series.month  and dp.created_at < (series.month + interval \'1 months\')');
 

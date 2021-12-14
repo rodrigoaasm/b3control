@@ -243,8 +243,18 @@ export class PostgresDataSetup {
       },
       {
         asset: this.registeredAssets.get('TEST11'),
-        createdAt: new Date('2021-01-17T15:00:00.000Z'),
+        createdAt: new Date('2021-03-17T15:00:00.000Z'),
         value: 7.00,
+      },
+      {
+        asset: this.registeredAssets.get('TEST3'),
+        createdAt: new Date(),
+        value: 10,
+      },
+      {
+        asset: this.registeredAssets.get('TEST11'),
+        createdAt: new Date(),
+        value: 12,
       },
     ];
   }

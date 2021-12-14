@@ -8,6 +8,7 @@ import { IDividendPaymentReport, IDividendPaymentsTimeSeriesReportInput } from '
 import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
 import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
 import { IDateHandlerAdapter } from '@domain-ports/adapters/date-handler-adapter-interface';
+import { IReportInputHandler } from '@usecases/reports/report-input-handler-interface';
 
 class DateValidatorUtilMock implements IDateValidatorAdapter {
   isTimeInterval(begin: Date, end: Date): boolean {
@@ -29,12 +30,14 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
   let dividendReportUsecase: DividendPaymentTimeSeriesReportUseCase;
   let dateValidatorUtilMock: DateValidatorUtilMock;
   let dateHandlerUtilMock: DateHandlerUtilMock;
+  let dividendPaymentRepositoryMock: DividendPaymentRepositoryMock;
 
   beforeEach(() => {
     dateValidatorUtilMock = new DateValidatorUtilMock();
     dateHandlerUtilMock = new DateHandlerUtilMock();
+    dividendPaymentRepositoryMock = new DividendPaymentRepositoryMock();
     dividendReportUsecase = new DividendPaymentTimeSeriesReportUseCase(
-      new DividendPaymentRepositoryMock(), dateValidatorUtilMock, dateHandlerUtilMock,
+      dividendPaymentRepositoryMock, dateValidatorUtilMock, dateHandlerUtilMock,
     );
   });
 
@@ -171,32 +174,35 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
     } as ITimeSeriesReportOutput<IDividendPaymentReport>);
   });
 
-  // it('Should return only data of the current
-  //  month, when the month time interval was not entered', async () => {
-  //   dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
+  it('Should generate a time interval that includes only the current month when the month time interval was not entered', async () => {
+    dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
+    dividendPaymentRepositoryMock.getDividendPaymentsByMonth = jest.fn()
+      .mockImplementationOnce((codes: string[], begin: Date, end: Date) => {
+        const currentDate = new Date();
+        const expectedBeginDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const expectedEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
 
-  //   const filter: IReportInput = {
-  //     codes: undefined,
-  //     begin: undefined,
-  //     end: undefined,
-  //   };
-  //   const output = await dividendReportUsecase.get(filter);
+        expect(begin).toEqual(expectedBeginDate);
+        expect(end).toEqual(expectedEndDate);
+        return [];
+      });
 
-  //   output.forEach(element => {
+    const filter: IReportInput = {
+      codes: undefined,
+      begin: undefined,
+      end: undefined,
+    };
+    const output = await dividendReportUsecase.get(filter);
 
-  //   });
-  //   expect(output).toEqual({
-  //     assets: [],
-  //     categories: [],
-  //   } as ITimeSeriesReportOutput<IDividendPaymentReport>);
-  // });
+    expect.assertions(2);
+  });
 
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {
     dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);
-    const filter: IReportInput = {
+    const filter: IDividendPaymentsTimeSeriesReportInput = {
       codes: [],
-      begin: new Date('2021-08-01T23:00:00.000Z'),
-      end: new Date('2021-01-01T23:00:00.000Z'),
+      beginMonth: '2021-08',
+      endMonth: '2021-01',
     };
 
     let error;

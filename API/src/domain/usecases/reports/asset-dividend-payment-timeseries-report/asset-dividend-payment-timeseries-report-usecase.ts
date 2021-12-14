@@ -25,12 +25,16 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
   ): Promise<ITimeSeriesReportOutput<IDividendPaymentReport>> {
     const { codes, beginMonth, endMonth } = filters;
 
-    const beginDate = beginMonth ? this.dateHandlerUtil.parse(beginMonth, 'YYYY-MM') : new Date();
-    const endDate = endMonth ? this.dateHandlerUtil.parse(endMonth, 'YYYY-MM') : new Date();
+    const today = new Date();
+    const beginDate = beginMonth ? this.dateHandlerUtil.parse(beginMonth, 'yyyy-MM')
+      : new Date(today.getFullYear(), today.getMonth(), 1);
+    const parsedEndDate = endMonth ? this.dateHandlerUtil.parse(endMonth, 'yyyy-MM')
+      : new Date(today.getFullYear(), today.getMonth(), 1);
+    const endDate = new Date(parsedEndDate.getFullYear(), parsedEndDate.getMonth() + 1, 0);
+
     if (!this.dateValidatorUtil.isTimeInterval(beginDate, endDate)) {
       throw BadRequestError('The end date is greater than begin date.');
     }
-    endDate.setMonth(endDate.getMonth() + 1); // more one month for end date
 
     const result = await this.dividendPaymentRepository.getDividendPaymentsByMonth(
       codes, beginDate, endDate,

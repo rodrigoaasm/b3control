@@ -88,37 +88,13 @@ describe('Relational - payment Repository', () => {
     expect.anything();
   });
 
-  it('Should run successfully when there is data and only a start date was entered in the filter', async () => {
-    expect.assertions(2);
-    connectionMock.queryBuilder.innerJoin = (query, allias, condition) => {
-      const dates = query.match(dateRegex);
-      expect(dates[0]).toEqual('2021-01-01T13:00:00.000Z');
-      expect(new Date(dates[1]).toDateString()).toEqual(new Date().toDateString());
-      return connectionMock.queryBuilder;
-    };
-    await dividendPaymentRepository.getDividendPaymentsByMonth([], new Date('2021-01-01T13:00:00.000Z'), undefined);
-    expect.anything();
-  });
-
-  it('Should run successfully when there is data and only a end date was entered in the filter', async () => {
-    expect.assertions(2);
-    connectionMock.queryBuilder.innerJoin = (query, allias, condition) => {
-      const dates = query.match(dateRegex);
-      expect(new Date(dates[0]).toDateString()).toEqual(new Date().toDateString());
-      expect(dates[1]).toEqual('2222-01-01T13:00:00.000Z');
-      return connectionMock.queryBuilder;
-    };
-    await dividendPaymentRepository.getDividendPaymentsByMonth([], undefined, new Date('2222-01-01T13:00:00.000Z'));
-    expect.anything();
-  });
-
   it('Should run successfully when code filter was entered ', async () => {
     expect.assertions(1);
     connectionMock.queryBuilder.where = (query, params) => {
       expect(params.codes).toEqual(['TEST11']);
       return connectionMock.queryBuilder;
     };
-    await dividendPaymentRepository.getDividendPaymentsByMonth(['TEST11'], undefined, new Date());
+    await dividendPaymentRepository.getDividendPaymentsByMonth(['TEST11'], new Date(), new Date());
     expect.anything();
   });
 
