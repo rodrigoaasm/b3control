@@ -34,6 +34,103 @@ describe('Date Handler Util', () => {
     }
   });
 
+  it('Should format a date following the full date format', () => {
+    const dateLabel = dateHandlerUtil.format(new Date('2021-01-01T03:00:00.000z'), 'yyyy-MM-dd HH:mm:ss');
+    expect(dateLabel).toEqual('2021-01-01 00:00:00');
+  });
+
+  it('Should throw a error when date is invalid', () => {
+    try {
+      dateHandlerUtil.format(new Date(NaN), 'yyyy-MM-dd HH:mm:ss');
+    } catch (formatError) {
+      expect(formatError).toBeDefined();
+    }
+
+    expect.assertions(1);
+  });
+
+  it('Should return the difference between dates in milliseconds', () => {
+    const dateLeft = new Date('2021-02-01T13:00:00.200Z');
+    const dateRight = new Date('2021-02-01T13:00:00.500Z');
+
+    const diff = dateHandlerUtil.dateDiff('Milliseconds', dateLeft, dateRight);
+
+    expect(diff).toEqual(-300);
+  });
+
+  it('Should return the difference between dates in seconds', () => {
+    const dateLeft = new Date('2021-02-01T13:00:10.000Z');
+    const dateRight = new Date('2021-02-01T13:00:22.000Z');
+
+    const diff = dateHandlerUtil.dateDiff('Seconds', dateLeft, dateRight);
+
+    expect(diff).toEqual(-12);
+  });
+
+  it('Should return the difference between dates in minutes', () => {
+    const dateLeft = new Date('2021-02-01T13:08:00.000Z');
+    const dateRight = new Date('2021-02-01T13:20:00.000Z');
+
+    const diff = dateHandlerUtil.dateDiff('Minutes', dateLeft, dateRight);
+
+    expect(diff).toEqual(-12);
+  });
+
+  it('Should return the difference between dates in hours', () => {
+    const dateLeft = new Date('2021-02-01T13:00:00.000Z');
+    const dateRight = new Date('2021-02-01T15:00:00.000Z');
+
+    const diff = dateHandlerUtil.dateDiff('Hours', dateLeft, dateRight);
+
+    expect(diff).toEqual(-2);
+  });
+
+  it('Should return the difference between dates in days', () => {
+    const dateLeft = new Date('2021-02-01T13:00:00.000Z');
+    const dateRight = new Date('2021-02-04T13:00:00.000Z');
+
+    const diff = dateHandlerUtil.dateDiff('Days', dateLeft, dateRight);
+
+    expect(diff).toEqual(-3);
+  });
+
+  it('Should return the difference between dates in weeks', () => {
+    const dateLeft = new Date('2021-02-01T13:00:00.000Z');
+    const dateRight = new Date('2021-02-16T13:00:00.000Z');
+
+    const diff = dateHandlerUtil.dateDiff('Weeks', dateLeft, dateRight);
+
+    expect(diff).toEqual(-2);
+  });
+
+  it('Should return the difference between dates in months', () => {
+    const dateLeft = new Date('2021-02-01T13:00:00.000Z');
+    const dateRight = new Date('2021-04-04T13:00:00.000Z');
+
+    const diff = dateHandlerUtil.dateDiff('Months', dateLeft, dateRight);
+
+    expect(diff).toEqual(-2);
+  });
+
+  it('Should return the difference between dates in Years', () => {
+    const dateLeft = new Date('2021-02-01T13:00:00.000Z');
+    const dateRight = new Date('2022-04-04T13:00:00.000Z');
+
+    const diff = dateHandlerUtil.dateDiff('Years', dateLeft, dateRight);
+
+    expect(diff).toEqual(-1);
+  });
+
+  it('Should throw a error when format is invalid', () => {
+    try {
+      dateHandlerUtil.format(new Date('2021-01-01T03:00:00.000z'), 'invalid');
+    } catch (formatError) {
+      expect(formatError).toBeDefined();
+    }
+
+    expect.assertions(1);
+  });
+
   it("Should return false when the 'date' is invalid date string. ", async () => {
     const valid = dateHandlerUtil.validate('invalid date');
     expect(valid).toBe(false);

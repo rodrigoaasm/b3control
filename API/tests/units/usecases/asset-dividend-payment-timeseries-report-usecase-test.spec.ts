@@ -7,9 +7,17 @@ import { DividendPaymentTimeSeriesReportUseCase } from '@usecases/reports/asset-
 import { IDividendPaymentReport, IDividendPaymentsTimeSeriesReportInput } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-interface';
 import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
 import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
-import { IDateHandlerAdapter } from '@domain-ports/adapters/date-handler-adapter-interface';
+import { DateDifferenceCategory, IDateHandlerAdapter } from '@domain-ports/adapters/date-handler-adapter-interface';
 
 class DateValidatorUtilMock implements IDateValidatorAdapter, IDateHandlerAdapter {
+  format(date: Date, format: string): string {
+    throw new Error('Method not implemented.');
+  }
+
+  dateDiff(category: DateDifferenceCategory, dateLeft: Date, dateRight: Date): number {
+    throw new Error('Method not implemented.');
+  }
+
   parse(dateString: string, format: string): Date {
     return new Date(`${dateString}-01T00:00:00.000`);
   }
