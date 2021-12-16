@@ -15,8 +15,7 @@ export class DividendPaymentTimeSeriesReportUseCase
 implements IDividendPaymentsTimeSeriesReportUseCase {
   constructor(
     private dividendPaymentRepository : IDividendPaymentRepository,
-    private dateValidatorUtil: IDateValidatorAdapter,
-    private dateHandlerUtil: IDateHandlerAdapter,
+    private dateHandlerUtil: IDateValidatorAdapter & IDateHandlerAdapter,
   ) {
   }
 
@@ -32,7 +31,7 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
       : new Date(today.getFullYear(), today.getMonth(), 1);
     const endDate = new Date(parsedEndDate.getFullYear(), parsedEndDate.getMonth() + 1, 0);
 
-    if (!this.dateValidatorUtil.isTimeInterval(beginDate, endDate)) {
+    if (!this.dateHandlerUtil.isTimeInterval(beginDate, endDate)) {
       throw BadRequestError('The end date is greater than begin date.');
     }
 

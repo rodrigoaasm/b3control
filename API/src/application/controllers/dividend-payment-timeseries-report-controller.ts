@@ -1,11 +1,12 @@
 import { IApplicationRequest, IApplicationResponse } from '@application/types';
-import { IDividendPaymentsTimeSeriesReportInput, IDividendPaymentsTimeSeriesReportUseCase } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-interface';
-import { IReportInputHandler } from '@usecases/reports/report-input-handler-interface';
+import {
+  IDividendPaymentsTimeSeriesReportInput,
+  IDividendPaymentsTimeSeriesReportUseCase,
+} from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-interface';
 
 export class DividendPaymentTimeseriesController {
   constructor(
     private dividendPaymentsTimeSeriesReportUseCase: IDividendPaymentsTimeSeriesReportUseCase,
-    private reportInputHandler: IReportInputHandler,
   ) {
 
   }

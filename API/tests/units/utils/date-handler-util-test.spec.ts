@@ -30,7 +30,37 @@ describe('Date Handler Util', () => {
         'yyyy-MM-dd HH:mm:ss',
       );
     } catch (parseError) {
-      expect(parseError.message).toEqual('The string that was entered does not match the format entered');
+      expect(parseError.message).toEqual('The string that was entered does not match the date format acceptable');
     }
+  });
+
+  it("Should return false when the 'date' is invalid date string. ", async () => {
+    const valid = dateHandlerUtil.validate('invalid date');
+    expect(valid).toBe(false);
+  });
+
+  it("Should return true when the 'date' is valid date string. ", async () => {
+    const valid = dateHandlerUtil.validate('2021-09-01T13:00:01.000Z');
+    expect(valid).toBe(true);
+  });
+
+  it("Should return false when the 'date' is undefined.", async () => {
+    const valid = dateHandlerUtil.validate(undefined);
+    expect(valid).toBe(false);
+  });
+
+  it("Should return true when the 'date' is valid date. ", async () => {
+    const valid = dateHandlerUtil.validate(new Date('2021-09-01T13:00:01.000Z'));
+    expect(valid).toBe(true);
+  });
+
+  it("Should return true when the 'time interval' is valid. ", async () => {
+    const valid = dateHandlerUtil.isTimeInterval(new Date('2021-09-01T13:00:01.000Z'), new Date('2021-09-03T13:00:01.000Z'));
+    expect(valid).toBe(true);
+  });
+
+  it("Should return false when the 'time interval' is not valid. ", async () => {
+    const valid = dateHandlerUtil.isTimeInterval(new Date('2021-09-03T13:00:01.000Z'), new Date('2021-09-01T13:00:01.000Z'));
+    expect(valid).toBe(false);
   });
 });

@@ -93,7 +93,7 @@ describe('ReportInputHandler', () => {
       error = serviceError;
     }
 
-    expect(error.message).toEqual('The end date is greater than begin date.');
+    expect(error.message).toEqual('The begin date is greater than end date.');
     expect(error.status).toEqual('BAD_REQUEST_ERROR');
   });
 });

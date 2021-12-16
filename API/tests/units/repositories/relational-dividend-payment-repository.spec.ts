@@ -32,7 +32,7 @@ describe('Relational - payment Repository', () => {
   let date: Date;
   let asset: any;
   let dividendPaymentRepository: DividendPaymentRepository;
-  const dateRegex = /(\d){4}-(\d){2}-(\d){2}T(\d){2}:(\d){2}:(\d){2}.(\d){3}Z/g;
+  const dateRegex = /([A-Za-z]{3} ){2}[\d]{2} [\d]{4}/g;
 
   beforeEach(() => {
     date = new Date();
@@ -79,8 +79,8 @@ describe('Relational - payment Repository', () => {
     expect.assertions(2);
     connectionMock.queryBuilder.innerJoin = (query, allias, condition) => {
       const dates = query.match(dateRegex);
-      expect(dates[0]).toEqual('2021-01-01T13:00:00.000Z');
-      expect(dates[1]).toEqual('2022-01-01T13:00:00.000Z');
+      expect(dates[0]).toEqual(new Date('2021-01-01T13:00:00.000Z').toDateString());
+      expect(dates[1]).toEqual(new Date('2022-01-01T13:00:00.000Z').toDateString());
       return connectionMock.queryBuilder;
     };
     await dividendPaymentRepository.getDividendPaymentsByMonth([], new Date('2021-01-01T13:00:00.000Z'), new Date('2022-01-01T13:00:00.000Z'));
@@ -102,8 +102,8 @@ describe('Relational - payment Repository', () => {
     expect.assertions(3);
     connectionMock.queryBuilder.innerJoin = (query, allias, condition) => {
       const dates = query.match(dateRegex);
-      expect(new Date(dates[0]).toDateString()).toEqual(new Date().toDateString());
-      expect(new Date(dates[1]).toDateString()).toEqual(new Date().toDateString());
+      expect(dates[0]).toEqual(new Date().toDateString());
+      expect(dates[1]).toEqual(new Date().toDateString());
       return connectionMock.queryBuilder;
     };
     const assetTimeseries = await dividendPaymentRepository

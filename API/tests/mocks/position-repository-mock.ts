@@ -2,7 +2,7 @@ import { IPositionRepository } from '@domain-ports/repositories/position-reposit
 import { AssetEntity } from '@entities/asset';
 import { PositionFactory } from '@entities/position';
 import { PositionEntity } from '@entities/position/position-entity';
-import DateValidatorUtil from '@utils/date-validator-util';
+import DateValidatorUtil from '@utils/date-handler-util';
 
 const assets: Array<AssetEntity> = [
   new AssetEntity(1, 'TEST11', '', '', 'stock'),

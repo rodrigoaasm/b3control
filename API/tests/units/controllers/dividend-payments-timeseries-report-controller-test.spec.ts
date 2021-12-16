@@ -3,7 +3,6 @@
 import { ITimeSeriesReportOutput, ITimeSeriesReportUseCase } from '@usecases/reports/timeseries-report-interfaces';
 import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IApplicationRequest } from '@application/types';
-import { IReportInputHandler } from '@usecases/reports/report-input-handler-interface';
 import { IDividendPaymentReport } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-interface';
 import DividendPaymentTimeseriesController from '@controllers/dividend-payment-timeseries-report-controller';
 
@@ -16,20 +15,14 @@ implements ITimeSeriesReportUseCase<IDividendPaymentReport> {
   }
 }
 
-class ReportInputHandlerMock implements IReportInputHandler {
-  handle = jest.fn();
-}
-
 describe('Dividend Payment Timeseries Controller', () => {
   let dividendPaymentTimeseriesController: DividendPaymentTimeseriesController;
   let dividendPaymentsTimeseriesReportUseCaseMock: DividendPaymentsTimeseriesReportUseCaseMock;
-  let reportInputHandlerMock: IReportInputHandler;
 
   beforeEach(() => {
-    reportInputHandlerMock = new ReportInputHandlerMock();
     dividendPaymentsTimeseriesReportUseCaseMock = new DividendPaymentsTimeseriesReportUseCaseMock();
     dividendPaymentTimeseriesController = new DividendPaymentTimeseriesController(
-      dividendPaymentsTimeseriesReportUseCaseMock, reportInputHandlerMock,
+      dividendPaymentsTimeseriesReportUseCaseMock,
     );
   });
 
@@ -47,7 +40,7 @@ describe('Dividend Payment Timeseries Controller', () => {
   });
 
   it('Should return an error when any of the filters is invalid', async () => {
-    reportInputHandlerMock.handle = jest.fn().mockImplementationOnce(() => {
+    dividendPaymentsTimeseriesReportUseCaseMock.get = jest.fn().mockImplementationOnce(() => {
       throw new Error('filters invalid');
     });
     const request: IApplicationRequest = {
