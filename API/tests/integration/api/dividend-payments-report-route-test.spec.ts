@@ -2,13 +2,14 @@ import * as request from 'supertest';
 
 import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
-import { differenceInMonths } from 'date-fns';
+import { DateHandlerUtil } from '@utils/date-handler-util';
 
 describe('GET /report/dividendpayments/...', () => {
   let app: IApp;
   let postgresDataSetup: PostgresDataSetup;
 
-  const diffInMonths = differenceInMonths(new Date(), new Date('2021-02-01T03:00:00.000Z')) + 1;
+  const dateHandlerUtil = new DateHandlerUtil();
+  const diffInMonths = dateHandlerUtil.dateDiff('Months', new Date(), new Date('2021-02-01T03:00:00.000Z')) + 1;
   const today = new Date();
   const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
@@ -162,13 +163,25 @@ describe('GET /report/dividendpayments/...', () => {
   });
 
   it('Should reply with all data between the current month and the end month, when only the end date is entered', (done) => {
+    const endDate = new Date(currentMonth);
+    endDate.setMonth(endDate.getMonth() + 1);
+
     request(app.api)
-      .get('/report/dividendpayments/codes/begin/end/2021-03')
+      .get(`/report/dividendpayments/codes/begin/end/${dateHandlerUtil.format(endDate, 'yyyy-MM')}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(400)
+      .expect(200)
       .then((response) => {
-        done(new Error('Not Implemented'));
+        // Checks the amount of assets
+        expect(response.body.assets.length).toEqual(3);
+        response.body.assets.forEach((asset) => {
+          expect(asset.items.length).toEqual(2);
+        });
+        expect(response.body.categories.length).toEqual(2);
+        response.body.categories.forEach((category) => {
+          expect(category.items.length).toEqual(2);
+        });
+        done();
       })
       .catch((error) => {
         done(error);
@@ -275,13 +288,25 @@ describe('GET /report/dividendpayments/...', () => {
   });
 
   it('Should reply with data for only one asset between the current month and the end month, when the end date and the codes are entered.', (done) => {
+    const endDate = new Date(currentMonth);
+    endDate.setMonth(endDate.getMonth() + 1);
+
     request(app.api)
-      .get('/report/dividendpayments/codes/TEST11/begin/end/2021-03')
+      .get(`/report/dividendpayments/codes/TEST11/begin/end/${dateHandlerUtil.format(endDate, 'yyyy-MM')}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(400)
+      .expect(200)
       .then((response) => {
-        done(new Error('Not Implemented'));
+        // Checks the amount of assets
+        expect(response.body.assets.length).toEqual(1);
+        response.body.assets.forEach((asset) => {
+          expect(asset.items.length).toEqual(2);
+        });
+        expect(response.body.categories.length).toEqual(1);
+        response.body.categories.forEach((category) => {
+          expect(category.items.length).toEqual(2);
+        });
+        done();
       })
       .catch((error) => {
         done(error);
