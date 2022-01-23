@@ -6,6 +6,7 @@ import { IOperationFactory } from '@domain-ports/factories/operation-factory-int
 import OperationRepositoryMock from '@test-mocks/operation-repository-mock';
 import AssetRepositoryMock from '@test-mocks/asset-repository-mock';
 import { OperationType, OperationEntity } from '@entities/operation';
+import { UserEntity } from '@entities/user';
 
 class OperationFactoryMock implements IOperationFactory {
   constructor(private date: Date) {
@@ -14,18 +15,20 @@ class OperationFactoryMock implements IOperationFactory {
 
   make(
     value: number, quantity: number, type: OperationType,
-    paper: AssetEntity, createdAt: string | Date, id: number,
+    paper: AssetEntity, user: UserEntity, createdAt: string | Date, id: number,
   ): OperationEntity {
-    return new OperationEntity(1, 15.95, 200, 'buy', new AssetEntity(1, 'TEST11', '', '', 'stock'), this.date);
+    return new OperationEntity(1, 15.95, 200, 'buy', new AssetEntity(1, 'TEST11', '', '', 'stock'), user, this.date);
   }
 }
 
 describe('Submit Operation Use Case', () => {
   let submitOperationService : SubmitOperationUseCase;
   let date: Date;
+  let user: UserEntity;
 
   beforeEach(() => {
     date = new Date();
+    user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
     submitOperationService = new SubmitOperationUseCase(
       new OperationRepositoryMock(), new AssetRepositoryMock(), new OperationFactoryMock(date),
     );
@@ -33,6 +36,7 @@ describe('Submit Operation Use Case', () => {
 
   it('Should register an operation', async () => {
     const submitedOperation = await submitOperationService.submit({
+      user,
       value: 15.95,
       quantity: 200,
       type: 'buy',
@@ -50,6 +54,7 @@ describe('Submit Operation Use Case', () => {
     expect(submitedOperation.asset.logo).toEqual('');
     expect(submitedOperation.asset.category).toEqual('stock');
     expect(submitedOperation.createdAt).toEqual(date);
+    expect(submitedOperation.user).toEqual(user);
   });
 
   it('Should throw an error when the paper not found', async () => {
@@ -57,6 +62,7 @@ describe('Submit Operation Use Case', () => {
 
     try {
       await submitOperationService.submit({
+        user,
         value: 15.95,
         quantity: 200,
         type: 'buy',

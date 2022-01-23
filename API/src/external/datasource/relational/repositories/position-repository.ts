@@ -2,10 +2,11 @@ import { Connection } from 'typeorm';
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { PositionEntity } from '@entities/position';
 import {
-  OperationModel, AssetModel, AssetQuoteModel,
+  OperationModel, AssetModel, AssetQuoteModel, UserModel,
 } from '@external/datasource/relational/models/';
 import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
 import { AssetEntity } from '@entities/asset/asset-entity';
+import { UserEntity } from '@entities/user';
 
 export class PositionRepository implements IPositionRepository {
   private connection : Connection;
@@ -14,13 +15,15 @@ export class PositionRepository implements IPositionRepository {
     this.connection = connection;
   }
 
-  async getAssetTimeseries(codes: string[], begin: Date, end: Date): Promise<PositionEntity[]> {
+  async getAssetTimeseries(
+    userId: string, codes: string[], begin: Date, end: Date,
+  ): Promise<PositionEntity[]> {
     let mainQuery = this.connection.createQueryBuilder();
 
     const positionQuery = this.connection.createQueryBuilder()
       .select('sum(op.quantity) as value')
       .from(OperationModel, 'op')
-      .where('op.created_at <= sq.date and op.asset_id = sq.asset_id');
+      .where('op.created_at <= sq.date and op.asset_id = sq.asset_id and op.user = :userId', { userId });
 
     mainQuery = mainQuery.select([
       'sq.date as date',
@@ -30,18 +33,23 @@ export class PositionRepository implements IPositionRepository {
       's.logo as asset_logo',
       's.category as asset_category',
       'sq.price as price',
+      'u.id as user_id',
+      'u.name as user_name',
+      'u.createdAt as user_createdAt',
+      'u.updatedAt as user_updatedAt',
       `(${positionQuery.getQuery()}) as quantity`,
     ])
       .from(AssetQuoteModel, 'sq')
-      .innerJoin(AssetModel, 's', 's.id = sq.asset_id');
+      .innerJoin(AssetModel, 's', 's.id = sq.asset_id')
+      .innerJoin(UserModel, 'u', 'u.id = :userId', { userId })
+      .where('u.id = :userId', { userId });
 
-    if (begin && end) {
-      mainQuery = mainQuery.where('sq.date >= :startDate', { startDate: begin })
-        .andWhere('sq.date <= :endDate', { endDate: end });
-    } else if (begin && !end) {
-      mainQuery = mainQuery.where('sq.date >= :startDate', { startDate: begin });
-    } else if (!begin && end) {
-      mainQuery = mainQuery.where('sq.date <= :endDate', { endDate: end });
+    if (begin) {
+      mainQuery = mainQuery.andWhere('sq.date >= :startDate', { startDate: begin });
+    }
+
+    if (end) {
+      mainQuery = mainQuery.andWhere('sq.date <= :endDate', { endDate: end });
     }
 
     if (codes.length > 0) {
@@ -59,8 +67,14 @@ export class PositionRepository implements IPositionRepository {
         element.asset_logo,
         element.asset_category,
       );
+      const user = new UserEntity(
+        element.user_id,
+        element.user_name,
+        new Date(element.user_createdAt),
+        new Date(element.user_updatedAt),
+      );
 
-      return this.positionFactory.make(asset, element.quantity, element.price, element.date);
+      return this.positionFactory.make(asset, user, element.quantity, element.price, element.date);
     });
 
     return positions;

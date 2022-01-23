@@ -3,17 +3,23 @@ import { AssetEntity } from '@entities/asset';
 import CustomError from '@domain-error/custom-error';
 import { ISubmitDividendPaymentUseCase, ISubmitDividendPaymentInput, ISubmitDividendPaymentOutput } from '@usecases/submit-dividend/submit-dividend-payments-interfaces';
 import DividendPaymentController from '@controllers/dividend-payment-controller';
+import { UserEntity } from '@entities/user';
+
+const date = new Date();
 
 class SubmitDividendPaymentMock implements ISubmitDividendPaymentUseCase {
   private asset: AssetEntity;
 
+  private user: UserEntity;
+
   constructor() {
+    this.user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
     this.asset = new AssetEntity(1, 'TEST11', 'Teste', '', 'stock');
   }
 
   async submit(input: ISubmitDividendPaymentInput): Promise<ISubmitDividendPaymentOutput> {
     return new DividendPaymentEntity(
-      1, input.value, this.asset, new Date(input.createdAt),
+      1, this.user, input.value, this.asset, new Date(input.createdAt),
     );
   }
 }
@@ -28,8 +34,6 @@ describe('Operation Controller', () => {
   });
 
   it('Should execute the submission successfully', async () => {
-    const date = new Date();
-
     const response = await dividendPaymentController.submit({
       header: [],
       params: [],
@@ -49,6 +53,12 @@ describe('Operation Controller', () => {
         _category: 'stock',
         _logo: '',
         _social: 'Teste',
+      },
+      _user: {
+        _id: 'jbfjbkglkbnlknglkb',
+        _name: 'user',
+        _createdAt: date,
+        _updatedAt: date,
       },
       _id: 1,
       _value: 2.00,

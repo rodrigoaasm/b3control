@@ -1,9 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 import { EntityConstructionError, EntityError } from '@domain-error/custom-error';
 import { AssetEntity } from '@entities/asset';
+import { UserEntity } from '@entities/user';
 
 export class DividendPaymentEntity {
   private _id: number;
+
+  private _user: UserEntity;
 
   private _value: number;
 
@@ -12,10 +15,11 @@ export class DividendPaymentEntity {
   private _createdAt: Date;
 
   constructor(
-    id: number, value: number, asset: AssetEntity, createdAt: Date,
+    id: number, user: UserEntity, value: number, asset: AssetEntity, createdAt: Date,
   ) {
     try {
       this.id = id;
+      this.user = user;
       this.asset = asset;
       this.value = value;
       this.createdAt = createdAt;
@@ -30,6 +34,18 @@ export class DividendPaymentEntity {
 
   set id(id: number) {
     this._id = id;
+  }
+
+  get user(): UserEntity {
+    return this._user;
+  }
+
+  set user(user: UserEntity) {
+    if (!user) {
+      throw EntityError('It was not possible create the dividend payment object!\n User is undefined.');
+    }
+
+    this._user = user;
   }
 
   get asset(): AssetEntity {

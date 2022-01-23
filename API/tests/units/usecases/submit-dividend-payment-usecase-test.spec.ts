@@ -6,6 +6,7 @@ import { DividendPaymentEntity } from '@entities/dividend-payment';
 import { SubmitDividendPaymentUseCase } from '@usecases/submit-dividend/submit-dividend-payments-usecase';
 import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
 import AssetRepositoryMock from '@test-mocks/asset-repository-mock';
+import { UserEntity } from '@entities/user';
 
 class DividendPaymentFactoryMock implements IDividendPaymentFactory {
   constructor(private date: Date) {
@@ -13,18 +14,20 @@ class DividendPaymentFactoryMock implements IDividendPaymentFactory {
   }
 
   make(
-    value: number, paper: AssetEntity, createdAt: string | Date, id: number,
+    user: UserEntity, value: number, paper: AssetEntity, createdAt: string | Date, id: number,
   ): DividendPaymentEntity {
-    return new DividendPaymentEntity(1, 2.00, new AssetEntity(1, 'TEST11', '', '', 'stock'), this.date);
+    return new DividendPaymentEntity(1, user, 2.00, new AssetEntity(1, 'TEST11', '', '', 'stock'), this.date);
   }
 }
 
 describe('Submit Dividend Payment Use Case', () => {
   let submitDividendPaymentUseCase : SubmitDividendPaymentUseCase;
   let date: Date;
+  let user: UserEntity;
 
   beforeEach(() => {
     date = new Date();
+    user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
     submitDividendPaymentUseCase = new SubmitDividendPaymentUseCase(
       new DividendPaymentRepositoryMock(),
       new AssetRepositoryMock(),
@@ -34,6 +37,7 @@ describe('Submit Dividend Payment Use Case', () => {
 
   it('Should register an dividend payment', async () => {
     const submitedPayment = await submitDividendPaymentUseCase.submit({
+      user,
       value: 15.95,
       assetCode: 'TEST11',
       createdAt: date,
@@ -47,6 +51,7 @@ describe('Submit Dividend Payment Use Case', () => {
     expect(submitedPayment.asset.logo).toEqual('');
     expect(submitedPayment.asset.category).toEqual('stock');
     expect(submitedPayment.createdAt).toEqual(date);
+    expect(submitedPayment.user).toEqual(user);
   });
 
   it('Should throw an error when the asset not found', async () => {
@@ -54,6 +59,7 @@ describe('Submit Dividend Payment Use Case', () => {
 
     try {
       await submitDividendPaymentUseCase.submit({
+        user,
         value: 15.95,
         assetCode: 'TEST4',
         createdAt: date,

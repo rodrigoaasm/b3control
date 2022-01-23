@@ -2,6 +2,7 @@ import { EntityConstructionError } from '@domain-error/custom-error';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { IDividendPaymentFactory } from '@domain-ports/factories/dividend-payment-factory-interface';
 import { AssetEntity } from '@entities/asset';
+import { UserEntity } from '@entities/user';
 import { DividendPaymentEntity } from './dividend-payment-entity';
 
 export class DividendPaymentFactory implements IDividendPaymentFactory {
@@ -10,6 +11,7 @@ export class DividendPaymentFactory implements IDividendPaymentFactory {
   }
 
   make(
+    user: UserEntity,
     value: number,
     asset: AssetEntity,
     createdAt: Date | string,
@@ -21,7 +23,7 @@ export class DividendPaymentFactory implements IDividendPaymentFactory {
 
     const validCreatedAt = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
 
-    return new DividendPaymentEntity(id, value, asset, validCreatedAt);
+    return new DividendPaymentEntity(id, user, value, asset, validCreatedAt);
   }
 }
 

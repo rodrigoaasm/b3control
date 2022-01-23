@@ -4,6 +4,7 @@ import OperationRepository from '@external/datasource/relational/repositories/op
 import { AssetEntity } from '@entities/asset';
 import { OperationType, OperationEntity } from '@entities/operation';
 import { QueryFailedError } from 'typeorm';
+import { UserEntity } from '@entities/user';
 
 const mockParentRepository = {
   save: jest.fn((object: any) => ({
@@ -23,10 +24,11 @@ class OperationFactoryMock implements IOperationFactory {
     quantity: number,
     type: OperationType,
     asset: AssetEntity,
+    user: UserEntity,
     createdAt: Date,
     id?: number,
   ): OperationEntity {
-    return new OperationEntity(id, value, quantity, type, asset, createdAt);
+    return new OperationEntity(id, value, quantity, type, asset, user, createdAt);
   }
 }
 
@@ -34,9 +36,11 @@ describe('Relational - Operation Repository', () => {
   let date: Date;
   let asset: any;
   let operationRepository: OperationRepository;
+  let user: UserEntity;
 
   beforeEach(() => {
     date = new Date();
+    user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
     asset = new AssetEntity(1, 'TEST11', 'Teste', '', 'stock');
     operationRepository = new OperationRepository(
       connectionMock as any, new OperationFactoryMock(),
@@ -44,7 +48,7 @@ describe('Relational - Operation Repository', () => {
   });
 
   it('Should insert the entry in the database', async () => {
-    const operation = new OperationEntity(undefined, 15.95, 200, 'buy', asset, date);
+    const operation = new OperationEntity(undefined, 15.95, 200, 'buy', asset, user, date);
 
     const savedOperation = await operationRepository.save(operation);
 
@@ -61,7 +65,7 @@ describe('Relational - Operation Repository', () => {
       throw new QueryFailedError('', [], {});
     });
 
-    const operation = new OperationEntity(undefined, 15.95, 200, 'buy', asset, date);
+    const operation = new OperationEntity(undefined, 15.95, 200, 'buy', asset, user, date);
     try {
       await operationRepository.save(operation);
     } catch (e) {

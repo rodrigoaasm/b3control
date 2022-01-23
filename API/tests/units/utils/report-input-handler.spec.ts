@@ -23,6 +23,7 @@ describe('ReportInputHandler', () => {
 
   it('Should return the filters with 3 codes, when an asset code list is entered', () => {
     const params = {
+      user: {},
       codes: 'TEST4,TEST3,TEST11',
     };
 
@@ -33,6 +34,7 @@ describe('ReportInputHandler', () => {
 
   it('Should return the filters with begin date defined, when the begin date is valid', async () => {
     const params = {
+      user: {},
       begin: new Date(),
     };
 
@@ -42,6 +44,7 @@ describe('ReportInputHandler', () => {
 
   it('Should return the filters with end date defined, when the end date is valid', async () => {
     const params = {
+      user: {},
       end: new Date(),
     };
 
@@ -55,7 +58,7 @@ describe('ReportInputHandler', () => {
 
     let error;
     try {
-      reportInputHandler.handle({ begin: 'invalid' });
+      reportInputHandler.handle({ user: {}, begin: 'invalid' });
     } catch (e) {
       error = e;
     }
@@ -69,7 +72,7 @@ describe('ReportInputHandler', () => {
 
     let error;
     try {
-      reportInputHandler.handle({ end: 'invalid' });
+      reportInputHandler.handle({ user: {}, end: 'invalid' });
     } catch (e) {
       error = e;
     }
@@ -81,6 +84,7 @@ describe('ReportInputHandler', () => {
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {
     dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);
     const filters = {
+      user: {},
       codes: [],
       begin: new Date('2021-08-01T23:00:00.000Z'),
       end: new Date('2021-01-01T23:00:00.000Z'),
@@ -94,6 +98,25 @@ describe('ReportInputHandler', () => {
     }
 
     expect(error.message).toEqual('The begin date is greater than end date.');
+    expect(error.status).toEqual('BAD_REQUEST_ERROR');
+  });
+
+  it('Should throw a Bad Request Error, when the user is not informed', async () => {
+    dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
+    const filters = {
+      codes: [],
+      begin: new Date('2021-08-01T23:00:00.000Z'),
+      end: new Date('2021-01-01T23:00:00.000Z'),
+    };
+
+    let error;
+    try {
+      reportInputHandler.handle(filters);
+    } catch (serviceError) {
+      error = serviceError;
+    }
+
+    expect(error.message).toEqual('The user was not informed.');
     expect(error.status).toEqual('BAD_REQUEST_ERROR');
   });
 });

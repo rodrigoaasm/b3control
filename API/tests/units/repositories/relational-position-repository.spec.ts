@@ -4,22 +4,28 @@ import { AssetEntity } from '@entities/asset';
 import { PositionEntity } from '@entities/position';
 
 import createConnectionMock from '@test-mocks/type-orm-mock';
+import { UserEntity } from '@entities/user';
 
 const connectionMock = createConnectionMock({});
 
 class PositionFactory implements IPositionFactory {
   // eslint-disable-next-line class-methods-use-this
-  make(asset: AssetEntity, quantity: number, price: number, date: Date): PositionEntity {
-    return new PositionEntity(asset, quantity, price, date);
+  make(
+    asset: AssetEntity, user: UserEntity, quantity: number, price: number, date: Date, id?: number,
+  ): PositionEntity {
+    return new PositionEntity(asset, user, quantity, price, date, id);
   }
 }
 
 describe('Relational - Position Repository', () => {
   let reportsRepository: PositionRepository;
+  let user: UserEntity;
   const beginDate = new Date('2021-01-01T13:00:00.000Z');
   const endDate = new Date('2022-01-01T13:00:00.000Z');
 
   beforeEach(async () => {
+    const date = new Date();
+    user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
     connectionMock.queryBuilder.where = () => connectionMock.queryBuilder;
     connectionMock.queryBuilder.andWhere = () => connectionMock.queryBuilder;
     connectionMock.queryBuilder.setRawManyReturnValue([]);
@@ -39,10 +45,16 @@ describe('Relational - Position Repository', () => {
         asset_category: 'stock',
         price: 15.00,
         quantity: 220,
+        user_id: user.id,
+        user_name: user.name,
+        user_createdAt: user.createdAt.toISOString(),
+        user_updatedAt: user.updatedAt.toISOString(),
       },
     ]);
 
-    const formatedData = await reportsRepository.getAssetTimeseries([], beginDate, endDate);
+    const formatedData = await reportsRepository
+      .getAssetTimeseries(user.id, [], beginDate, endDate);
+
     expect(formatedData).toEqual([{
       _date: beginDate,
       _asset: {
@@ -52,6 +64,12 @@ describe('Relational - Position Repository', () => {
         _logo: '',
         _category: 'stock',
       },
+      _user: {
+        _id: user.id,
+        _name: user.name,
+        _createdAt: user.createdAt,
+        _updatedAt: user.updatedAt,
+      },
       _quantity: 220,
       _price: 15.00,
     }]);
@@ -59,42 +77,41 @@ describe('Relational - Position Repository', () => {
 
   it('should run successfully when there is data and time interval in the filter', async () => {
     expect.assertions(2);
-    connectionMock.queryBuilder.where = (query, params) => {
-      if (params) {
+    connectionMock.queryBuilder.andWhere = (query, params) => {
+      if (params.startDate) {
         expect(params.startDate).toEqual(beginDate);
+      }
+      if (params.endDate) {
+        expect(params.endDate).toEqual(endDate);
       }
       return connectionMock.queryBuilder;
     };
-    connectionMock.queryBuilder.andWhere = (query, params) => {
-      expect(params.endDate).toEqual(endDate);
-      return connectionMock.queryBuilder;
-    };
 
-    await reportsRepository.getAssetTimeseries([], beginDate, endDate);
+    await reportsRepository.getAssetTimeseries(user.id, [], beginDate, endDate);
     expect.anything();
   });
 
   it('Should run successfully when there is data and only a start date was entered in the filter', async () => {
     expect.assertions(1);
-    connectionMock.queryBuilder.where = (query, params) => {
-      if (params) {
+    connectionMock.queryBuilder.andWhere = (query, params) => {
+      if (params.startDate) {
         expect(params.startDate).toEqual(beginDate);
       }
       return connectionMock.queryBuilder;
     };
-    await reportsRepository.getAssetTimeseries([], beginDate, undefined);
+    await reportsRepository.getAssetTimeseries(user.id, [], beginDate, undefined);
     expect.anything();
   });
 
   it('Should run successfully when there is data and only a end date was entered in the filter', async () => {
     expect.assertions(1);
-    connectionMock.queryBuilder.where = (query, params) => {
-      if (params) {
+    connectionMock.queryBuilder.andWhere = (query, params) => {
+      if (params.endDate) {
         expect(params.endDate).toEqual(endDate);
       }
       return connectionMock.queryBuilder;
     };
-    await reportsRepository.getAssetTimeseries([], undefined, endDate);
+    await reportsRepository.getAssetTimeseries(user.id, [], undefined, endDate);
     expect.anything();
   });
 
@@ -106,12 +123,13 @@ describe('Relational - Position Repository', () => {
       }
       return connectionMock.queryBuilder;
     };
-    await reportsRepository.getAssetTimeseries(['TEST11'], undefined, undefined);
+    await reportsRepository.getAssetTimeseries(user.id, ['TEST11'], undefined, undefined);
     expect.anything();
   });
 
   it('Should return a empty dataset, when there is no data ', async () => {
-    const assetTimeseries = await reportsRepository.getAssetTimeseries([], new Date(), new Date());
+    const assetTimeseries = await reportsRepository
+      .getAssetTimeseries(user.id, [], new Date(), new Date());
     expect(assetTimeseries.length).toEqual(0);
   });
 });

@@ -2,6 +2,7 @@ import { EntityConstructionError } from '@domain-error/custom-error';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 import { AssetEntity } from '@entities/asset/';
+import { UserEntity } from '@entities/user';
 import { OperationEntity } from './operation-entity';
 import { OperationType } from './operation-type';
 
@@ -15,6 +16,7 @@ export class OperationFactory implements IOperationFactory {
     quantity : number,
     type : OperationType,
     asset : AssetEntity,
+    user: UserEntity,
     createdAt: Date | string,
     id : number | undefined = undefined,
   ) : OperationEntity {
@@ -24,7 +26,7 @@ export class OperationFactory implements IOperationFactory {
 
     const validCreatedAt = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
 
-    return new OperationEntity(id, value, quantity, type, asset, validCreatedAt);
+    return new OperationEntity(id, value, quantity, type, asset, user, validCreatedAt);
   }
 }
 

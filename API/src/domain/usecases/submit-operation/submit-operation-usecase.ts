@@ -17,17 +17,17 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
 
   public async submit(submitOperationInput: ISubmitOperationInput) : Promise<OperationEntity> {
     const {
-      value, quantity, type, assetCode, createdAt,
+      value, user, quantity, type, assetCode, createdAt,
     } = submitOperationInput;
 
-    if (!(value && quantity && type && assetCode && createdAt)) {
+    if (!(value && quantity && type && assetCode && user && createdAt)) {
       throw BadRequestError('A required attr was not found');
     }
 
     const asset = await this.assetRepository.findByCode(assetCode);
     if (!asset) throw NotFoundError('Asset not found');
 
-    const operation = this.operationFactory.make(value, quantity, type, asset, createdAt);
+    const operation = this.operationFactory.make(value, quantity, type, asset, user, createdAt);
     const submitedOperation = await this.operationRepository.save(operation);
     return submitedOperation;
   }

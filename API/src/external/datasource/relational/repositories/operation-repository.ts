@@ -1,8 +1,9 @@
 import { IOperationRepository } from '@domain-ports/repositories/operation-repository-interface';
 import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 import { OperationEntity } from '@entities/operation';
-import { Connection, Repository } from 'typeorm';
+import { Connection, Entity, Repository } from 'typeorm';
 import { OperationModel } from '@external/datasource/relational/models';
+import { UserEntity } from '@entities/user';
 
 export class OperationRepository implements IOperationRepository {
   private repo: Repository<OperationModel>;
@@ -17,15 +18,28 @@ export class OperationRepository implements IOperationRepository {
       type: operation.type,
       value: operation.value,
       quantity: operation.quantity,
+      user: {
+        id: operation.user.id,
+        name: operation.user.name,
+        createdAt: operation.user.createdAt,
+        updatedAt: operation.user.updatedAt,
+      },
       createdAt: operation.createdAt,
     };
 
     const {
-      value, id, quantity, type, createdAt,
+      value, id, quantity, type, user: userModel, createdAt,
     } = await this.repo.save(entity);
 
+    const userEntity = new UserEntity(
+      userModel.id,
+      userModel.name,
+      userModel.createdAt,
+      userModel.updatedAt,
+    );
+
     return this.operationFactory.make(
-      value, Math.abs(quantity), type, operation.asset, createdAt, id,
+      value, Math.abs(quantity), type, operation.asset, userEntity, createdAt, id,
     );
   }
 }

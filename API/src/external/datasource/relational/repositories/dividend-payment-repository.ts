@@ -3,6 +3,7 @@ import { AssetModel, DividendPaymentModel } from '@external/datasource/relationa
 import { IDividendPaymentRepository } from '@domain-ports/repositories/dividend-payment-repository-interface';
 import { DividendPaymentEntity } from '@entities/dividend-payment';
 import { IDividendPaymentFactory } from '@domain-ports/factories/dividend-payment-factory-interface';
+import { UserEntity } from '@entities/user';
 
 export class DividendPaymentRepository implements IDividendPaymentRepository {
   private repo: Repository<DividendPaymentModel>;
@@ -18,18 +19,33 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
       asset: payment.asset,
       value: payment.value,
       createdAt: payment.createdAt,
+      user: {
+        id: payment.user.id,
+        name: payment.user.name,
+        createdAt: payment.user.createdAt,
+        updatedAt: payment.user.updatedAt,
+      },
     };
 
     const {
-      value, id, createdAt,
+      value, id, createdAt, user: userModel,
     } = await this.repo.save(entity);
 
+    const userEntity = new UserEntity(
+      userModel.id,
+      userModel.name,
+      userModel.createdAt,
+      userModel.updatedAt,
+    );
+
     return this.dividendPaymentFactory.make(
-      value, payment.asset, createdAt, id,
+      userEntity, value, payment.asset, createdAt, id,
     );
   }
 
-  async getDividendPaymentsByMonth(codes: string[], begin: Date, end: Date): Promise<any[]> {
+  async getDividendPaymentsByMonth(
+    user: UserEntity, codes: string[], begin: Date, end: Date,
+  ): Promise<any[]> {
     let mainQuery = this.connection.createQueryBuilder()
       .select([
         'a.code as code',
@@ -42,10 +58,11 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
       .innerJoin(
         `(select generate_series(timestamp '${begin.toDateString()}', timestamp '${end.toDateString()}', interval  '1 month') as month)`, 'series', 'true',
       )
-      .leftJoin(DividendPaymentModel, 'dp', 'a.id = dp.asset_id  and dp.created_at >= series.month  and dp.created_at < (series.month + interval \'1 months\')');
+      .leftJoin(DividendPaymentModel, 'dp', 'a.id = dp.asset_id  and dp.created_at >= series.month  and dp.created_at < (series.month + interval \'1 months\')')
+      .where('dp.user_id = :userId', { userId: user.id });
 
     if (codes.length > 0) {
-      mainQuery = mainQuery.where('a.code in (:...codes)', { codes });
+      mainQuery = mainQuery.andWhere('a.code in (:...codes)', { codes });
     }
 
     mainQuery = mainQuery.addGroupBy('a.code, a.category, a.social, series.month')

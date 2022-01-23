@@ -4,7 +4,7 @@ import {
   OneToOne, JoinColumn,
   Column,
 } from 'typeorm';
-
+import { UserModel } from './user-model';
 import { AssetModel } from './asset-model';
 
 export const OPERATION_TABLE_NAME = 'operation';
@@ -26,6 +26,10 @@ export class OperationModel {
   @OneToOne(() => AssetModel)
   @JoinColumn({ name: 'asset_id' })
   public asset : AssetModel;
+
+  @OneToOne(() => UserModel)
+  @JoinColumn({ name: 'user_id' })
+  public user : UserModel;
 
   @Column({ name: 'created_at' })
   public createdAt : Date;

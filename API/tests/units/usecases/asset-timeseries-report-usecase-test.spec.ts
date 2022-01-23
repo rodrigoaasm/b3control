@@ -6,6 +6,10 @@ import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { IPositionReport } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
+import { UserEntity } from '@entities/user';
+
+const defaultDate = new Date();
+const defaultUser = new UserEntity('jbfjbkglkbnlknglkb', 'user', defaultDate, defaultDate);
 
 class DateValidatorUtilMock implements IDateValidatorAdapter {
   isTimeInterval(begin: Date, end: Date): boolean {
@@ -30,6 +34,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
   it('Should return formatted data, when repository returns data', async () => {
     const filter: IReportInput = {
+      user: defaultUser,
       codes: undefined,
       begin: undefined,
       end: undefined,
@@ -157,6 +162,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
   it('Should return an empty dataset, when the repository does not return anything', async () => {
     const filter: IReportInput = {
+      user: defaultUser,
       codes: ['notexits'],
       begin: undefined,
       end: undefined,
@@ -172,6 +178,7 @@ describe('Asset Timeseries Report UseCase', () => {
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {
     dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);
     const filter: IReportInput = {
+      user: defaultUser,
       codes: [],
       begin: new Date('2021-08-01T23:00:00.000Z'),
       end: new Date('2021-01-01T23:00:00.000Z'),

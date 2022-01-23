@@ -1,9 +1,14 @@
 /* eslint-disable no-underscore-dangle */
 import { EntityConstructionError, EntityError } from '@domain-error/custom-error';
 import { AssetEntity } from '@entities/asset';
+import { UserEntity } from '@entities/user';
 
 export class PositionEntity {
+  private _id: number;
+
   private _asset: AssetEntity;
+
+  private _user: UserEntity;
 
   private _quantity : number;
 
@@ -11,15 +16,32 @@ export class PositionEntity {
 
   private _date : Date;
 
-  constructor(asset: AssetEntity, quantity: number, price: number, date: Date) {
+  constructor(
+    asset: AssetEntity,
+    user: UserEntity,
+    quantity: number,
+    price: number,
+    date: Date,
+    id: number | undefined,
+  ) {
     try {
+      this.id = id;
       this.asset = asset;
+      this.user = user;
       this.quantity = quantity;
       this.price = price;
       this.date = date;
     } catch (error) {
       throw EntityConstructionError(error.message);
     }
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  set id(id: number) {
+    this._id = id;
   }
 
   get asset() {
@@ -32,6 +54,18 @@ export class PositionEntity {
     }
 
     this._asset = asset;
+  }
+
+  get user(): UserEntity {
+    return this._user;
+  }
+
+  set user(user: UserEntity) {
+    if (!user) {
+      throw EntityError('It was not possible create the position object!\n User is undefined.');
+    }
+
+    this._user = user;
   }
 
   get quantity() {

@@ -22,7 +22,9 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
   public async get(
     filters: IDividendPaymentsTimeSeriesReportInput,
   ): Promise<ITimeSeriesReportOutput<IDividendPaymentReport>> {
-    const { codes, beginMonth, endMonth } = filters;
+    const {
+      user, codes, beginMonth, endMonth,
+    } = filters;
 
     const today = new Date();
     const beginDate = beginMonth ? this.dateHandlerUtil.parse(beginMonth, 'yyyy-MM')
@@ -31,12 +33,16 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
       : new Date(today.getFullYear(), today.getMonth(), 1);
     const endDate = new Date(parsedEndDate.getFullYear(), parsedEndDate.getMonth() + 1, 0);
 
+    if (!user) {
+      throw BadRequestError('The user is not entered');
+    }
+
     if (!this.dateHandlerUtil.isTimeInterval(beginDate, endDate)) {
       throw BadRequestError('The end date is greater than begin date.');
     }
 
     const result = await this.dividendPaymentRepository.getDividendPaymentsByMonth(
-      codes, beginDate, endDate,
+      user, codes, beginDate, endDate,
     );
 
     const assetTimeseries = new Map< string, IAssetReport<IDividendPaymentReport>>();

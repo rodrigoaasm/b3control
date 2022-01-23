@@ -6,6 +6,7 @@ import {
 } from 'typeorm';
 
 import { AssetModel } from './asset-model';
+import { UserModel } from './user-model';
 
 export const DIVIDEND_PAYMENT_TABLE_NAME = 'dividend_payment';
 
@@ -20,6 +21,10 @@ export class DividendPaymentModel {
   @OneToOne(() => AssetModel)
   @JoinColumn({ name: 'asset_id' })
   public asset : AssetModel;
+
+  @OneToOne(() => UserModel)
+  @JoinColumn({ name: 'user_id' })
+  public user : UserModel;
 
   @Column({ name: 'created_at' })
   public createdAt : Date;

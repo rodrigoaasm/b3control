@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { EntityConstructionError, EntityError } from '@domain-error/custom-error';
 import { AssetEntity } from '@entities/asset/asset-entity';
+import UserEntity from '@entities/user/user-entity';
 import { OperationType } from './operation-type';
 
 export class OperationEntity {
@@ -14,15 +15,23 @@ export class OperationEntity {
 
   private _asset : AssetEntity;
 
+  private _user: UserEntity;
+
   private _createdAt : Date;
 
   constructor(
-    id: number, value: number, quantity: number,
-    type: OperationType, asset: AssetEntity, createdAt: Date,
+    id: number,
+    value: number,
+    quantity: number,
+    type: OperationType,
+    asset: AssetEntity,
+    user: UserEntity,
+    createdAt: Date,
   ) {
     try {
       this.id = id;
       this.asset = asset;
+      this.user = user;
       this.quantity = quantity;
       this.value = value;
       this.type = type;
@@ -86,6 +95,18 @@ export class OperationEntity {
     }
 
     this._asset = asset;
+  }
+
+  get user(): UserEntity {
+    return this._user;
+  }
+
+  set user(user: UserEntity) {
+    if (!user) {
+      throw EntityError('It was not possible create the operation object!\n User is undefined.');
+    }
+
+    this._user = user;
   }
 
   get createdAt(): Date {

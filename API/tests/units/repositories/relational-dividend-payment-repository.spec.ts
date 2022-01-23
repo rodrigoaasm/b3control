@@ -6,6 +6,7 @@ import { IDividendPaymentFactory } from '@domain-ports/factories/dividend-paymen
 import { DividendPaymentEntity } from '@entities/dividend-payment';
 import { DividendPaymentRepository } from '@external/datasource/relational/repositories/dividend-payment-repository';
 import createConnectionMock from '@test-mocks/type-orm-mock';
+import { UserEntity } from '@entities/user';
 
 const mockParentRepository = {
   save: jest.fn((object: any) => ({
@@ -19,12 +20,13 @@ const connectionMock = createConnectionMock(mockParentRepository);
 class DividendPaymentFactoryMock implements IDividendPaymentFactory {
   // eslint-disable-next-line class-methods-use-this
   make(
+    user: UserEntity,
     value: number,
     asset: AssetEntity,
     createdAt: Date,
     id?: number,
   ): DividendPaymentEntity {
-    return new DividendPaymentEntity(id, value, asset, createdAt);
+    return new DividendPaymentEntity(id, user, value, asset, createdAt);
   }
 }
 
@@ -32,11 +34,13 @@ describe('Relational - payment Repository', () => {
   let date: Date;
   let asset: any;
   let dividendPaymentRepository: DividendPaymentRepository;
+  let user: UserEntity;
   const dateRegex = /([A-Za-z]{3} ){2}[\d]{2} [\d]{4}/g;
 
   beforeEach(() => {
     date = new Date();
     asset = new AssetEntity(1, 'TEST11', 'Teste', '', 'stock');
+    user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
 
     // clear mock
     connectionMock.queryBuilder.innerJoin = () => connectionMock.queryBuilder;
@@ -48,7 +52,7 @@ describe('Relational - payment Repository', () => {
   });
 
   it('Should insert the entry in the database', async () => {
-    const payment = new DividendPaymentEntity(undefined, 1.95, asset, date);
+    const payment = new DividendPaymentEntity(undefined, user, 1.95, asset, date);
 
     const savedPayment = await dividendPaymentRepository.save(payment);
 
@@ -65,7 +69,7 @@ describe('Relational - payment Repository', () => {
       throw new QueryFailedError('', [], {});
     });
 
-    const payment = new DividendPaymentEntity(undefined, 1.95, asset, date);
+    const payment = new DividendPaymentEntity(undefined, user, 1.95, asset, date);
     try {
       await dividendPaymentRepository.save(payment);
     } catch (e) {
@@ -83,18 +87,18 @@ describe('Relational - payment Repository', () => {
       expect(dates[1]).toEqual(new Date('2022-01-01T13:00:00.000Z').toDateString());
       return connectionMock.queryBuilder;
     };
-    await dividendPaymentRepository.getDividendPaymentsByMonth([], new Date('2021-01-01T13:00:00.000Z'), new Date('2022-01-01T13:00:00.000Z'));
+    await dividendPaymentRepository.getDividendPaymentsByMonth(user, [], new Date('2021-01-01T13:00:00.000Z'), new Date('2022-01-01T13:00:00.000Z'));
 
     expect.anything();
   });
 
   it('Should run successfully when code filter was entered ', async () => {
     expect.assertions(1);
-    connectionMock.queryBuilder.where = (query, params) => {
+    connectionMock.queryBuilder.andWhere = (query, params) => {
       expect(params.codes).toEqual(['TEST11']);
       return connectionMock.queryBuilder;
     };
-    await dividendPaymentRepository.getDividendPaymentsByMonth(['TEST11'], new Date(), new Date());
+    await dividendPaymentRepository.getDividendPaymentsByMonth(user, ['TEST11'], new Date(), new Date());
     expect.anything();
   });
 
@@ -107,7 +111,7 @@ describe('Relational - payment Repository', () => {
       return connectionMock.queryBuilder;
     };
     const assetTimeseries = await dividendPaymentRepository
-      .getDividendPaymentsByMonth([], new Date(), new Date());
+      .getDividendPaymentsByMonth(user, [], new Date(), new Date());
     expect(assetTimeseries.length).toEqual(0);
   });
 });

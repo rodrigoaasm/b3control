@@ -1,5 +1,8 @@
+import { UserEntity } from '@entities/user';
+
 export interface IReportInput {
-  codes : Array<string>
+  user: UserEntity,
+  codes : Array<string>,
   begin ?: Date,
   end ?: Date
 }
