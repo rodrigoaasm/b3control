@@ -23,7 +23,7 @@ describe('ReportInputHandler', () => {
 
   it('Should return the filters with 3 codes, when an asset code list is entered', () => {
     const params = {
-      user: {},
+      userId: 'uuid',
       codes: 'TEST4,TEST3,TEST11',
     };
 
@@ -34,7 +34,7 @@ describe('ReportInputHandler', () => {
 
   it('Should return the filters with begin date defined, when the begin date is valid', async () => {
     const params = {
-      user: {},
+      userId: 'uuid',
       begin: new Date(),
     };
 
@@ -44,7 +44,7 @@ describe('ReportInputHandler', () => {
 
   it('Should return the filters with end date defined, when the end date is valid', async () => {
     const params = {
-      user: {},
+      userId: 'uuid',
       end: new Date(),
     };
 
@@ -58,7 +58,7 @@ describe('ReportInputHandler', () => {
 
     let error;
     try {
-      reportInputHandler.handle({ user: {}, begin: 'invalid' });
+      reportInputHandler.handle({ userId: 'uuid', begin: 'invalid' });
     } catch (e) {
       error = e;
     }
@@ -72,7 +72,7 @@ describe('ReportInputHandler', () => {
 
     let error;
     try {
-      reportInputHandler.handle({ user: {}, end: 'invalid' });
+      reportInputHandler.handle({ userId: 'uuid', end: 'invalid' });
     } catch (e) {
       error = e;
     }
@@ -84,7 +84,7 @@ describe('ReportInputHandler', () => {
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {
     dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);
     const filters = {
-      user: {},
+      userId: 'uuid',
       codes: [],
       begin: new Date('2021-08-01T23:00:00.000Z'),
       end: new Date('2021-01-01T23:00:00.000Z'),

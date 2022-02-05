@@ -111,11 +111,11 @@ export default class DividendPaymentRepositoryMock implements IDividendPaymentRe
   }
 
   getDividendPaymentsByMonth(
-    user: UserEntity, codes: string[], begin: Date, end: Date,
+    userId: string, codes: string[], begin: Date, end: Date,
   ): Promise<any[]> {
     return Promise.resolve(
       this.payments.filter((payment: any): boolean => (
-        user.id === payment.user.id
+        userId === payment.user.id
           && (!codes || codes.length === 0 || codes.includes(payment.code))
           && (!begin || payment.month >= begin)
           && (!end || payment.month <= end)

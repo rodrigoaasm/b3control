@@ -1,8 +1,7 @@
 import { OperationEntity } from '@entities/operation/';
-import { UserEntity } from '@entities/user';
 
 export interface ISubmitOperationInput {
-  user: UserEntity,
+  userId: string,
   value : number,
   quantity : number,
   type : 'buy' | 'sale',

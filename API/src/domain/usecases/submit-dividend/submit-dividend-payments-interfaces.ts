@@ -1,8 +1,7 @@
 import { DividendPaymentEntity } from '@entities/dividend-payment';
-import { UserEntity } from '@entities/user';
 
 export interface ISubmitDividendPaymentInput {
-  user: UserEntity,
+  userId: string,
   value : number,
   assetCode : string,
   createdAt : string | Date

@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { AssetCategory, AssetEntity } from '@entities/asset';
 import { SubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-usecase';
@@ -7,6 +8,7 @@ import OperationRepositoryMock from '@test-mocks/operation-repository-mock';
 import AssetRepositoryMock from '@test-mocks/asset-repository-mock';
 import { OperationType, OperationEntity } from '@entities/operation';
 import { UserEntity } from '@entities/user';
+import { IUserRepository } from '@domain-ports/repositories/user-repository-interface';
 
 class OperationFactoryMock implements IOperationFactory {
   constructor(private date: Date) {
@@ -21,22 +23,35 @@ class OperationFactoryMock implements IOperationFactory {
   }
 }
 
+const date = new Date();
+const user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
+
+class UserRepositoryMock implements IUserRepository {
+  // eslint-disable-next-line class-methods-use-this
+  async findUser(userId: string): Promise<UserEntity> {
+    if (userId) {
+      return user;
+    }
+
+    return undefined;
+  }
+}
+
 describe('Submit Operation Use Case', () => {
   let submitOperationService : SubmitOperationUseCase;
-  let date: Date;
-  let user: UserEntity;
 
   beforeEach(() => {
-    date = new Date();
-    user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
     submitOperationService = new SubmitOperationUseCase(
-      new OperationRepositoryMock(), new AssetRepositoryMock(), new OperationFactoryMock(date),
+      new OperationRepositoryMock(),
+      new AssetRepositoryMock(),
+      new UserRepositoryMock(),
+      new OperationFactoryMock(date),
     );
   });
 
   it('Should register an operation', async () => {
     const submitedOperation = await submitOperationService.submit({
-      user,
+      userId: user.id,
       value: 15.95,
       quantity: 200,
       type: 'buy',
@@ -62,11 +77,30 @@ describe('Submit Operation Use Case', () => {
 
     try {
       await submitOperationService.submit({
-        user,
+        userId: user.id,
         value: 15.95,
         quantity: 200,
         type: 'buy',
         assetCode: 'TEST4',
+        createdAt: date,
+      });
+    } catch (submitedError) {
+      error = submitedError;
+    }
+
+    expect(error.name).toBe('Error');
+  });
+
+  it('Should throw an error when the user not found', async () => {
+    let error: Error;
+
+    try {
+      await submitOperationService.submit({
+        userId: undefined,
+        value: 15.95,
+        quantity: 200,
+        type: 'buy',
+        assetCode: 'TEST11',
         createdAt: date,
       });
     } catch (submitedError) {

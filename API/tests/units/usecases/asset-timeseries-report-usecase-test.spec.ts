@@ -34,7 +34,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
   it('Should return formatted data, when repository returns data', async () => {
     const filter: IReportInput = {
-      user: defaultUser,
+      userId: defaultUser.id,
       codes: undefined,
       begin: undefined,
       end: undefined,
@@ -162,7 +162,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
   it('Should return an empty dataset, when the repository does not return anything', async () => {
     const filter: IReportInput = {
-      user: defaultUser,
+      userId: defaultUser.id,
       codes: ['notexits'],
       begin: undefined,
       end: undefined,
@@ -178,7 +178,7 @@ describe('Asset Timeseries Report UseCase', () => {
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {
     dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);
     const filter: IReportInput = {
-      user: defaultUser,
+      userId: defaultUser.id,
       codes: [],
       begin: new Date('2021-08-01T23:00:00.000Z'),
       end: new Date('2021-01-01T23:00:00.000Z'),

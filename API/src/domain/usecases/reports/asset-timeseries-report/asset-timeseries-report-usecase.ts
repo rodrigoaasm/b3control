@@ -89,7 +89,7 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
     }
 
     const result = await this.positionRepository.getAssetTimeseries(
-      filters.user.id, filters.codes, filters.begin, filters.end,
+      filters.userId, filters.codes, filters.begin, filters.end,
     );
 
     const assetTimeseries = new Map< string, IAssetReport<IPositionReport> >();

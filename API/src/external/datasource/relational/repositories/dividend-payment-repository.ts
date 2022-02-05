@@ -44,7 +44,7 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
   }
 
   async getDividendPaymentsByMonth(
-    user: UserEntity, codes: string[], begin: Date, end: Date,
+    userId: string, codes: string[], begin: Date, end: Date,
   ): Promise<any[]> {
     let mainQuery = this.connection.createQueryBuilder()
       .select([
@@ -59,7 +59,7 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
         `(select generate_series(timestamp '${begin.toDateString()}', timestamp '${end.toDateString()}', interval  '1 month') as month)`, 'series', 'true',
       )
       .leftJoin(DividendPaymentModel, 'dp', 'a.id = dp.asset_id  and dp.created_at >= series.month  and dp.created_at < (series.month + interval \'1 months\')')
-      .where('dp.user_id = :userId', { userId: user.id });
+      .where('dp.user_id = :userId', { userId });
 
     if (codes.length > 0) {
       mainQuery = mainQuery.andWhere('a.code in (:...codes)', { codes });

@@ -23,7 +23,7 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
     filters: IDividendPaymentsTimeSeriesReportInput,
   ): Promise<ITimeSeriesReportOutput<IDividendPaymentReport>> {
     const {
-      user, codes, beginMonth, endMonth,
+      userId, codes, beginMonth, endMonth,
     } = filters;
 
     const today = new Date();
@@ -33,7 +33,7 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
       : new Date(today.getFullYear(), today.getMonth(), 1);
     const endDate = new Date(parsedEndDate.getFullYear(), parsedEndDate.getMonth() + 1, 0);
 
-    if (!user) {
+    if (!userId) {
       throw BadRequestError('The user is not entered');
     }
 
@@ -42,7 +42,7 @@ implements IDividendPaymentsTimeSeriesReportUseCase {
     }
 
     const result = await this.dividendPaymentRepository.getDividendPaymentsByMonth(
-      user, codes, beginDate, endDate,
+      userId, codes, beginDate, endDate,
     );
 
     const assetTimeseries = new Map< string, IAssetReport<IDividendPaymentReport>>();

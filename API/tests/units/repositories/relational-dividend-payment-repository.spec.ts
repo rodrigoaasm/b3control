@@ -87,7 +87,7 @@ describe('Relational - payment Repository', () => {
       expect(dates[1]).toEqual(new Date('2022-01-01T13:00:00.000Z').toDateString());
       return connectionMock.queryBuilder;
     };
-    await dividendPaymentRepository.getDividendPaymentsByMonth(user, [], new Date('2021-01-01T13:00:00.000Z'), new Date('2022-01-01T13:00:00.000Z'));
+    await dividendPaymentRepository.getDividendPaymentsByMonth(user.id, [], new Date('2021-01-01T13:00:00.000Z'), new Date('2022-01-01T13:00:00.000Z'));
 
     expect.anything();
   });
@@ -98,7 +98,7 @@ describe('Relational - payment Repository', () => {
       expect(params.codes).toEqual(['TEST11']);
       return connectionMock.queryBuilder;
     };
-    await dividendPaymentRepository.getDividendPaymentsByMonth(user, ['TEST11'], new Date(), new Date());
+    await dividendPaymentRepository.getDividendPaymentsByMonth(user.id, ['TEST11'], new Date(), new Date());
     expect.anything();
   });
 
@@ -111,7 +111,7 @@ describe('Relational - payment Repository', () => {
       return connectionMock.queryBuilder;
     };
     const assetTimeseries = await dividendPaymentRepository
-      .getDividendPaymentsByMonth(user, [], new Date(), new Date());
+      .getDividendPaymentsByMonth(user.id, [], new Date(), new Date());
     expect(assetTimeseries.length).toEqual(0);
   });
 });

@@ -1,7 +1,10 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { AssetEntity } from '@entities/asset';
 
 import { IDividendPaymentFactory } from '@domain-ports/factories/dividend-payment-factory-interface';
+import { IUserRepository } from '@domain-ports/repositories/user-repository-interface';
 import { DividendPaymentEntity } from '@entities/dividend-payment';
 import { SubmitDividendPaymentUseCase } from '@usecases/submit-dividend/submit-dividend-payments-usecase';
 import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
@@ -20,24 +23,34 @@ class DividendPaymentFactoryMock implements IDividendPaymentFactory {
   }
 }
 
+const date = new Date();
+const user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
+
+class UserRepositoryMock implements IUserRepository {
+  async findUser(userId: string): Promise<UserEntity> {
+    if (userId) {
+      return user;
+    }
+
+    return undefined;
+  }
+}
+
 describe('Submit Dividend Payment Use Case', () => {
   let submitDividendPaymentUseCase : SubmitDividendPaymentUseCase;
-  let date: Date;
-  let user: UserEntity;
 
   beforeEach(() => {
-    date = new Date();
-    user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
     submitDividendPaymentUseCase = new SubmitDividendPaymentUseCase(
       new DividendPaymentRepositoryMock(),
       new AssetRepositoryMock(),
+      new UserRepositoryMock(),
       new DividendPaymentFactoryMock(date),
     );
   });
 
   it('Should register an dividend payment', async () => {
     const submitedPayment = await submitDividendPaymentUseCase.submit({
-      user,
+      userId: user.id,
       value: 15.95,
       assetCode: 'TEST11',
       createdAt: date,
@@ -59,7 +72,7 @@ describe('Submit Dividend Payment Use Case', () => {
 
     try {
       await submitDividendPaymentUseCase.submit({
-        user,
+        userId: user.id,
         value: 15.95,
         assetCode: 'TEST4',
         createdAt: date,
@@ -68,7 +81,24 @@ describe('Submit Dividend Payment Use Case', () => {
       error = submitedError;
     }
 
-    expect(error.name).toBe('Error');
+    expect(error.message).toBe('Asset not found');
+  });
+
+  it('Should throw an error when the user not found', async () => {
+    let error: Error;
+
+    try {
+      await submitDividendPaymentUseCase.submit({
+        userId: undefined,
+        value: 15.95,
+        assetCode: 'TEST11',
+        createdAt: date,
+      });
+    } catch (submitedError) {
+      error = submitedError;
+    }
+
+    expect(error.message).toEqual('User not found');
   });
 
   it('Should throw an error when required attributes are not entered', async () => {

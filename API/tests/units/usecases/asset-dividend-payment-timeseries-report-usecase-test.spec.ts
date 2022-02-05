@@ -51,7 +51,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
   it('Should return all data', async () => {
     dateHandlerUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
     const filter: IDividendPaymentsTimeSeriesReportInput = {
-      user: userEntity,
+      userId: userEntity.id,
       codes: undefined,
       begin: undefined,
       end: undefined,
@@ -170,7 +170,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
   it('Should return an empty dataset, when the repository does not return anything', async () => {
     dateHandlerUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
     const filter: IReportInput = {
-      user: userEntity,
+      userId: userEntity.id,
       codes: ['notexits'],
       begin: undefined,
       end: undefined,
@@ -197,7 +197,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
       });
 
     const filter: IReportInput = {
-      user: userEntity,
+      userId: userEntity.id,
       codes: undefined,
       begin: undefined,
       end: undefined,
@@ -210,7 +210,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {
     dateHandlerUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);
     const filter: IDividendPaymentsTimeSeriesReportInput = {
-      user: userEntity,
+      userId: userEntity.id,
       codes: [],
       beginMonth: '2021-08',
       endMonth: '2021-01',

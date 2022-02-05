@@ -8,7 +8,7 @@ export class ReportInputHandler implements IReportInputHandler {
   }
 
   public handle(params: any): IReportInput {
-    if (!params.user) {
+    if (!params.userId) {
       throw BadRequestError('The user was not informed.');
     }
 
@@ -29,7 +29,7 @@ export class ReportInputHandler implements IReportInputHandler {
     }
 
     return {
-      user: params.user,
+      userId: params.userId,
       codes: params.codes ? params.codes.split(',') : [],
       begin: beginDate,
       end: endDate,
