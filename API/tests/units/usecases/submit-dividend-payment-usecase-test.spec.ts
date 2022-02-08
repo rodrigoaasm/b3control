@@ -27,6 +27,10 @@ const date = new Date();
 const user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
 
 class UserRepositoryMock implements IUserRepository {
+  signIn(username: string, password: string): Promise<UserEntity> {
+    throw new Error('Method not implemented.');
+  }
+
   async findUser(userId: string): Promise<UserEntity> {
     if (userId) {
       return user;

@@ -8,5 +8,6 @@ export const EntityConstructionError = (message: string) => new CustomError('ENT
 export const EntityError = (message: string) => new CustomError('ENTITY_ERROR', message);
 export const NotFoundError = (message: string) => new CustomError('NOT_FOUND_ERROR', message);
 export const BadRequestError = (message: string) => new CustomError('BAD_REQUEST_ERROR', message);
+export const UnauthorizedError = (message: string) => new CustomError('UNAUTHORIZED_ERROR', message);
 
 export default CustomError;
