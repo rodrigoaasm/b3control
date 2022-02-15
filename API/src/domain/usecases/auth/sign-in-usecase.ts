@@ -7,7 +7,7 @@ import { ISignInOutput, ISignInUseCase } from './sign-in-interface';
 export class SignInUsecase implements ISignInUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private jwtHandlerUtil: IJWTHandlerAdapter,
+    private jwtHandler: IJWTHandlerAdapter,
   ) {
   }
 
@@ -24,7 +24,7 @@ export class SignInUsecase implements ISignInUseCase {
       throw UnauthorizedError('Username and password don\'t match a user!');
     }
 
-    const jwt = this.jwtHandlerUtil.generateToken({ id: user.id }, 1800000);
+    const jwt = this.jwtHandler.generateToken({ id: user.id }, 1800000);
 
     return {
       _token: jwt,

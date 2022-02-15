@@ -1,5 +1,6 @@
 export interface IApplicationRequest{
-  header : any;
+  header: any;
   params: any;
-  body : any;
+  body: any;
+  owner?: any
 }
