@@ -1,23 +1,16 @@
 /* eslint-disable arrow-body-style */
 import { Request, Response } from 'express';
 import { IApplicationRequest, IApplicationResponse } from '@application/types';
-import CustomError from '@domain-error/custom-error';
-
-const HTTPError = {
-  ENTITY_CONSTRUCTION_ERROR: 400,
-  NOT_FOUND_ERROR: 404,
-  BAD_REQUEST_ERROR: 400,
-};
+import { IExpressHttpErrorAdapter } from '@application/ports/express-http-error-adapter-interface';
 
 export class ExpressRouterAdapter {
-  public static parseHTTPError(status: string) {
-    return (HTTPError[status] ? HTTPError[status] : 500);
+  constructor(private expressHTTPErrorAdapter: IExpressHttpErrorAdapter) {
   }
 
-  public static routerAdapter = async (routeFunc : Function) => {
+  public routerAdapter = async (routeFunc : Function) => {
     return async (expressRequest : Request, expressResponse : Response) => {
       const aplicationRequest: IApplicationRequest = {
-        header: expressRequest.header,
+        headers: expressRequest.headers,
         body: expressRequest.body,
         params: expressRequest.params,
       };
@@ -25,11 +18,8 @@ export class ExpressRouterAdapter {
       let aplicationResponse : IApplicationResponse;
       try {
         aplicationResponse = await routeFunc(aplicationRequest);
-      } catch (error) {
-        return expressResponse.status(ExpressRouterAdapter.parseHTTPError(error.status)).json({
-          message: error.message,
-          status: error instanceof CustomError ? error.status : 'UNKNOWN',
-        });
+      } catch (aplicationError) {
+        return this.expressHTTPErrorAdapter.handleHTTPError(expressResponse, aplicationError);
       }
 
       return expressResponse.status(aplicationResponse.code).json(aplicationResponse.body);
