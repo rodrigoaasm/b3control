@@ -29,7 +29,7 @@ describe('Dividend Payment Timeseries Controller', () => {
   it('Should execute the listing successfully, when no filter is entered', async () => {
     const request: IApplicationRequest = {
       body: {},
-      header: {},
+      headers: {},
       params: {},
     };
 
@@ -45,7 +45,7 @@ describe('Dividend Payment Timeseries Controller', () => {
     });
     const request: IApplicationRequest = {
       body: {},
-      header: {},
+      headers: {},
       params: {
         begin: 'Invalid Date',
       },

@@ -35,7 +35,7 @@ describe('Operation Controller', () => {
 
   it('Should execute the submission successfully', async () => {
     const response = await dividendPaymentController.submit({
-      header: [],
+      headers: [],
       params: [],
       body: {
         value: 2.00,
@@ -54,12 +54,6 @@ describe('Operation Controller', () => {
         _logo: '',
         _social: 'Teste',
       },
-      _user: {
-        _id: 'jbfjbkglkbnlknglkb',
-        _name: 'user',
-        _createdAt: date,
-        _updatedAt: date,
-      },
       _id: 1,
       _value: 2.00,
     });
@@ -71,7 +65,7 @@ describe('Operation Controller', () => {
 
     try {
       await dividendPaymentController.submit({
-        header: [],
+        headers: [],
         params: [],
         body: [],
       });

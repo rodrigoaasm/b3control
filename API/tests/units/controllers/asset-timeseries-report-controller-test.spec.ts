@@ -35,7 +35,7 @@ describe('Asset Timeseries Report Controller', () => {
   it('Should execute the listing successfully, when no filter is entered', async () => {
     const request: IApplicationRequest = {
       body: {},
-      header: {},
+      headers: {},
       params: {},
     };
 
@@ -50,7 +50,7 @@ describe('Asset Timeseries Report Controller', () => {
     });
     const request: IApplicationRequest = {
       body: {},
-      header: {},
+      headers: {},
       params: {
         begin: 'Invalid Date',
       },

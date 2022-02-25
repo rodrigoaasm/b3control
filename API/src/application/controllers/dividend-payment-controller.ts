@@ -15,7 +15,10 @@ export class DividendPaymentController {
 
     return {
       code: 201,
-      body: submitedOperation,
+      body: {
+        ...submitedOperation,
+        _user: undefined,
+      },
     };
   };
 }

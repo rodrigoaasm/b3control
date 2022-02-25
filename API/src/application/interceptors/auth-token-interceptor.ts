@@ -9,11 +9,11 @@ export class AuthTokenInterceptor {
   }
 
   verify(request: IApplicationRequest, next: Function) {
-    if (!request?.header?.authorization) {
+    if (!request?.headers?.authorization) {
       throw UnauthorizedError('The token was not informed!');
     }
 
-    request.owner = this.jwtHandler.verifyAndDecodeToken(request.header.authorization);
+    request.owner = this.jwtHandler.verifyAndDecodeToken(request.headers.authorization);
     next();
   }
 }

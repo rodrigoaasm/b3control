@@ -9,13 +9,21 @@ export class OperationController {
   }
 
   public submit = async (req : IApplicationRequest) : Promise<IApplicationResponse> => {
-    const submitedOperation = await this.submitOperationUseCase.submit(
-      req.body as ISubmitOperationInput,
-    );
+    const submitedOperation = await this.submitOperationUseCase.submit({
+      userId: req.owner,
+      assetCode: req.body.assetCode,
+      type: req.body.type,
+      value: req.body.value,
+      quantity: req.body.quantity,
+      createdAt: req.body.createdAt,
+    } as ISubmitOperationInput);
 
     return {
       code: 201,
-      body: submitedOperation,
+      body: {
+        ...submitedOperation,
+        _user: undefined,
+      },
     };
   };
 }

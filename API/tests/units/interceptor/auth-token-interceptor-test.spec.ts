@@ -26,7 +26,7 @@ describe('AuthTokenInterceptor', () => {
   it('Should verify token and return the jwt data when the token is valid', () => {
     const request: IApplicationRequest = {
       body: {},
-      header: { authorization: 'Bearer token' },
+      headers: { authorization: 'Bearer token' },
       params: {},
     };
 
@@ -39,7 +39,7 @@ describe('AuthTokenInterceptor', () => {
     expect.assertions(1);
     const request: IApplicationRequest = {
       body: {},
-      header: { authorization: 'Bearer token' },
+      headers: { authorization: 'Bearer token' },
       params: {},
     };
 
@@ -60,7 +60,7 @@ describe('AuthTokenInterceptor', () => {
     expect.assertions(1);
     const request: IApplicationRequest = {
       body: {},
-      header: { authorization: 'Bearer token' },
+      headers: { authorization: 'Bearer token' },
       params: {},
     };
 

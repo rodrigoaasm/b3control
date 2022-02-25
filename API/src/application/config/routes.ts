@@ -1,27 +1,31 @@
 import * as express from 'express';
 import { ExpressRouterAdapter } from '@external/adapters/express-router-adapter';
 
-export default async (app : express.Express, internalDependencies) => {
+export default async (app: express.Express, internalDependencies: any) => {
+  const expressRouterAdapter = new ExpressRouterAdapter(
+    internalDependencies.expressHttpErrorAdapter,
+  );
+
   app.post(
     '/operation',
-    await ExpressRouterAdapter.routerAdapter(internalDependencies.operationController.submit),
+    await expressRouterAdapter.routerAdapter(internalDependencies.operationController.submit),
   );
 
   app.post(
     '/dividendpayment',
-    await ExpressRouterAdapter.routerAdapter(internalDependencies.dividendPaymentController.submit),
+    await expressRouterAdapter.routerAdapter(internalDependencies.dividendPaymentController.submit),
   );
 
   app.get(
     '/report/assettimeseries/codes/:codes?/begin/:begin?/end/:end?',
-    await ExpressRouterAdapter.routerAdapter(
+    await expressRouterAdapter.routerAdapter(
       internalDependencies.assetTimeseriesReportController.getStockTimeseries,
     ),
   );
 
   app.get(
     '/report/dividendpayments/codes/:codes?/begin/:begin?/end/:end?',
-    await ExpressRouterAdapter.routerAdapter(
+    await expressRouterAdapter.routerAdapter(
       internalDependencies.dividendPaymentTimeseriesController.getDividendPaymentTimeseries,
     ),
   );

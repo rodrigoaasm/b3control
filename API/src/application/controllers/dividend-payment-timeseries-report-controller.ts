@@ -14,6 +14,7 @@ export class DividendPaymentTimeseriesController {
   public getDividendPaymentTimeseries =
   async (req : IApplicationRequest) : Promise<IApplicationResponse> => {
     const filters: IDividendPaymentsTimeSeriesReportInput = {
+      userId: req.owner,
       codes: req.params.codes ? req.params.codes.split(',') : [],
       beginMonth: req.params.begin,
       endMonth: req.params.end,

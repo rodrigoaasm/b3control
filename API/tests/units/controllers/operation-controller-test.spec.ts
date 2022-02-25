@@ -3,17 +3,22 @@ import { OperationEntity } from '@entities/operation';
 import { AssetEntity } from '@entities/asset';
 import { ISubmitOperationInput, ISubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-interfaces';
 import CustomError from '@domain-error/custom-error';
+import { UserEntity } from '@entities/user';
 
 class SubmitOperationMock implements ISubmitOperationUseCase {
   private asset: AssetEntity;
+
+  private user: UserEntity;
 
   constructor() {
     this.asset = new AssetEntity(1, 'TEST11', 'Teste', '', 'stock');
   }
 
   async submit(input: ISubmitOperationInput): Promise<OperationEntity> {
+    const date = new Date();
+    const user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
     return new OperationEntity(
-      1, input.value, input.quantity, input.type, this.asset, new Date(input.createdAt),
+      1, input.value, input.quantity, input.type, this.asset, user, new Date(input.createdAt),
     );
   }
 }
@@ -31,7 +36,7 @@ describe('Operation Controller', () => {
     const date = new Date();
 
     const response = await operationController.submit({
-      header: [],
+      headers: [],
       params: [],
       body: {
         value: 20,
@@ -64,7 +69,7 @@ describe('Operation Controller', () => {
 
     try {
       await operationController.submit({
-        header: [],
+        headers: [],
         params: [],
         body: [],
       });

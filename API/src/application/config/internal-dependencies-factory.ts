@@ -16,13 +16,17 @@ import { DividendPaymentController } from '@controllers/dividend-payment-control
 import { ReportInputHandler } from '@utils/report-input-handler';
 import { DividendPaymentTimeSeriesReportUseCase } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-usecase';
 import { DividendPaymentTimeseriesController } from '@controllers/dividend-payment-timeseries-report-controller';
-import DateHandlerUtil from '@utils/date-handler-util';
+import { DateHandlerUtil } from '@utils/date-handler-util';
+import { ExpressHTTPErrorAdapter } from '@external/adapters/express-http-error-adapter';
 
 export class InternalDependenciesFactory {
   public static make(connection: Connection) {
     // Utils
     const dateHandlerUtil = new DateHandlerUtil();
     const reportInputHandler = new ReportInputHandler(dateHandlerUtil);
+
+    // Adapters
+    const expressHttpErrorAdapter = new ExpressHTTPErrorAdapter();
 
     // Factories
     const operationFactory = new OperationFactory(dateHandlerUtil);
@@ -62,6 +66,7 @@ export class InternalDependenciesFactory {
     );
 
     return {
+      expressHttpErrorAdapter,
       operationController,
       assetTimeseriesReportController,
       dividendPaymentController,
