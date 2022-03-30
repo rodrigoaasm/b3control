@@ -12,6 +12,7 @@
       "@domain-error/*": ["./src/domain/error/*"],
       "@usecases/*": ["./src/domain/usecases/*"],
       "@controllers/*": ["./src/application/controllers/*"],
+      "@interceptors/*": ["./src/application/interceptors/*"],
       "@utils/*": ["./src/external/utils/*"],  
       "@external/*":["./src/external/*"],
       "@config/*": ["./src/application/config/*"],

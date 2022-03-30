@@ -1,5 +1,5 @@
 import { IApplicationRequest, IApplicationResponse } from 'src/application/types';
-import { ISubmitDividendPaymentUseCase, ISubmitDividendPaymentInput } from '@usecases/submit-dividend/submit-dividend-payments-interfaces';
+import { ISubmitDividendPaymentUseCase } from '@usecases/submit-dividend/submit-dividend-payments-interfaces';
 
 export class DividendPaymentController {
   constructor(
@@ -9,9 +9,12 @@ export class DividendPaymentController {
   }
 
   public submit = async (req : IApplicationRequest) : Promise<IApplicationResponse> => {
-    const submitedOperation = await this.submitDividendPaymentUseCase.submit(
-      req.body as ISubmitDividendPaymentInput,
-    );
+    const submitedOperation = await this.submitDividendPaymentUseCase.submit({
+      userId: req.headers.owner,
+      assetCode: req.body.assetCode,
+      createdAt: req.body.createdAt,
+      value: req.body.value,
+    });
 
     return {
       code: 201,

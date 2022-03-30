@@ -9,8 +9,10 @@ import { AssetModel, ASSET_TABLE_NAME } from '@external/datasource/relational/mo
 import { OperationModel, OPERATION_TABLE_NAME } from '@external/datasource/relational/models/operation-model';
 import { AssetQuoteModel, ASSET_QUOTE_TABLE_NAME } from '@external/datasource/relational/models/asset-quote-model';
 import { DividendPaymentModel, DIVIDEND_PAYMENT_TABLE_NAME } from '@external/datasource/relational/models/dividend-payment-model';
+import { UserModel, USER_TABLE_NAME } from '@external/datasource/relational/models/user-model';
 
 import entities from '@external/datasource/relational/models';
+import { v4 as uuid } from 'uuid';
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ export class PostgresDataSetup {
   private connection: Connection;
 
   private queryRunner: QueryRunner;
+
+  private userRepositoryTest: Repository<UserModel>;
 
   private assetRepositoryTest: Repository<AssetModel>;
 
@@ -28,6 +32,8 @@ export class PostgresDataSetup {
   private dividendPaymentRepositoryTest: Repository<DividendPaymentModel>;
 
   private registeredAssets: Map<string, AssetModel>;
+
+  public registeredUsers: Array<UserModel>;
 
   constructor() {
     this.registeredAssets = new Map();
@@ -53,6 +59,7 @@ export class PostgresDataSetup {
   }
 
   public async up(): Promise<void> {
+    this.userRepositoryTest = getRepository(UserModel);
     this.assetRepositoryTest = getRepository(AssetModel);
     this.operationRepositoryTest = getRepository(OperationModel);
     this.assetQuoteRepositoryTest = getRepository(AssetQuoteModel);
@@ -62,7 +69,8 @@ export class PostgresDataSetup {
       await this.down();
     } catch (error) {
     }
-
+    const users = this.users();
+    this.registeredUsers = await this.userRepositoryTest.save(users);
     const listRegisteredAssets = await this.assetRepositoryTest.save(this.assets());
     listRegisteredAssets.forEach((asset) => {
       this.registeredAssets.set(asset.code, asset);
@@ -74,14 +82,33 @@ export class PostgresDataSetup {
   }
 
   public async down(): Promise<void> {
-    await this.queryRunner.query(`delete from ${DIVIDEND_PAYMENT_TABLE_NAME}`);
-    await this.queryRunner.query(`delete from ${ASSET_QUOTE_TABLE_NAME}`);
     await this.queryRunner.query(`delete from ${OPERATION_TABLE_NAME}`);
+    await this.queryRunner.query(`delete from ${DIVIDEND_PAYMENT_TABLE_NAME}`);
+    await this.queryRunner.query(`delete from "${USER_TABLE_NAME}"`);
+    await this.queryRunner.query(`delete from ${ASSET_QUOTE_TABLE_NAME}`);
     await this.queryRunner.query(`delete from ${ASSET_TABLE_NAME}`);
   }
 
   public async finish(): Promise<void> {
     await this.connection.close();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private users(): Array<UserModel> {
+    return [
+      {
+        id: uuid(),
+        name: 'user1',
+        createdAt: new Date('2020-01-01T13:00:00.000Z'),
+        updatedAt: new Date('2020-01-01T13:00:00.000Z'),
+      },
+      {
+        id: uuid(),
+        name: 'user2',
+        createdAt: new Date('2020-01-01T13:00:00.000Z'),
+        updatedAt: new Date('2020-01-01T13:00:00.000Z'),
+      },
+    ];
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -116,6 +143,7 @@ export class PostgresDataSetup {
         quantity: 80,
         type: 'buy',
         value: 10.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST11'),
@@ -123,6 +151,7 @@ export class PostgresDataSetup {
         quantity: -40,
         type: 'sale',
         value: 15.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST11'),
@@ -130,6 +159,7 @@ export class PostgresDataSetup {
         quantity: -40,
         type: 'sale',
         value: 15.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST4'),
@@ -137,6 +167,7 @@ export class PostgresDataSetup {
         quantity: 100,
         type: 'buy',
         value: 10.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST4'),
@@ -144,6 +175,7 @@ export class PostgresDataSetup {
         quantity: -40,
         type: 'sale',
         value: 15.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST3'),
@@ -151,6 +183,7 @@ export class PostgresDataSetup {
         quantity: 40,
         type: 'buy',
         value: 15.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST3'),
@@ -158,6 +191,7 @@ export class PostgresDataSetup {
         quantity: 40,
         type: 'buy',
         value: 15.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST3'),
@@ -165,6 +199,7 @@ export class PostgresDataSetup {
         quantity: -40,
         type: 'sale',
         value: 15.00,
+        user: this.registeredUsers[0],
       },
     ];
   }
@@ -225,36 +260,43 @@ export class PostgresDataSetup {
         asset: this.registeredAssets.get('TEST3'),
         createdAt: new Date('2021-01-12T15:00:00.000Z'),
         value: 5.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST11'),
         createdAt: new Date('2021-01-17T15:00:00.000Z'),
         value: 7.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST11'),
         createdAt: new Date('2021-02-17T15:00:00.000Z'),
         value: 7.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST3'),
         createdAt: new Date('2021-03-12T15:00:00.000Z'),
         value: 5.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST11'),
         createdAt: new Date('2021-03-17T15:00:00.000Z'),
         value: 7.00,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST3'),
         createdAt: new Date(),
         value: 10,
+        user: this.registeredUsers[0],
       },
       {
         asset: this.registeredAssets.get('TEST11'),
         createdAt: new Date(),
         value: 12,
+        user: this.registeredUsers[0],
       },
     ];
   }

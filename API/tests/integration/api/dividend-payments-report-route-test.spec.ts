@@ -3,10 +3,12 @@ import * as request from 'supertest';
 import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
 import { DateHandlerUtil } from '@utils/date-handler-util';
+import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 
 describe('GET /report/dividendpayments/...', () => {
   let app: IApp;
   let postgresDataSetup: PostgresDataSetup;
+  let accessTokens: Array<string>;
 
   const dateHandlerUtil = new DateHandlerUtil();
   const diffInMonths = dateHandlerUtil.dateDiff('Months', new Date(), new Date('2021-02-01T03:00:00.000Z')) + 1;
@@ -54,6 +56,16 @@ describe('GET /report/dividendpayments/...', () => {
     await postgresDataSetup.init();
     await postgresDataSetup.up();
     app = await createApp(postgresDataSetup.getConnection());
+
+    // generate access tokens
+    const jwtHandler = new JWTHandlerAdapter();
+    accessTokens = [];
+    accessTokens.push(
+      jwtHandler.generateToken({ id: postgresDataSetup.registeredUsers[0].id }),
+    );
+    accessTokens.push(
+      jwtHandler.generateToken({ id: postgresDataSetup.registeredUsers[1].id }),
+    );
   });
 
   afterAll(async () => {
@@ -65,6 +77,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply payments of 0 amount when no dates are set', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/2010-01/end/2010-06')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -86,6 +99,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply bad request http response, when the begin date is greater than now ', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/2222-01/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -101,6 +115,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply bad request http response, when the end date is less than now ', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/end/2000-01')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -116,6 +131,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should return the payments of this month when the time interval is not entered', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/end/')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -132,6 +148,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with all data after a month when the begin month is entered ', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/2021-02/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -150,6 +167,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with a bad request http response when the begin date is invalid', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/invalid/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -168,6 +186,7 @@ describe('GET /report/dividendpayments/...', () => {
 
     request(app.api)
       .get(`/report/dividendpayments/codes/begin/end/${dateHandlerUtil.format(endDate, 'yyyy-MM')}`)
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -191,6 +210,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply http bad request when the entered end date is less than now', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/end/2021-03')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -207,6 +227,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with a bad request http response when the end date is invalid', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/end/invalid')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -222,6 +243,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with all data within the time interval when a time interval is entered', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/2021-02/end/2021-03')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -240,6 +262,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with a bad request http response when the time interval is invalid', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/begin/2021-02/end/2021-01')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -256,6 +279,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with just one asset when the code is entered', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/TEST11/begin/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -273,6 +297,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with just one asset and its payments after a date when code and begin date are entered', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/TEST11/begin/2021-02/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -293,6 +318,7 @@ describe('GET /report/dividendpayments/...', () => {
 
     request(app.api)
       .get(`/report/dividendpayments/codes/TEST11/begin/end/${dateHandlerUtil.format(endDate, 'yyyy-MM')}`)
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -316,6 +342,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply http bad request when the end date is less than now and the "codes" filter is entered', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/TEST11/begin/end/2021-03')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -332,6 +359,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with just one asset and its payments within the time interval when a time interval and the code are entered', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/TEST11/begin/2021-02/end/2021-03')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -349,6 +377,7 @@ describe('GET /report/dividendpayments/...', () => {
   it('Should reply with two assets when two codes are entered', (done) => {
     request(app.api)
       .get('/report/dividendpayments/codes/TEST11,TEST4/begin/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)

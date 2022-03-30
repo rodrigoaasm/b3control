@@ -2,10 +2,12 @@ import * as request from 'supertest';
 
 import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
+import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 
 describe('GET /report/assettimeline/...', () => {
   let app: IApp;
   let postgresDataSetup: PostgresDataSetup;
+  let accessTokens: Array<string>;
 
   // results
   const correctedValues = new Map<string, number>();
@@ -57,6 +59,16 @@ describe('GET /report/assettimeline/...', () => {
     await postgresDataSetup.init();
     await postgresDataSetup.up();
     app = await createApp(postgresDataSetup.getConnection());
+
+    // generate access tokens
+    const jwtHandler = new JWTHandlerAdapter();
+    accessTokens = [];
+    accessTokens.push(
+      jwtHandler.generateToken({ id: postgresDataSetup.registeredUsers[0].id }),
+    );
+    accessTokens.push(
+      jwtHandler.generateToken({ id: postgresDataSetup.registeredUsers[1].id }),
+    );
   });
 
   afterAll(async () => {
@@ -68,6 +80,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with all data when no filter is entered', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/begin/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -85,6 +98,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with all data after a date when the begin date is entered ', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/begin/2020-02-01T13:00:00.000Z/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -103,6 +117,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with a bad request http response when the begin date is invalid', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/begin/invalid/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -119,6 +134,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with all data before a date when the end date is entered', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/begin/end/2020-03-01T13:00:00.000Z')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -137,6 +153,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with a bad request http response when the end date is invalid', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/begin/end/invalid')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -153,6 +170,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with all data within the time interval when a time interval is entered', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/begin/2020-02-01T13:00:00.000Z/end/2020-03-01T13:00:00.000Z')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -171,6 +189,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with a bad request http response when the time interval is invalid', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/begin/2020-02-01T13:00:00.000Z/end/2020-01-01T13:00:00.000Z')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -187,6 +206,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with just one asset when the code is entered', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/TEST11/begin/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -204,6 +224,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with just one asset and its positions after a date when code and begin date are entered', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/TEST11/begin/2020-02-01T13:00:00.000Z/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -221,6 +242,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with just one asset and its positions before a date when code and end date are entered', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/TEST11/begin/end/2020-03-01T13:00:00.000Z')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -238,6 +260,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with just one asset and its positions within the time interval when a time interval and the code are entered', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/TEST11/begin/2020-02-02T13:00:00.000Z/end/2020-03-01T13:00:00.000Z')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -255,6 +278,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with two assets when two codes are entered', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/TEST11,TEST4/begin/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
@@ -290,6 +314,7 @@ describe('GET /report/assettimeline/...', () => {
   it('Should reply with empty response when the asset is not found', (done) => {
     request(app.api)
       .get('/report/assettimeseries/codes/TEST8/begin/end')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)

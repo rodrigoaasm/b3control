@@ -8,14 +8,23 @@ export class AuthTokenInterceptor {
   ) {
   }
 
-  verify(request: IApplicationRequest, next: Function) {
+  public verify = (request: IApplicationRequest, next: Function) => {
     if (!request?.headers?.authorization) {
       throw UnauthorizedError('The token was not informed!');
     }
 
-    request.owner = this.jwtHandler.verifyAndDecodeToken(request.headers.authorization);
+    const [bearer, accessToken] = request.headers.authorization.split(' ');
+    if (bearer !== 'Bearer') {
+      throw UnauthorizedError('The authorization header format is invalid!');
+    }
+
+    try {
+      request.headers.owner = this.jwtHandler.verifyAndDecodeToken(accessToken).id;
+    } catch (verifyError) {
+      throw UnauthorizedError(verifyError.message);
+    }
     next();
-  }
+  };
 }
 
 export default AuthTokenInterceptor;

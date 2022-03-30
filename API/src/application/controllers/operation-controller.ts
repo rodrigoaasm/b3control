@@ -10,7 +10,7 @@ export class OperationController {
 
   public submit = async (req : IApplicationRequest) : Promise<IApplicationResponse> => {
     const submitedOperation = await this.submitOperationUseCase.submit({
-      userId: req.owner,
+      userId: req.headers.owner,
       assetCode: req.body.assetCode,
       type: req.body.type,
       value: req.body.value,

@@ -3,10 +3,12 @@ import * as request from 'supertest';
 
 import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
+import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 
 describe('POST /dividendpayment', () => {
   let app: IApp;
   let postgresDataSetup: PostgresDataSetup;
+  let accessTokens: Array<string>;
 
   const requestBody = {
     value: 2.00,
@@ -19,6 +21,16 @@ describe('POST /dividendpayment', () => {
     await postgresDataSetup.init();
     await postgresDataSetup.up();
     app = await createApp(postgresDataSetup.getConnection());
+
+    // generate access tokens
+    const jwtHandler = new JWTHandlerAdapter();
+    accessTokens = [];
+    accessTokens.push(
+      jwtHandler.generateToken({ id: postgresDataSetup.registeredUsers[0].id }),
+    );
+    accessTokens.push(
+      jwtHandler.generateToken({ id: postgresDataSetup.registeredUsers[1].id }),
+    );
   });
 
   afterAll(async () => {
@@ -33,6 +45,7 @@ describe('POST /dividendpayment', () => {
       .send({
         ...requestBody,
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(201)
@@ -52,6 +65,7 @@ describe('POST /dividendpayment', () => {
   it('Should return a BadRequest response when the request body is empty', (done) => {
     request(app.api)
       .post('/dividendpayment')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -70,6 +84,7 @@ describe('POST /dividendpayment', () => {
       .send({
         assetCode: 'TEST11',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -89,6 +104,7 @@ describe('POST /dividendpayment', () => {
         ...requestBody,
         assetCode: 'TEST8',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(404)
@@ -108,6 +124,7 @@ describe('POST /dividendpayment', () => {
         ...requestBody,
         value: 'erro',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)
@@ -127,6 +144,7 @@ describe('POST /dividendpayment', () => {
         ...requestBody,
         createdAt: 'erro',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400)

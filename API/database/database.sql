@@ -56,6 +56,6 @@ CREATE TABLE public.user_current_position (
 	created_at	timestamp NOT NULL,
 	updated_at	timestamp NOT NULL,
 	CONSTRAINT  user_current_position_pkey PRIMARY KEY (id),
-	CONSTRAINT  user_current_position_asset_id_fkey FOREIGN KEY ("asset_id") REFERENCES public.asset(id).
+	CONSTRAINT  user_current_position_asset_id_fkey FOREIGN KEY ("asset_id") REFERENCES public.asset(id),
 	CONSTRAINT  user_current_position_user_id_fkey FOREIGN KEY ("user_id") REFERENCES public.user(id)
 )

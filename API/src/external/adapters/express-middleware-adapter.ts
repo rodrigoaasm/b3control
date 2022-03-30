@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { Request, Response } from 'express';
 import { IApplicationRequest } from '@application/types';
 import { IExpressHttpErrorAdapter } from '@application/ports/express-http-error-adapter-interface';
@@ -16,6 +17,7 @@ export class ExpressMiddlewareAdapter {
 
       try {
         middlewareFunc(aplicationRequest, next);
+        expressRequest.headers = aplicationRequest.headers;
       } catch (middlewareError) {
         return this.expressHttpErrorAdapter.handleHTTPError(expressResponse, middlewareError);
       }

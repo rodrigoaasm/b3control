@@ -10,7 +10,7 @@ class JWTHandlerUtil implements IJWTHandlerAdapter {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   verifyAndDecodeToken(token: string) {
-    return {};
+    return { id: 'id' };
   }
 }
 
@@ -31,7 +31,7 @@ describe('AuthTokenInterceptor', () => {
     };
 
     authTokenInterceptor.verify(request, () => {
-      expect(request.owner).toBeDefined();
+      expect(request.headers.owner).toBeDefined();
     });
   });
 
@@ -48,9 +48,7 @@ describe('AuthTokenInterceptor', () => {
     };
 
     try {
-      authTokenInterceptor.verify(request, () => {
-        expect(request.owner).toBeDefined();
-      });
+      authTokenInterceptor.verify(request, () => {});
     } catch (verificationError) {
       expect(verificationError.message).toEqual('Token verification fails');
     }
@@ -60,16 +58,29 @@ describe('AuthTokenInterceptor', () => {
     expect.assertions(1);
     const request: IApplicationRequest = {
       body: {},
-      headers: { authorization: 'Bearer token' },
+      headers: { },
       params: {},
     };
 
     try {
-      authTokenInterceptor.verify(request, () => {
-        expect(request.owner).toBeDefined();
-      });
+      authTokenInterceptor.verify(request, () => {});
     } catch (verificationError) {
       expect(verificationError.message).toEqual('The token was not informed!');
+    }
+  });
+
+  it('Should throw an error when the token format is invalid', () => {
+    expect.assertions(1);
+    const request: IApplicationRequest = {
+      body: {},
+      headers: { authorization: 'token' },
+      params: {},
+    };
+
+    try {
+      authTokenInterceptor.verify(request, () => {});
+    } catch (verificationError) {
+      expect(verificationError.message).toEqual('The authorization header format is invalid!');
     }
   });
 });

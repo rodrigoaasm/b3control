@@ -2,10 +2,12 @@ import * as request from 'supertest';
 
 import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
+import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 
 describe('POST /operation', () => {
   let app: IApp;
   let postgresDataSetup: PostgresDataSetup;
+  let accessTokens: Array<string>;
 
   const requestBody = {
     assetCode: 'TEST11',
@@ -16,10 +18,23 @@ describe('POST /operation', () => {
   };
 
   beforeAll(async () => {
+    // prepare postgres
     postgresDataSetup = new PostgresDataSetup();
     await postgresDataSetup.init();
     await postgresDataSetup.up();
+
+    // create app
     app = await createApp(postgresDataSetup.getConnection());
+
+    // generate access tokens
+    const jwtHandler = new JWTHandlerAdapter();
+    accessTokens = [];
+    accessTokens.push(
+      jwtHandler.generateToken({ id: postgresDataSetup.registeredUsers[0].id }),
+    );
+    accessTokens.push(
+      jwtHandler.generateToken({ id: postgresDataSetup.registeredUsers[1].id }),
+    );
   });
 
   afterAll(async () => {
@@ -34,6 +49,7 @@ describe('POST /operation', () => {
       .send({
         ...requestBody,
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(201, done);
@@ -42,6 +58,7 @@ describe('POST /operation', () => {
   it('Should return a BadRequest response when the request body is empty', (done) => {
     request(app.api)
       .post('/operation')
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400, done);
@@ -53,6 +70,7 @@ describe('POST /operation', () => {
       .send({
         assetCode: 'TEST11',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400, done);
@@ -65,6 +83,7 @@ describe('POST /operation', () => {
         ...requestBody,
         assetCode: 'TEST8',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(404, done);
@@ -77,6 +96,7 @@ describe('POST /operation', () => {
         ...requestBody,
         value: 'erro',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400, done);
@@ -89,6 +109,7 @@ describe('POST /operation', () => {
         ...requestBody,
         quantity: 'erro',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400, done);
@@ -101,6 +122,7 @@ describe('POST /operation', () => {
         ...requestBody,
         createdAt: 'erro',
       })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400, done);

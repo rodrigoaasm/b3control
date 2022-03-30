@@ -58,8 +58,12 @@ export class DividendPaymentRepository implements IDividendPaymentRepository {
       .innerJoin(
         `(select generate_series(timestamp '${begin.toDateString()}', timestamp '${end.toDateString()}', interval  '1 month') as month)`, 'series', 'true',
       )
-      .leftJoin(DividendPaymentModel, 'dp', 'a.id = dp.asset_id  and dp.created_at >= series.month  and dp.created_at < (series.month + interval \'1 months\')')
-      .where('dp.user_id = :userId', { userId });
+      .leftJoin(
+        DividendPaymentModel,
+        'dp',
+        'dp.user_id = :userId and a.id = dp.asset_id  and dp.created_at >= series.month  and dp.created_at < (series.month + interval \'1 months\')',
+        { userId },
+      );
 
     if (codes.length > 0) {
       mainQuery = mainQuery.andWhere('a.code in (:...codes)', { codes });

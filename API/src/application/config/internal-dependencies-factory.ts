@@ -18,6 +18,11 @@ import { DividendPaymentTimeSeriesReportUseCase } from '@usecases/reports/asset-
 import { DividendPaymentTimeseriesController } from '@controllers/dividend-payment-timeseries-report-controller';
 import { DateHandlerUtil } from '@utils/date-handler-util';
 import { ExpressHTTPErrorAdapter } from '@external/adapters/express-http-error-adapter';
+import { UserRepository } from '@external/datasource/relational/repositories/user-repository';
+import { ExpressRouterAdapter } from '@external/adapters/express-router-adapter';
+import { AuthTokenInterceptor } from '@interceptors/auth-token-interceptor';
+import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
+import { ExpressMiddlewareAdapter } from '@external/adapters/express-middleware-adapter';
 
 export class InternalDependenciesFactory {
   public static make(connection: Connection) {
@@ -27,6 +32,13 @@ export class InternalDependenciesFactory {
 
     // Adapters
     const expressHttpErrorAdapter = new ExpressHTTPErrorAdapter();
+    const expressRouterAdapter = new ExpressRouterAdapter(
+      expressHttpErrorAdapter,
+    );
+    const expressMiddlewareAdapter = new ExpressMiddlewareAdapter(
+      expressHttpErrorAdapter,
+    );
+    const jwtHandlerAdapter = new JWTHandlerAdapter();
 
     // Factories
     const operationFactory = new OperationFactory(dateHandlerUtil);
@@ -37,23 +49,27 @@ export class InternalDependenciesFactory {
     const operationRepository = new OperationRepository(connection, operationFactory);
     const assetRepository = new AssetRepository(connection);
     const positionRepository = new PositionRepository(connection, positionFactory);
+    const userRepository = new UserRepository(connection);
     const dividendPaymentRepository = new DividendPaymentRepository(
       connection, dividendPaymentFactory,
     );
 
     // Use cases
     const submitOperationUseCase = new SubmitOperationUseCase(
-      operationRepository, assetRepository, operationFactory,
+      operationRepository, assetRepository, userRepository, operationFactory,
     );
     const assetTimeSeriesReportUseCase = new AssetTimeSeriesReportUseCase(
       positionRepository, dateHandlerUtil,
     );
     const submitDividendPaymentUseCase = new SubmitDividendPaymentUseCase(
-      dividendPaymentRepository, assetRepository, dividendPaymentFactory,
+      dividendPaymentRepository, assetRepository, userRepository, dividendPaymentFactory,
     );
     const dividendPaymentTimeSeriesReportUseCase = new DividendPaymentTimeSeriesReportUseCase(
       dividendPaymentRepository, dateHandlerUtil,
     );
+
+    // Interceptors
+    const authTokenInterceptor = new AuthTokenInterceptor(jwtHandlerAdapter);
 
     // Controllers
     const operationController = new OperationController(submitOperationUseCase);
@@ -66,7 +82,9 @@ export class InternalDependenciesFactory {
     );
 
     return {
-      expressHttpErrorAdapter,
+      expressMiddlewareAdapter,
+      authTokenInterceptor,
+      expressRouterAdapter,
       operationController,
       assetTimeseriesReportController,
       dividendPaymentController,

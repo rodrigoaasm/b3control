@@ -1,32 +1,41 @@
 import * as express from 'express';
-import { ExpressRouterAdapter } from '@external/adapters/express-router-adapter';
 
 export default async (app: express.Express, internalDependencies: any) => {
-  const expressRouterAdapter = new ExpressRouterAdapter(
-    internalDependencies.expressHttpErrorAdapter,
-  );
+  const {
+    expressMiddlewareAdapter,
+    authTokenInterceptor,
+    expressRouterAdapter,
+    operationController,
+    dividendPaymentController,
+    assetTimeseriesReportController,
+    dividendPaymentTimeseriesController,
+  } = internalDependencies;
 
   app.post(
     '/operation',
-    await expressRouterAdapter.routerAdapter(internalDependencies.operationController.submit),
+    await expressMiddlewareAdapter.middlewareAdapter(authTokenInterceptor.verify),
+    await expressRouterAdapter.routerAdapter(operationController.submit),
   );
 
   app.post(
     '/dividendpayment',
-    await expressRouterAdapter.routerAdapter(internalDependencies.dividendPaymentController.submit),
+    await expressMiddlewareAdapter.middlewareAdapter(authTokenInterceptor.verify),
+    await expressRouterAdapter.routerAdapter(dividendPaymentController.submit),
   );
 
   app.get(
     '/report/assettimeseries/codes/:codes?/begin/:begin?/end/:end?',
+    await expressMiddlewareAdapter.middlewareAdapter(authTokenInterceptor.verify),
     await expressRouterAdapter.routerAdapter(
-      internalDependencies.assetTimeseriesReportController.getStockTimeseries,
+      assetTimeseriesReportController.getStockTimeseries,
     ),
   );
 
   app.get(
     '/report/dividendpayments/codes/:codes?/begin/:begin?/end/:end?',
+    await expressMiddlewareAdapter.middlewareAdapter(authTokenInterceptor.verify),
     await expressRouterAdapter.routerAdapter(
-      internalDependencies.dividendPaymentTimeseriesController.getDividendPaymentTimeseries,
+      dividendPaymentTimeseriesController.getDividendPaymentTimeseries,
     ),
   );
 };

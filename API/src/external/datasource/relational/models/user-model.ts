@@ -1,19 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-export const ASSET_TABLE_NAME = 'user';
+export const USER_TABLE_NAME = 'user';
 
-@Entity({ name: ASSET_TABLE_NAME })
+@Entity({ name: USER_TABLE_NAME })
 export class UserModel {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   public id : string;
 
   @Column()
   public name : string;
 
-  @Column()
+  @Column({ name: 'created_at' })
   public createdAt : Date;
 
-  @Column()
+  @Column({ name: 'updated_at' })
   public updatedAt : Date;
 }
 

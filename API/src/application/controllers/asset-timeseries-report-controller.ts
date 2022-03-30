@@ -11,7 +11,10 @@ export class AssetTimeseriesReportController {
   }
 
   public getStockTimeseries = async (req : IApplicationRequest) : Promise<IApplicationResponse> => {
-    const filters = this.reportInputHandler.handle(req.params);
+    const filters = this.reportInputHandler.handle({
+      ...(req.params),
+      userId: req.headers.owner,
+    });
     const result = await this.assetTimeSeriesReportUseCase.get(filters);
     return {
       code: 200,
