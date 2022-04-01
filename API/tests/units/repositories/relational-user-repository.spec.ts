@@ -47,20 +47,24 @@ describe('Relational - User Repository', () => {
       name: 'name',
       createdAt: date,
       updatedAt: date,
+      password: 'password',
     });
-    const user = await userRepository.signIn('user', 'password');
+    const user = await userRepository.signIn('user');
 
     expect(user).toEqual({
-      _id: 'userId',
-      _name: 'name',
-      _createdAt: date,
-      _updatedAt: date,
+      user: {
+        _id: 'userId',
+        _name: 'name',
+        _createdAt: date,
+        _updatedAt: date,
+      },
+      password: 'password',
     });
   });
 
   it('Should return null when there is no related user by credential', async () => {
     mockParentRepository.findOne.mockReturnValueOnce(undefined);
-    const user = await userRepository.signIn('user', 'password');
+    const user = await userRepository.signIn('user');
 
     expect(user).toEqual(null);
   });

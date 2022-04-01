@@ -8,7 +8,7 @@ import OperationRepositoryMock from '@test-mocks/operation-repository-mock';
 import AssetRepositoryMock from '@test-mocks/asset-repository-mock';
 import { OperationType, OperationEntity } from '@entities/operation';
 import { UserEntity } from '@entities/user';
-import { IUserRepository } from '@domain-ports/repositories/user-repository-interface';
+import { ISignInResult, IUserRepository } from '@domain-ports/repositories/user-repository-interface';
 
 class OperationFactoryMock implements IOperationFactory {
   constructor(private date: Date) {
@@ -28,7 +28,7 @@ const user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
 
 class UserRepositoryMock implements IUserRepository {
   // eslint-disable-next-line class-methods-use-this
-  signIn(username: string, password: string): Promise<UserEntity> {
+  signIn(username: string): Promise<ISignInResult> {
     throw new Error('Method not implemented.');
   }
 

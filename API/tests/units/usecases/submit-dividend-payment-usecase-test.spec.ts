@@ -4,7 +4,7 @@
 import { AssetEntity } from '@entities/asset';
 
 import { IDividendPaymentFactory } from '@domain-ports/factories/dividend-payment-factory-interface';
-import { IUserRepository } from '@domain-ports/repositories/user-repository-interface';
+import { ISignInResult, IUserRepository } from '@domain-ports/repositories/user-repository-interface';
 import { DividendPaymentEntity } from '@entities/dividend-payment';
 import { SubmitDividendPaymentUseCase } from '@usecases/submit-dividend/submit-dividend-payments-usecase';
 import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
@@ -27,7 +27,7 @@ const date = new Date();
 const user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
 
 class UserRepositoryMock implements IUserRepository {
-  signIn(username: string, password: string): Promise<UserEntity> {
+  signIn(username: string): Promise<ISignInResult> {
     throw new Error('Method not implemented.');
   }
 

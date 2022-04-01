@@ -13,6 +13,8 @@ import { UserModel, USER_TABLE_NAME } from '@external/datasource/relational/mode
 
 import entities from '@external/datasource/relational/models';
 import { v4 as uuid } from 'uuid';
+import { ICryptHandlerAdapter } from '@domain-ports/adapters/crypt-handler-adapter-interface';
+import CryptAdapter from '@external/adapters/bcrypt-adapter';
 
 dotenv.config();
 
@@ -31,12 +33,15 @@ export class PostgresDataSetup {
 
   private dividendPaymentRepositoryTest: Repository<DividendPaymentModel>;
 
+  private cryptAdapter: ICryptHandlerAdapter;
+
   private registeredAssets: Map<string, AssetModel>;
 
   public registeredUsers: Array<UserModel>;
 
   constructor() {
     this.registeredAssets = new Map();
+    this.cryptAdapter = new CryptAdapter();
   }
 
   public async init() {
@@ -69,7 +74,7 @@ export class PostgresDataSetup {
       await this.down();
     } catch (error) {
     }
-    const users = this.users();
+    const users = await this.users();
     this.registeredUsers = await this.userRepositoryTest.save(users);
     const listRegisteredAssets = await this.assetRepositoryTest.save(this.assets());
     listRegisteredAssets.forEach((asset) => {
@@ -94,17 +99,19 @@ export class PostgresDataSetup {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private users(): Array<UserModel> {
+  private async users(): Promise<Array<UserModel>> {
     return [
       {
         id: uuid(),
         name: 'user1',
+        password: await this.cryptAdapter.generateHash('test123*'),
         createdAt: new Date('2020-01-01T13:00:00.000Z'),
         updatedAt: new Date('2020-01-01T13:00:00.000Z'),
       },
       {
         id: uuid(),
         name: 'user2',
+        password: await this.cryptAdapter.generateHash('test123*'),
         createdAt: new Date('2020-01-01T13:00:00.000Z'),
         updatedAt: new Date('2020-01-01T13:00:00.000Z'),
       },

@@ -1,4 +1,4 @@
-import { IUserRepository } from '@domain-ports/repositories/user-repository-interface';
+import { ISignInResult, IUserRepository } from '@domain-ports/repositories/user-repository-interface';
 import { UserEntity } from '@entities/user';
 import { Connection, Repository } from 'typeorm';
 import { UserModel } from '../models';
@@ -21,20 +21,23 @@ export class UserRepository implements IUserRepository {
     ) : null;
   }
 
-  async signIn(username: string, password: string): Promise<UserEntity> {
+  async signIn(username: string): Promise<ISignInResult> {
     const userModel = await this.repo.findOne({
+      select: ['id', 'name', 'password', 'createdAt', 'updatedAt'],
       where: [
         { name: username },
-        { password },
       ],
     });
 
-    return userModel ? new UserEntity(
-      userModel.id,
-      userModel.name,
-      userModel.createdAt,
-      userModel.updatedAt,
-    ) : null;
+    return userModel ? {
+      user: new UserEntity(
+        userModel.id,
+        userModel.name,
+        userModel.createdAt,
+        userModel.updatedAt,
+      ),
+      password: userModel.password,
+    } : null;
   }
 }
 

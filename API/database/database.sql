@@ -10,6 +10,7 @@ CREATE TABLE public.asset (
 CREATE TABLE public.user (
 	id			varchar(40),
 	name 		varchar(20),
+	password	varchar(128),
 	created_at	timestamp NOT NULL,
 	updated_at	timestamp NOT NULL,
 	CONSTRAINT  user_pkey PRIMARY KEY (id)

@@ -16,6 +16,8 @@ import { DividendPaymentController } from '@controllers/dividend-payment-control
 import { ReportInputHandler } from '@utils/report-input-handler';
 import { DividendPaymentTimeSeriesReportUseCase } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-usecase';
 import { DividendPaymentTimeseriesController } from '@controllers/dividend-payment-timeseries-report-controller';
+import { SignInUsecase } from '@usecases/auth/sign-in-usecase';
+import { SignInController } from '@controllers/sign-in-controller';
 import { DateHandlerUtil } from '@utils/date-handler-util';
 import { ExpressHTTPErrorAdapter } from '@external/adapters/express-http-error-adapter';
 import { UserRepository } from '@external/datasource/relational/repositories/user-repository';
@@ -23,6 +25,7 @@ import { ExpressRouterAdapter } from '@external/adapters/express-router-adapter'
 import { AuthTokenInterceptor } from '@interceptors/auth-token-interceptor';
 import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 import { ExpressMiddlewareAdapter } from '@external/adapters/express-middleware-adapter';
+import { CryptAdapter } from '@external/adapters/bcrypt-adapter';
 
 export class InternalDependenciesFactory {
   public static make(connection: Connection) {
@@ -39,6 +42,7 @@ export class InternalDependenciesFactory {
       expressHttpErrorAdapter,
     );
     const jwtHandlerAdapter = new JWTHandlerAdapter();
+    const cryptAdapter = new CryptAdapter();
 
     // Factories
     const operationFactory = new OperationFactory(dateHandlerUtil);
@@ -67,6 +71,7 @@ export class InternalDependenciesFactory {
     const dividendPaymentTimeSeriesReportUseCase = new DividendPaymentTimeSeriesReportUseCase(
       dividendPaymentRepository, dateHandlerUtil,
     );
+    const signInUseCase = new SignInUsecase(userRepository, jwtHandlerAdapter, cryptAdapter);
 
     // Interceptors
     const authTokenInterceptor = new AuthTokenInterceptor(jwtHandlerAdapter);
@@ -80,11 +85,13 @@ export class InternalDependenciesFactory {
     const dividendPaymentTimeseriesController = new DividendPaymentTimeseriesController(
       dividendPaymentTimeSeriesReportUseCase,
     );
+    const signInController = new SignInController(signInUseCase);
 
     return {
       expressMiddlewareAdapter,
-      authTokenInterceptor,
       expressRouterAdapter,
+      authTokenInterceptor,
+      signInController,
       operationController,
       assetTimeseriesReportController,
       dividendPaymentController,

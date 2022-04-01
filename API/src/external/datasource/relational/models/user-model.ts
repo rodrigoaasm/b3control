@@ -10,6 +10,9 @@ export class UserModel {
   @Column()
   public name : string;
 
+  @Column({ select: false })
+  public password?: string;
+
   @Column({ name: 'created_at' })
   public createdAt : Date;
 

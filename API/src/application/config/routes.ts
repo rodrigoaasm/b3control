@@ -9,7 +9,13 @@ export default async (app: express.Express, internalDependencies: any) => {
     dividendPaymentController,
     assetTimeseriesReportController,
     dividendPaymentTimeseriesController,
+    signInController,
   } = internalDependencies;
+
+  app.post(
+    '/signin',
+    await expressRouterAdapter.routerAdapter(signInController.signIn),
+  );
 
   app.post(
     '/operation',
