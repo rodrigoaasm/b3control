@@ -2,9 +2,8 @@ import { IPositionRepository } from '@domain-ports/repositories/position-reposit
 import { PositionEntity } from '@entities/position/position-entity';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { BadRequestError } from '@domain-error/custom-error';
-import { IReportInput } from '../report-interfaces';
 import {
-  IAssetCategoryReport, IAssetReport, ITimeSeriesReportOutput,
+  IAssetCategoryReport, IAssetReport, ITimeSeriesReportInput, ITimeSeriesReportOutput,
 } from '../timeseries-report-interfaces';
 import {
   IAssetTimeSeriesReportUseCase, IPositionReport,
@@ -82,7 +81,8 @@ export class AssetTimeSeriesReportUseCase implements IAssetTimeSeriesReportUseCa
     }
   }
 
-  public async get(filters: IReportInput): Promise<ITimeSeriesReportOutput<IPositionReport>> {
+  public async get(filters: ITimeSeriesReportInput)
+    : Promise<ITimeSeriesReportOutput<IPositionReport>> {
     if (filters.begin && filters.end
       && !this.dateValidatorUtil.isTimeInterval(filters.begin, filters.end)) {
       throw BadRequestError('The begin date is greater than end date.');

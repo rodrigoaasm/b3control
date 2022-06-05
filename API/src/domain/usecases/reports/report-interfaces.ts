@@ -1,8 +1,5 @@
 export interface IReportInput {
   userId: string,
-  codes : Array<string>,
-  begin ?: Date,
-  end ?: Date
 }
 
 export interface IReportOutput {

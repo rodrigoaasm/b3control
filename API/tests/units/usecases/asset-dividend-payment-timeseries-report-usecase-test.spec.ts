@@ -5,7 +5,7 @@ import { IReportInput } from '@usecases/reports/report-interfaces';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { DividendPaymentTimeSeriesReportUseCase } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-usecase';
 import { IDividendPaymentReport, IDividendPaymentsTimeSeriesReportInput } from '@usecases/reports/asset-dividend-payment-timeseries-report/asset-dividend-payment-timeseries-report-interface';
-import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
+import { IAssetReport, ITimeSeriesReportInput, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
 import DividendPaymentRepositoryMock from '@test-mocks/dividend-payment-repository-mock';
 import { DateDifferenceCategory, IDateHandlerAdapter } from '@domain-ports/adapters/date-handler-adapter-interface';
 import { UserEntity } from '@entities/user';
@@ -53,8 +53,6 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
     const filter: IDividendPaymentsTimeSeriesReportInput = {
       userId: userEntity.id,
       codes: undefined,
-      begin: undefined,
-      end: undefined,
       beginMonth: '2021-01',
       endMonth: '2021-03',
     };
@@ -169,11 +167,9 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
 
   it('Should return an empty dataset, when the repository does not return anything', async () => {
     dateHandlerUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(true);
-    const filter: IReportInput = {
+    const filter: IDividendPaymentsTimeSeriesReportInput = {
       userId: userEntity.id,
       codes: ['notexits'],
-      begin: undefined,
-      end: undefined,
     };
     const output = await dividendReportUsecase.get(filter);
 
@@ -196,11 +192,9 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
         return [];
       });
 
-    const filter: IReportInput = {
+    const filter: IDividendPaymentsTimeSeriesReportInput = {
       userId: userEntity.id,
       codes: undefined,
-      begin: undefined,
-      end: undefined,
     };
     const output = await dividendReportUsecase.get(filter);
 

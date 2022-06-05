@@ -1,6 +1,12 @@
 import { AssetCategory } from '@entities/asset';
 import { IReportInput, IReportOutput, IReportUseCase } from './report-interfaces';
 
+export interface ITimeSeriesReportInput extends IReportInput {
+  codes ?: Array<string>,
+  begin ?: Date,
+  end ?: Date
+}
+
 export interface IAssetReport<T> {
   name : string,
   category : AssetCategory,
@@ -18,5 +24,5 @@ export interface ITimeSeriesReportOutput<T> extends IReportOutput{
 }
 
 export interface ITimeSeriesReportUseCase<T>
-  extends IReportUseCase<IReportInput, ITimeSeriesReportOutput<T>> {
+  extends IReportUseCase<ITimeSeriesReportInput, ITimeSeriesReportOutput<T>> {
 }

@@ -7,6 +7,7 @@ export interface IDividendPaymentReport {
 }
 
 export interface IDividendPaymentsTimeSeriesReportInput extends IReportInput {
+  codes: Array<string>,
   beginMonth ?: string,
   endMonth ?: string
 }
