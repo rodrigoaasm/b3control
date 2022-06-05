@@ -2,8 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { AssetTimeSeriesReportUseCase } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-usecase';
 import { PositionRepositoryMock } from '@test-mocks/position-repository-mock';
-import { IReportInput } from '@usecases/reports/report-interfaces';
-import { IAssetReport, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
+import { IAssetReport, ITimeSeriesReportInput, ITimeSeriesReportOutput } from '@usecases/reports/timeseries-report-interfaces';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { IPositionReport } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-interface';
 import { UserEntity } from '@entities/user';
@@ -33,7 +32,7 @@ describe('Asset Timeseries Report UseCase', () => {
   });
 
   it('Should return formatted data, when repository returns data', async () => {
-    const filter: IReportInput = {
+    const filter: ITimeSeriesReportInput = {
       userId: defaultUser.id,
       codes: undefined,
       begin: undefined,
@@ -161,7 +160,7 @@ describe('Asset Timeseries Report UseCase', () => {
   });
 
   it('Should return an empty dataset, when the repository does not return anything', async () => {
-    const filter: IReportInput = {
+    const filter: ITimeSeriesReportInput = {
       userId: defaultUser.id,
       codes: ['notexits'],
       begin: undefined,
@@ -177,7 +176,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
   it('Should throw a Bad Request Error, when the date validator returns false', async () => {
     dateValidatorUtilMock.isTimeInterval = jest.fn().mockReturnValueOnce(false);
-    const filter: IReportInput = {
+    const filter: ITimeSeriesReportInput = {
       userId: defaultUser.id,
       codes: [],
       begin: new Date('2021-08-01T23:00:00.000Z'),

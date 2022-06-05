@@ -1,13 +1,13 @@
 import { BadRequestError } from '@domain-error/custom-error';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { IReportInputHandler } from '@usecases/reports/report-input-handler-interface';
-import { IReportInput } from '@usecases/reports/report-interfaces';
+import { ITimeSeriesReportInput } from '@usecases/reports/timeseries-report-interfaces';
 
 export class ReportInputHandler implements IReportInputHandler {
   constructor(private dateValidator: IDateValidatorAdapter) {
   }
 
-  public handle(params: any): IReportInput {
+  public handle(params: any): ITimeSeriesReportInput {
     if (!params.userId) {
       throw BadRequestError('The user was not informed.');
     }
