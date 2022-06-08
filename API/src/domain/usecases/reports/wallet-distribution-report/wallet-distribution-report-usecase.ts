@@ -1,4 +1,4 @@
-import { IWalletRepository } from '@domain-ports/repositories/wallet-repository-interface';
+import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { PositionEntity } from '@entities/position';
 import { IReportInput } from '../report-interfaces';
 import {
@@ -9,7 +9,7 @@ import {
 } from './wallet-distribution-report-interface';
 
 export class WalletDistributionReportUseCase implements IWalletDistributionUseCase {
-  constructor(private walletRepository: IWalletRepository) {
+  constructor(private walletRepository: IPositionRepository) {
 
   }
 
