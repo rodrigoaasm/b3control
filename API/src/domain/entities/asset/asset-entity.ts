@@ -28,7 +28,7 @@ export class AssetEntity {
       throw EntityConstructionError('It was not possible create the stock object!\n Stock code not found.');
     }
 
-    if (category !== 'stock' && category !== 'general') {
+    if (category !== 'stock' && category !== 'general' && category !== 'current') {
       throw EntityConstructionError("It was not possible create the stock object!\n The category is invalid! Expect 'stock' or 'general'.");
     }
 

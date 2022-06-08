@@ -1,1 +1,1 @@
-export type AssetCategory = 'stock' | 'general';
+export type AssetCategory = 'stock' | 'general' | 'current';
