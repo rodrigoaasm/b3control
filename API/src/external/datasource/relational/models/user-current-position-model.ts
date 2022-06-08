@@ -24,6 +24,9 @@ export class UserCurrentPositionModel {
 
   @Column({ name: 'created_at' })
   public createdAt : Date;
+
+  @Column({ name: 'updated_at' })
+  public updatedAt : Date;
 }
 
 export default UserCurrentPositionModel;

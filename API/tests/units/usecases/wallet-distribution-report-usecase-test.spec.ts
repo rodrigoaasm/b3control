@@ -1,5 +1,6 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { IWalletRepository } from '@domain-ports/repositories/wallet-repository-interface';
+import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { AssetEntity } from '@entities/asset';
 import { PositionEntity } from '@entities/position';
 import { UserEntity } from '@entities/user';
@@ -12,7 +13,13 @@ const test11 = new AssetEntity(1, 'TEST11', '', '', 'general');
 const test4 = new AssetEntity(2, 'TEST4', '', '', 'stock');
 const test3 = new AssetEntity(3, 'TEST3', '', '', 'stock');
 
-class WalletRepositoryMock implements IWalletRepository {
+class WalletRepositoryMock implements IPositionRepository {
+  getAssetTimeseries(
+    userId: string, codes: string[], begin: Date, end: Date,
+  ): Promise<PositionEntity[]> {
+    throw new Error('Method not implemented.');
+  }
+
   // eslint-disable-next-line class-methods-use-this
   getUserCurrentPositions(userId: string): Promise<Array<PositionEntity>> {
     return Promise.resolve([
@@ -46,7 +53,7 @@ class WalletRepositoryMock implements IWalletRepository {
 
 describe('Wallet Distribution Report UseCase ', () => {
   let walletDistributionUseCase: WalletDistributionReportUseCase;
-  let walletRepository: IWalletRepository;
+  let walletRepository: IPositionRepository;
 
   beforeEach(() => {
     walletRepository = new WalletRepositoryMock();
@@ -66,37 +73,37 @@ describe('Wallet Distribution Report UseCase ', () => {
     expect(currentPositions).toEqual({
       assets: [
         {
-          price: 11.5,
-          quantity: 100,
-          date: currentDate,
-          value: 1150,
-          asset: test11,
+          _price: 11.5,
+          _quantity: 100,
+          _date: currentDate,
+          _value: 1150,
+          _asset: test11,
         },
         {
-          price: 12.0,
-          quantity: 100,
-          value: 1200,
-          date: currentDate,
-          asset: test4,
+          _price: 12.0,
+          _quantity: 100,
+          _value: 1200,
+          _date: currentDate,
+          _asset: test4,
         },
         {
-          price: 13.0,
-          quantity: 100,
-          value: 1300,
-          date: currentDate,
-          asset: test3,
+          _price: 13.0,
+          _quantity: 100,
+          _value: 1300,
+          _date: currentDate,
+          _asset: test3,
         },
       ],
       categories: [
         {
-          value: 1150,
-          date: currentDate,
-          category: 'general',
+          _value: 1150,
+          _date: currentDate,
+          _category: 'general',
         },
         {
-          value: 2500,
-          date: currentDate,
-          category: 'stock',
+          _value: 2500,
+          _date: currentDate,
+          _category: 'stock',
         },
       ],
     } as IWalletDistributionOutput);

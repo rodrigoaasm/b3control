@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { PositionEntity } from '@entities/position';
 import { IReportInput } from '../report-interfaces';
@@ -22,21 +23,21 @@ export class WalletDistributionReportUseCase implements IWalletDistributionUseCa
 
     currentPositions.forEach((positionEntity: PositionEntity) => {
       assets.push({
-        quantity: positionEntity.quantity,
-        price: positionEntity.price,
-        value: positionEntity.value,
-        date: positionEntity.date,
-        asset: positionEntity.asset,
+        _quantity: positionEntity.quantity,
+        _price: positionEntity.price,
+        _value: positionEntity.value,
+        _date: positionEntity.date,
+        _asset: positionEntity.asset,
       });
 
       if (categories.has(positionEntity.asset.category)) {
         const categoryPosition = categories.get(positionEntity.asset.category);
-        categoryPosition.value += positionEntity.value;
+        categoryPosition._value += positionEntity.value;
       } else {
         categories.set(positionEntity.asset.category, {
-          value: positionEntity.value,
-          date: positionEntity.date,
-          category: positionEntity.asset.category,
+          _value: positionEntity.value,
+          _date: positionEntity.date,
+          _category: positionEntity.asset.category,
         });
       }
     });

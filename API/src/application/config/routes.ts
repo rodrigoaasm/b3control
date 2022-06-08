@@ -10,6 +10,7 @@ export default async (app: express.Express, internalDependencies: any) => {
     assetTimeseriesReportController,
     dividendPaymentTimeseriesController,
     signInController,
+    walletDistributionReportController,
   } = internalDependencies;
 
   app.post(
@@ -42,6 +43,14 @@ export default async (app: express.Express, internalDependencies: any) => {
     await expressMiddlewareAdapter.middlewareAdapter(authTokenInterceptor.verify),
     await expressRouterAdapter.routerAdapter(
       dividendPaymentTimeseriesController.getDividendPaymentTimeseries,
+    ),
+  );
+
+  app.get(
+    '/report/walletstatus',
+    await expressMiddlewareAdapter.middlewareAdapter(authTokenInterceptor.verify),
+    await expressRouterAdapter.routerAdapter(
+      walletDistributionReportController.getWalletDistribution,
     ),
   );
 };

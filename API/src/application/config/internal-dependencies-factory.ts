@@ -26,6 +26,8 @@ import { AuthTokenInterceptor } from '@interceptors/auth-token-interceptor';
 import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 import { ExpressMiddlewareAdapter } from '@external/adapters/express-middleware-adapter';
 import { CryptAdapter } from '@external/adapters/bcrypt-adapter';
+import WalletDistributionReportController from '@controllers/wallet-distribution-report-controller';
+import WalletDistributionReportUseCase from '@usecases/reports/wallet-distribution-report/wallet-distribution-report-usecase';
 
 export class InternalDependenciesFactory {
   public static make(connection: Connection) {
@@ -72,6 +74,7 @@ export class InternalDependenciesFactory {
       dividendPaymentRepository, dateHandlerUtil,
     );
     const signInUseCase = new SignInUsecase(userRepository, jwtHandlerAdapter, cryptAdapter);
+    const walletDistributionReportUseCase = new WalletDistributionReportUseCase(positionRepository);
 
     // Interceptors
     const authTokenInterceptor = new AuthTokenInterceptor(jwtHandlerAdapter);
@@ -86,6 +89,9 @@ export class InternalDependenciesFactory {
       dividendPaymentTimeSeriesReportUseCase,
     );
     const signInController = new SignInController(signInUseCase);
+    const walletDistributionReportController = new WalletDistributionReportController(
+      walletDistributionReportUseCase,
+    );
 
     return {
       expressMiddlewareAdapter,
@@ -96,6 +102,7 @@ export class InternalDependenciesFactory {
       assetTimeseriesReportController,
       dividendPaymentController,
       dividendPaymentTimeseriesController,
+      walletDistributionReportController,
     };
   }
 }

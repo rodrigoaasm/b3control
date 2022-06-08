@@ -1,7 +1,7 @@
 import { IOperationRepository } from '@domain-ports/repositories/operation-repository-interface';
 import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 import { OperationEntity } from '@entities/operation';
-import { Connection, Entity, Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { OperationModel } from '@external/datasource/relational/models';
 import { UserEntity } from '@entities/user';
 

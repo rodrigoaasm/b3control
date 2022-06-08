@@ -1,5 +1,5 @@
 class QueryBuilder {
-  public rawManyReturnValue;
+  public rawManyReturnValue: any;
 
   constructor() {
     this.rawManyReturnValue = [];

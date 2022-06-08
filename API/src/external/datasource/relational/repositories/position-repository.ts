@@ -72,8 +72,8 @@ export class PositionRepository implements IPositionRepository {
 
     const positionRaws = await this.connection.createQueryBuilder()
       .select([
-        'ucp.id',
-        'ucp.quantity',
+        'ucp.id as id',
+        'ucp.quantity as quantity',
         'u.id as user_id',
         'u.name as user_name',
         'u.created_at as user_createdAt',
@@ -87,9 +87,9 @@ export class PositionRepository implements IPositionRepository {
         'aq.date as quote_date',
       ])
       .from(UserCurrentPositionModel, 'ucp')
-      .innerJoin(UserModel, 'u')
-      .innerJoin(AssetModel, 'a')
-      .innerJoin(AssetQuoteModel, 'aq')
+      .innerJoin(UserModel, 'u', 'u.id = ucp.user_id')
+      .innerJoin(AssetModel, 'a', 'a.id = ucp.asset_id')
+      .innerJoin(AssetQuoteModel, 'aq', 'a.id = aq.asset_id')
       .where('u.id = :userId', { userId })
       .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
       .getRawMany();

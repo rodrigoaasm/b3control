@@ -10,8 +10,9 @@ import { OperationModel, OPERATION_TABLE_NAME } from '@external/datasource/relat
 import { AssetQuoteModel, ASSET_QUOTE_TABLE_NAME } from '@external/datasource/relational/models/asset-quote-model';
 import { DividendPaymentModel, DIVIDEND_PAYMENT_TABLE_NAME } from '@external/datasource/relational/models/dividend-payment-model';
 import { UserModel, USER_TABLE_NAME } from '@external/datasource/relational/models/user-model';
+import { UserCurrentPositionModel, USER_CURRENT_POSITION_TABLE_NAME } from '@external/datasource/relational/models/user-current-position-model';
 
-import entities from '@external/datasource/relational/models';
+import entities from '@external/datasource/relational/models/index';
 import { v4 as uuid } from 'uuid';
 import { ICryptHandlerAdapter } from '@domain-ports/adapters/crypt-handler-adapter-interface';
 import CryptAdapter from '@external/adapters/bcrypt-adapter';
@@ -33,9 +34,11 @@ export class PostgresDataSetup {
 
   private dividendPaymentRepositoryTest: Repository<DividendPaymentModel>;
 
+  private userCurrentPositionRepositoryTest: Repository<UserCurrentPositionModel>;
+
   private cryptAdapter: ICryptHandlerAdapter;
 
-  private registeredAssets: Map<string, AssetModel>;
+  public registeredAssets: Map<string, AssetModel>;
 
   public registeredUsers: Array<UserModel>;
 
@@ -69,6 +72,7 @@ export class PostgresDataSetup {
     this.operationRepositoryTest = getRepository(OperationModel);
     this.assetQuoteRepositoryTest = getRepository(AssetQuoteModel);
     this.dividendPaymentRepositoryTest = getRepository(DividendPaymentModel);
+    this.userCurrentPositionRepositoryTest = getRepository(UserCurrentPositionModel);
 
     try {
       await this.down();
@@ -82,12 +86,14 @@ export class PostgresDataSetup {
     });
 
     await this.operationRepositoryTest.save(this.operations());
+    await this.userCurrentPositionRepositoryTest.save(this.currentPositions());
     await this.assetQuoteRepositoryTest.save(this.assetQuotes());
     await this.dividendPaymentRepositoryTest.save(this.dividendPayments());
   }
 
   public async down(): Promise<void> {
     await this.queryRunner.query(`delete from ${OPERATION_TABLE_NAME}`);
+    await this.queryRunner.query(`delete from ${USER_CURRENT_POSITION_TABLE_NAME}`);
     await this.queryRunner.query(`delete from ${DIVIDEND_PAYMENT_TABLE_NAME}`);
     await this.queryRunner.query(`delete from "${USER_TABLE_NAME}"`);
     await this.queryRunner.query(`delete from ${ASSET_QUOTE_TABLE_NAME}`);
@@ -207,6 +213,33 @@ export class PostgresDataSetup {
         type: 'sale',
         value: 15.00,
         user: this.registeredUsers[0],
+      },
+    ];
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private currentPositions(): Array<Omit<UserCurrentPositionModel, 'id'>> {
+    return [
+      {
+        asset: this.registeredAssets.get('TEST11'),
+        user: this.registeredUsers[0],
+        quantity: 0,
+        createdAt: new Date('2020-01-01T13:00:00.000Z'),
+        updatedAt: new Date('2020-03-02T13:00:00.000Z'),
+      },
+      {
+        asset: this.registeredAssets.get('TEST4'),
+        user: this.registeredUsers[0],
+        quantity: 60,
+        createdAt: new Date('2020-02-01T13:00:00.000Z'),
+        updatedAt: new Date('2020-03-02T13:00:00.000Z'),
+      },
+      {
+        asset: this.registeredAssets.get('TEST3'),
+        user: this.registeredUsers[0],
+        quantity: 40,
+        createdAt: new Date('2020-01-02T13:00:00.000Z'),
+        updatedAt: new Date('2020-03-02T13:00:00.000Z'),
       },
     ];
   }

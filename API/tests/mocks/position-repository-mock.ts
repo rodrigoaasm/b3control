@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { AssetEntity } from '@entities/asset';
 import { PositionFactory } from '@entities/position';
@@ -25,6 +26,11 @@ export class PositionRepositoryMock implements IPositionRepository {
     this.factory.make(assets[0], defaultUser, 240, 10, new Date('2021-03-30T00:00:00.000Z')),
     this.factory.make(assets[1], defaultUser, 140, 10, new Date('2021-03-30T00:00:00.000Z')),
   ];
+
+  // eslint-disable-next-line class-methods-use-this
+  getUserCurrentPositions(userId: string): Promise<PositionEntity[]> {
+    throw new Error('Method not implemented.');
+  }
 
   getAssetTimeseries(
     userId: string, codes: string[], begin: Date, end: Date,
