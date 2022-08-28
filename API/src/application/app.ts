@@ -3,9 +3,9 @@ import 'reflect-metadata';
 import * as express from 'express';
 import { Connection } from 'typeorm';
 
-import configMiddlewares from 'src/application/config/middlewares';
-import routes from 'src/application/config/routes';
-import { InternalDependenciesFactory } from 'src/application/config/internal-dependencies-factory';
+import configMiddlewares from './config/middlewares';
+import routes from './config/routes';
+import { InternalDependenciesFactory } from './config/internal-dependencies-factory';
 
 export interface IApp {
   api: express.Express,

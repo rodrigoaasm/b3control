@@ -5,7 +5,7 @@ import { createApp } from './application/app';
 
 dotenv.config();
 
-import('src/application/config/orm').then(async (config: any) => {
+import('./application/config/orm').then(async (config: any) => {
   const port = process.env.API_PORT;
 
   const connection = await createConnection(config.default);
