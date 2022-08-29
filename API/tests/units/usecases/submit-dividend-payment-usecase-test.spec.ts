@@ -78,7 +78,7 @@ describe('Submit Dividend Payment Use Case', () => {
       await submitDividendPaymentUseCase.submit({
         userId: user.id,
         value: 15.95,
-        assetCode: 'TEST4',
+        assetCode: 'TEST3',
         createdAt: date,
       });
     } catch (submitedError) {

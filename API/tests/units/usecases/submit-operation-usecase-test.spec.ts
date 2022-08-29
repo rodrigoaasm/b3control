@@ -86,7 +86,7 @@ describe('Submit Operation Use Case', () => {
         value: 15.95,
         quantity: 200,
         type: 'buy',
-        assetCode: 'TEST4',
+        assetCode: 'TEST3',
         createdAt: date,
       });
     } catch (submitedError) {

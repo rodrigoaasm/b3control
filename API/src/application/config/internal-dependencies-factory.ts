@@ -26,8 +26,10 @@ import { AuthTokenInterceptor } from '@interceptors/auth-token-interceptor';
 import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 import { ExpressMiddlewareAdapter } from '@external/adapters/express-middleware-adapter';
 import { CryptAdapter } from '@external/adapters/bcrypt-adapter';
-import WalletDistributionReportController from '@controllers/wallet-distribution-report-controller';
-import WalletDistributionReportUseCase from '@usecases/reports/wallet-distribution-report/wallet-distribution-report-usecase';
+import { WalletDistributionReportController } from '@controllers/wallet-distribution-report-controller';
+import { WalletDistributionReportUseCase } from '@usecases/reports/wallet-distribution-report/wallet-distribution-report-usecase';
+import { AssetsListingController } from '@controllers/assets-listing-controller';
+import { AssetsListingUsecase } from '@usecases/assets-listing/assets-listing-usecase';
 
 export class InternalDependenciesFactory {
   public static make(connection: Connection) {
@@ -75,6 +77,7 @@ export class InternalDependenciesFactory {
     );
     const signInUseCase = new SignInUsecase(userRepository, jwtHandlerAdapter, cryptAdapter);
     const walletDistributionReportUseCase = new WalletDistributionReportUseCase(positionRepository);
+    const assetsListingUsecase = new AssetsListingUsecase(assetRepository);
 
     // Interceptors
     const authTokenInterceptor = new AuthTokenInterceptor(jwtHandlerAdapter);
@@ -92,12 +95,14 @@ export class InternalDependenciesFactory {
     const walletDistributionReportController = new WalletDistributionReportController(
       walletDistributionReportUseCase,
     );
+    const assetsListingController = new AssetsListingController(assetsListingUsecase);
 
     return {
       expressMiddlewareAdapter,
       expressRouterAdapter,
       authTokenInterceptor,
       signInController,
+      assetsListingController,
       operationController,
       assetTimeseriesReportController,
       dividendPaymentController,

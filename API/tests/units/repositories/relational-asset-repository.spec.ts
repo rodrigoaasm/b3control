@@ -2,6 +2,7 @@ import { AssetRepository } from '@external/datasource/relational/repositories/as
 
 const mockParentRepository = {
   findOne: jest.fn(),
+  find: jest.fn(),
 };
 
 const connectionMock = {
@@ -38,5 +39,28 @@ describe('Relational - Asset Repository', () => {
     const retrievedAsset = await assetRepository.findByCode('TEST4');
 
     expect(retrievedAsset).toBeNull();
+  });
+
+  it('Should retrieve list of all assets', async () => {
+    const stocks = [
+      {
+        id: 1,
+        code: 'TEST11',
+        social: 'Teste',
+        logo: '',
+        category: 'stock',
+      },
+      {
+        id: 2,
+        code: 'TEST4',
+        social: 'Teste',
+        logo: '',
+        category: 'stock',
+      },
+    ];
+    mockParentRepository.find.mockReturnValueOnce(stocks);
+    const retrievedAssets = await assetRepository.listAll();
+
+    expect(retrievedAssets).toHaveLength(2);
   });
 });

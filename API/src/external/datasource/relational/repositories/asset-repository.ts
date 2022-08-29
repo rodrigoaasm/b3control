@@ -11,12 +11,24 @@ export class AssetRepository implements IAssetRepository {
     this.repo = connection.getRepository(AssetModel);
   }
 
+  private static format(asset: AssetModel): AssetEntity {
+    const assetEntity = new AssetEntity(
+      asset.id, asset.code, asset.social, asset.logo, asset.category as AssetCategory,
+    );
+
+    return assetEntity;
+  }
+
   public async findByCode(code: string): Promise<AssetEntity> {
     const asset = await this.repo.findOne({ code });
 
-    return asset ? new AssetEntity(
-      asset.id, asset.code, asset.social, asset.logo, asset.category as AssetCategory,
-    ) : null;
+    return asset ? AssetRepository.format(asset) : null;
+  }
+
+  public async listAll(): Promise<AssetEntity[]> {
+    const assets = await this.repo.find();
+
+    return assets.map((asset: AssetModel) => AssetRepository.format(asset));
   }
 }
 
