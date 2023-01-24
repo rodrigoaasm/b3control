@@ -9,5 +9,6 @@ export const EntityError = (message: string) => new CustomError('ENTITY_ERROR', 
 export const NotFoundError = (message: string) => new CustomError('NOT_FOUND_ERROR', message);
 export const BadRequestError = (message: string) => new CustomError('BAD_REQUEST_ERROR', message);
 export const UnauthorizedError = (message: string) => new CustomError('UNAUTHORIZED_ERROR', message);
+export const DatabaseError = (message: string) => new CustomError('DATABASE_ERROR', message);
 
 export default CustomError;

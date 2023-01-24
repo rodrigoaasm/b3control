@@ -1,4 +1,5 @@
-class QueryBuilder {
+/* eslint-disable max-classes-per-file */
+class QueryBuilderMock {
   public rawManyReturnValue: any;
 
   constructor() {
@@ -9,31 +10,47 @@ class QueryBuilder {
     this.rawManyReturnValue = returnValue;
   };
 
-  public select = (): QueryBuilder => this;
+  public select = (): QueryBuilderMock => this;
 
-  public from = (): QueryBuilder => this;
+  public from = (): QueryBuilderMock => this;
 
-  public leftJoin = (): QueryBuilder => this;
+  public leftJoin = (): QueryBuilderMock => this;
 
-  public where = (): QueryBuilder => this;
+  public where = (): QueryBuilderMock => this;
 
-  public andWhere = (): QueryBuilder => this;
+  public andWhere = (): QueryBuilderMock => this;
 
-  public innerJoin = (): QueryBuilder => this;
+  public innerJoin = (): QueryBuilderMock => this;
 
-  public orderBy = (): QueryBuilder => this;
+  public orderBy = (): QueryBuilderMock => this;
 
-  public addGroupBy = (): QueryBuilder => this;
+  public addGroupBy = (): QueryBuilderMock => this;
 
   public getQuery = (): string => '';
 
   public getRawMany = (): any => this.rawManyReturnValue;
 }
 
+class QueryRunnerMock {
+  public manager: any;
+
+  public startTransaction = () => {
+    this.manager = {};
+  };
+
+  public commitTransaction = jest.fn();
+
+  public rollbackTransaction = jest.fn();
+
+  public release = jest.fn();
+}
+
 const createConnectionMock = (mockParentRepository: any): any => {
   const connectionMock = {
-    queryBuilder: new QueryBuilder(),
-    createQueryBuilder: (): QueryBuilder => connectionMock.queryBuilder,
+    queryBuilder: new QueryBuilderMock(),
+    queryRunner: new QueryRunnerMock(),
+    createQueryBuilderMock: (): QueryBuilderMock => connectionMock.queryBuilder,
+    createQueryRunner: (): QueryRunnerMock => connectionMock.queryRunner,
     getRepository: () => mockParentRepository,
   };
   return connectionMock;
