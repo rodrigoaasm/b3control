@@ -11,14 +11,13 @@ describe('RelationalUnitOfWork', () => {
   });
 
   it('Should throw an error when the transaction has not started', async () => {
-    expect(4);
+    expect(3);
     try {
       await relationalUnitOfWork.complete(() => {});
     } catch (error) {
       expect(error.message).toEqual('Transaction not found');
       expect(connectionMock.queryRunner.commitTransaction).not.toBeCalled();
       expect(connectionMock.queryRunner.rollbackTransaction).not.toBeCalled();
-      expect(connectionMock.queryRunner.release).not.toBeCalled();
     }
   });
 
@@ -35,7 +34,6 @@ describe('RelationalUnitOfWork', () => {
     expect(work).toBeCalled();
     expect(connectionMock.queryRunner.commitTransaction).toBeCalled();
     expect(connectionMock.queryRunner.rollbackTransaction).not.toBeCalled();
-    expect(connectionMock.queryRunner.release).toBeCalled();
   });
 
   it('Should throw an error when the transaction failed', async () => {
@@ -48,7 +46,6 @@ describe('RelationalUnitOfWork', () => {
       expect(error.message).toEqual('There is an error in transaction');
       expect(connectionMock.queryRunner.commitTransaction).not.toBeCalled();
       expect(connectionMock.queryRunner.rollbackTransaction).toBeCalled();
-      expect(connectionMock.queryRunner.release).toBeCalled();
     }
   });
 });

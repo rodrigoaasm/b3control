@@ -28,8 +28,6 @@ export class RelationalUnitOfWork implements IUnitOfWork {
     } catch (error) {
       this.queryRunner.rollbackTransaction();
       throw DatabaseError('There is an error in transaction');
-    } finally {
-      this.queryRunner.release();
     }
   }
 }

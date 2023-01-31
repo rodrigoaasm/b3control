@@ -20,7 +20,7 @@ export class PositionEntity {
     asset: AssetEntity,
     user: UserEntity,
     quantity: number,
-    price: number,
+    price: number | undefined,
     date: Date,
     id: number | undefined,
   ) {
@@ -85,7 +85,7 @@ export class PositionEntity {
   }
 
   set price(price: number) {
-    if (!Number(price) || Number(price) < 0) {
+    if ((!Number(price) && price !== 0) || Number(price) < 0) {
       throw EntityError("It was not possible set a price in the position object!\n The value of the field 'price' is not accept");
     }
     this._price = Number(Number(price).toFixed(3));

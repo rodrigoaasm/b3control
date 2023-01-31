@@ -2,11 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { IApplicationRequest } from '@application/types';
 import AssetsListingController from '@controllers/assets-listing-controller';
-import { WalletDistributionReportController } from '@controllers/wallet-distribution-report-controller';
-import { AssetEntity } from '@entities/asset';
-import { IAssetsListingOutput, IAssetsListingUsecase, IAssetsListingItem } from '@usecases/assets-listing /assets-listing-interface';
-import { IReportInput } from '@usecases/reports/report-interfaces';
-import { IWalletDistributionOutput, IWalletDistributionUseCase } from '@usecases/reports/wallet-distribution-report/wallet-distribution-report-interface';
+import { IAssetsListingOutput, IAssetsListingUsecase, IAssetsListingItem } from '@usecases/assets-listing/assets-listing-interface';
 
 const output = [
   {

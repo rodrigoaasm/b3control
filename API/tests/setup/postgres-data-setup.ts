@@ -66,6 +66,10 @@ export class PostgresDataSetup {
     return this.connection;
   }
 
+  public getQueryRunner(): QueryRunner {
+    return this.queryRunner;
+  }
+
   public async up(): Promise<void> {
     this.userRepositoryTest = getRepository(UserModel);
     this.assetRepositoryTest = getRepository(AssetModel);
@@ -127,6 +131,18 @@ export class PostgresDataSetup {
   // eslint-disable-next-line class-methods-use-this
   private assets(): Array<Omit<AssetModel, 'id'>> {
     return [
+      {
+        code: 'TEST13',
+        social: 'Teste',
+        logo: '',
+        category: 'general',
+      },
+      {
+        code: 'TEST12',
+        social: 'Teste',
+        logo: '',
+        category: 'general',
+      },
       {
         code: 'TEST11',
         social: 'Teste',

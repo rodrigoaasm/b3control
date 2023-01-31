@@ -9,7 +9,7 @@ export const USER_CURRENT_POSITION_TABLE_NAME = 'user_current_position';
 @Entity({ name: USER_CURRENT_POSITION_TABLE_NAME })
 export class UserCurrentPositionModel {
   @PrimaryColumn()
-  public id : string;
+  public id : number;
 
   @OneToOne(() => AssetModel)
   @JoinColumn({ name: 'asset_id' })

@@ -30,6 +30,7 @@ import { WalletDistributionReportController } from '@controllers/wallet-distribu
 import { WalletDistributionReportUseCase } from '@usecases/reports/wallet-distribution-report/wallet-distribution-report-usecase';
 import { AssetsListingController } from '@controllers/assets-listing-controller';
 import { AssetsListingUsecase } from '@usecases/assets-listing/assets-listing-usecase';
+import { RelationalUnitOfWorkFactory } from '@external/datasource/relational/relational-unit-of-work-factory';
 
 export class InternalDependenciesFactory {
   public static make(connection: Connection) {
@@ -52,6 +53,7 @@ export class InternalDependenciesFactory {
     const operationFactory = new OperationFactory(dateHandlerUtil);
     const positionFactory = new PositionFactory(dateHandlerUtil);
     const dividendPaymentFactory = new DividendPaymentFactory(dateHandlerUtil);
+    const relationalUnitOfWorkFactory = new RelationalUnitOfWorkFactory(connection);
 
     // Repositories
     const operationRepository = new OperationRepository(connection, operationFactory);
@@ -64,8 +66,15 @@ export class InternalDependenciesFactory {
 
     // Use cases
     const submitOperationUseCase = new SubmitOperationUseCase(
-      operationRepository, assetRepository, userRepository, operationFactory,
+      operationRepository,
+      assetRepository,
+      userRepository,
+      positionRepository,
+      operationFactory,
+      positionFactory,
+      relationalUnitOfWorkFactory,
     );
+
     const assetTimeSeriesReportUseCase = new AssetTimeSeriesReportUseCase(
       positionRepository, dateHandlerUtil,
     );

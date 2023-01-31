@@ -3,10 +3,12 @@ import * as request from 'supertest';
 import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
 import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
+import PostgresQueryExec from '@test-setup/postgres-query-exec';
 
 describe('POST /operation', () => {
   let app: IApp;
   let postgresDataSetup: PostgresDataSetup;
+  let postgresQueryExec: PostgresQueryExec;
   let accessTokens: Array<string>;
 
   const requestBody = {
@@ -22,6 +24,7 @@ describe('POST /operation', () => {
     postgresDataSetup = new PostgresDataSetup();
     await postgresDataSetup.init();
     await postgresDataSetup.up();
+    postgresQueryExec = new PostgresQueryExec(postgresDataSetup);
 
     // create app
     app = await createApp(postgresDataSetup.getConnection());
@@ -43,7 +46,7 @@ describe('POST /operation', () => {
     app = null;
   });
 
-  it('Should submit sucessfully', (done) => {
+  it('Should submit successfully when user current position already exists', (done) => {
     request(app.api)
       .post('/operation')
       .send({
@@ -52,7 +55,38 @@ describe('POST /operation', () => {
       .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(201, done);
+      .then(async (response) => {
+        expect(response.status).toEqual(201);
+        const currentPositions = await postgresQueryExec.getUserCurrentPosition('TEST11', postgresDataSetup.registeredUsers[0].id);
+        expect(currentPositions).toHaveLength(1);
+        expect(currentPositions[0].quantity).toEqual(200);
+        done();
+      })
+      .catch((error) => {
+        done(error);
+      });
+  });
+
+  it('Should submit successfully when the user current position does not exist', (done) => {
+    request(app.api)
+      .post('/operation')
+      .send({
+        ...requestBody,
+        assetCode: 'TEST12',
+      })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .then(async (response) => {
+        expect(response.status).toEqual(201);
+        const currentPositions = await postgresQueryExec.getUserCurrentPosition('TEST12', postgresDataSetup.registeredUsers[0].id);
+        expect(currentPositions).toHaveLength(1);
+        expect(currentPositions[0].quantity).toEqual(200);
+        done();
+      })
+      .catch((error) => {
+        done(error);
+      });
   });
 
   it('Should return a BadRequest response when the request body is empty', (done) => {
@@ -112,7 +146,58 @@ describe('POST /operation', () => {
       .set('Authorization', `Bearer ${accessTokens[0]}`)
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
-      .expect(400, done);
+      .then((response) => {
+        expect(response.status).toEqual(400);
+        expect(response.body).toEqual({ message: 'Quantity is invalid', status: 'BAD_REQUEST_ERROR' });
+        done();
+      })
+      .catch((error) => done(error));
+  });
+
+  it('Should return a BadRequest response when the current position is not found in a sales request ', (done) => {
+    request(app.api)
+      .post('/operation')
+      .send({
+        ...requestBody,
+        assetCode: 'TEST13',
+        type: 'sale',
+        quantity: 300,
+      })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .then((response) => {
+        expect(response.status).toEqual(400);
+        expect(response.body).toEqual({
+          message: "It was not possible set a quantity in the position object!\n The value of the field 'quantity' is not accept",
+          status: 'ENTITY_CONSTRUCTION_ERROR',
+        });
+        done();
+      })
+      .catch((error) => done(error));
+  });
+
+  it('Should return a BadRequest response when the quantity entered in a sales request is greater than the current position', (done) => {
+    request(app.api)
+      .post('/operation')
+      .send({
+        ...requestBody,
+        assetCode: 'TEST12',
+        type: 'sale',
+        quantity: 300,
+      })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .then((response) => {
+        expect(response.status).toEqual(400);
+        expect(response.body).toEqual({
+          message: "It was not possible set a quantity in the position object!\n The value of the field 'quantity' is not accept",
+          status: 'ENTITY_CONSTRUCTION_ERROR',
+        });
+        done();
+      })
+      .catch((error) => done(error));
   });
 
   it('Should return a BadRequest response when the date is invalid', (done) => {
@@ -126,5 +211,24 @@ describe('POST /operation', () => {
       .set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(400, done);
+  });
+
+  it('Should return an internal server error response and not keep log of the new position when the transaction fails', (done) => {
+    request(app.api)
+      .post('/operation')
+      .send({
+        ...requestBody,
+        assetCode: 'TEST13',
+      })
+      .set('Authorization', `Bearer ${accessTokens[0]}`)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .then(async (response) => {
+        expect(response.status).toEqual(500);
+        const currentPosition = await postgresQueryExec.getUserCurrentPosition('TEST13', postgresDataSetup.registeredUsers[0].id);
+        expect(currentPosition).toHaveLength(0);
+        done();
+      })
+      .catch((error) => done(error));
   });
 });

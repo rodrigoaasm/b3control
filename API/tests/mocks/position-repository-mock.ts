@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { AssetEntity } from '@entities/asset';
@@ -16,6 +17,14 @@ const assets: Array<AssetEntity> = [
 
 export class PositionRepositoryMock implements IPositionRepository {
   private factory = new PositionFactory(new DateValidatorUtil());
+
+  getUserCurrentPosition(userId: string, assetId: number): Promise<PositionEntity> {
+    throw new Error('Method not implemented.');
+  }
+
+  saveUserCurrentPosition(userCurrentPosition: PositionEntity): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
 
   private positions: Array<PositionEntity> = [
     this.factory.make(assets[0], defaultUser, 200, 20, new Date('2021-01-31T00:00:00.000Z')),

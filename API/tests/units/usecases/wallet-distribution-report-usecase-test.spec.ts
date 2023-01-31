@@ -14,6 +14,14 @@ const test4 = new AssetEntity(2, 'TEST4', '', '', 'stock');
 const test3 = new AssetEntity(3, 'TEST3', '', '', 'stock');
 
 class WalletRepositoryMock implements IPositionRepository {
+  getUserCurrentPosition(userId: string, assetId: number): Promise<PositionEntity> {
+    throw new Error('Method not implemented.');
+  }
+
+  saveUserCurrentPosition(userCurrentPosition: PositionEntity): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   getAssetTimeseries(
     userId: string, codes: string[], begin: Date, end: Date,
   ): Promise<PositionEntity[]> {

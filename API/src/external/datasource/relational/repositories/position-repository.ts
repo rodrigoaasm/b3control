@@ -1,4 +1,4 @@
-import { Connection, Repository } from 'typeorm';
+import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { PositionEntity } from '@entities/position';
 import {
@@ -12,6 +12,8 @@ import { AssetCategory } from '@entities/asset';
 export interface IPositionQueryRaw {
   id ?: string,
   quantity: string,
+  created_at?: string,
+  updated_at?: string,
   price: string,
   date: string,
   asset_id: string,
@@ -32,48 +34,77 @@ export class PositionRepository implements IPositionRepository {
 
   constructor(connection: Connection, private positionFactory: IPositionFactory) {
     this.connection = connection;
+    this.positionRepo = connection.getRepository(UserCurrentPositionModel);
   }
 
-  formatPositions(raw: Array<IPositionQueryRaw>): Array<PositionEntity> {
-    const positions = raw.map((element : IPositionQueryRaw) => {
-      const asset = new AssetEntity(
-        Number(element.asset_id),
-        element.asset_code,
-        element.asset_social,
-        element.asset_logo,
-        element.asset_category as AssetCategory,
-      );
+  async saveUserCurrentPosition(userCurrentPosition: PositionEntity): Promise<void> {
+    const user: UserModel = {
+      id: userCurrentPosition.user.id,
+      name: userCurrentPosition.user.name,
+      createdAt: userCurrentPosition.user.createdAt,
+      updatedAt: userCurrentPosition.user.updatedAt,
+    };
 
-      const user = new UserEntity(
-        element.user_id,
-        element.user_name,
-        new Date(element.user_createdAt),
-        new Date(element.user_updatedAt),
-      );
+    const asset: AssetModel = {
+      id: userCurrentPosition.asset.id,
+      code: userCurrentPosition.asset.code,
+      category: userCurrentPosition.asset.category,
+      logo: userCurrentPosition.asset.logo,
+      social: userCurrentPosition.asset.social,
+    };
 
-      return this.positionFactory.make(
-        asset,
-        user,
-        Number(element.quantity),
-        Number(element.price),
-        element.date ? new Date(element.date) : new Date(),
-        element.id ? Number(element.id) : undefined,
-      );
-    });
+    const userCurrentPositionModel: UserCurrentPositionModel = {
+      user,
+      asset,
+      quantity: userCurrentPosition.quantity,
+      createdAt: userCurrentPosition.date,
+      updatedAt: new Date(),
+      id: userCurrentPosition.id,
+    };
 
-    return positions;
+    await this.positionRepo.save(userCurrentPositionModel);
   }
 
-  async getUserCurrentPositions(userId: string): Promise<PositionEntity[]> {
-    const lastQuoteQuery = this.connection.createQueryBuilder()
+  private formatPosition(positionRaw: IPositionQueryRaw): PositionEntity {
+    const asset = new AssetEntity(
+      Number(positionRaw.asset_id),
+      positionRaw.asset_code,
+      positionRaw.asset_social,
+      positionRaw.asset_logo,
+      positionRaw.asset_category as AssetCategory,
+    );
+
+    const user = new UserEntity(
+      positionRaw.user_id,
+      positionRaw.user_name,
+      new Date(positionRaw.user_createdAt),
+      new Date(positionRaw.user_updatedAt),
+    );
+
+    return this.positionFactory.make(
+      asset,
+      user,
+      Number(positionRaw.quantity),
+      Number(positionRaw.price),
+      positionRaw.created_at ? new Date(positionRaw.created_at) : new Date(positionRaw.date),
+      positionRaw.id ? Number(positionRaw.id) : undefined,
+    );
+  }
+
+  private createLastQuoteQuery(): SelectQueryBuilder<any> {
+    return this.connection.createQueryBuilder()
       .select('max(sub_aq.date)')
       .from(AssetQuoteModel, 'sub_aq')
       .where('sub_aq.asset_id = a.id');
+  }
 
-    const positionRaws = await this.connection.createQueryBuilder()
+  private createQueryBaseForUserCurrentPositions(): SelectQueryBuilder<UserCurrentPositionModel> {
+    return this.connection.createQueryBuilder()
       .select([
         'ucp.id as id',
         'ucp.quantity as quantity',
+        'ucp.created_at as created_at',
+        'ucp.updated_at as updated_at',
         'u.id as user_id',
         'u.name as user_name',
         'u.created_at as user_createdAt',
@@ -89,12 +120,28 @@ export class PositionRepository implements IPositionRepository {
       .from(UserCurrentPositionModel, 'ucp')
       .innerJoin(UserModel, 'u', 'u.id = ucp.user_id')
       .innerJoin(AssetModel, 'a', 'a.id = ucp.asset_id')
-      .innerJoin(AssetQuoteModel, 'aq', 'a.id = aq.asset_id')
+      .innerJoin(AssetQuoteModel, 'aq', 'a.id = aq.asset_id');
+  }
+
+  async getUserCurrentPosition(userId: string, assetId: number)
+    : Promise<PositionEntity | undefined> {
+    const lastQuoteQuery = this.createLastQuoteQuery();
+    const positionRaw = await this.createQueryBaseForUserCurrentPositions()
+      .where('u.id = :userId', { userId })
+      .andWhere('a.id = :assetId', { assetId })
+      .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
+      .getRawOne();
+    return positionRaw ? this.formatPosition(positionRaw) : positionRaw;
+  }
+
+  async getUserCurrentPositions(userId: string): Promise<PositionEntity[]> {
+    const lastQuoteQuery = this.createLastQuoteQuery();
+    const positionRaws = await this.createQueryBaseForUserCurrentPositions()
       .where('u.id = :userId', { userId })
       .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
       .getRawMany();
 
-    return this.formatPositions(positionRaws);
+    return positionRaws.map(this.formatPosition.bind(this));
   }
 
   async getAssetTimeseries(
@@ -141,7 +188,7 @@ export class PositionRepository implements IPositionRepository {
     mainQuery = mainQuery.orderBy('s.id, sq.date', 'ASC');
     const datasetReports = await mainQuery.getRawMany();
 
-    return this.formatPositions(datasetReports);
+    return datasetReports.map(this.formatPosition.bind(this));
   }
 }
 
