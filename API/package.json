@@ -5,8 +5,8 @@
         "start": "ts-node -r tsconfig-paths/register ./build/index.js",
         "dev": "nodemon ts-node-dev -r tsconfig-paths/register ./src/index.ts",
         "test": "jest --coverage",
-        "unit-test": "jest ./tests/units --coverage",
-        "integration-test": "jest ./tests/integration --runInBand"
+        "test:unit": "jest ./tests/units --coverage",
+        "test:integration": "jest ./tests/integration --runInBand"
     },
     "devDependencies": {
         "@types/bcrypt": "^5.0.0",

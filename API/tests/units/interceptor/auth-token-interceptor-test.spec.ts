@@ -30,9 +30,8 @@ describe('AuthTokenInterceptor', () => {
       params: {},
     };
 
-    authTokenInterceptor.verify(request, () => {
-      expect(request.headers.owner).toBeDefined();
-    });
+    authTokenInterceptor.verify(request);
+    expect(request.headers.owner).toBeDefined();
   });
 
   it('Should throw an error when verification fails', () => {
@@ -48,7 +47,7 @@ describe('AuthTokenInterceptor', () => {
     };
 
     try {
-      authTokenInterceptor.verify(request, () => {});
+      authTokenInterceptor.verify(request);
     } catch (verificationError) {
       expect(verificationError.message).toEqual('Token verification fails');
     }
@@ -63,7 +62,7 @@ describe('AuthTokenInterceptor', () => {
     };
 
     try {
-      authTokenInterceptor.verify(request, () => {});
+      authTokenInterceptor.verify(request);
     } catch (verificationError) {
       expect(verificationError.message).toEqual('The token was not informed!');
     }
@@ -78,7 +77,7 @@ describe('AuthTokenInterceptor', () => {
     };
 
     try {
-      authTokenInterceptor.verify(request, () => {});
+      authTokenInterceptor.verify(request);
     } catch (verificationError) {
       expect(verificationError.message).toEqual('The authorization header format is invalid!');
     }

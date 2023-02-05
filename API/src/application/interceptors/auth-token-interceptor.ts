@@ -8,7 +8,7 @@ export class AuthTokenInterceptor {
   ) {
   }
 
-  public verify = (request: IApplicationRequest, next: Function) => {
+  public verify = (request: IApplicationRequest) => {
     if (!request?.headers?.authorization) {
       throw UnauthorizedError('The token was not informed!');
     }
@@ -23,7 +23,6 @@ export class AuthTokenInterceptor {
     } catch (verifyError) {
       throw UnauthorizedError(verifyError.message);
     }
-    next();
   };
 }
 

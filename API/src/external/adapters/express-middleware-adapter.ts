@@ -16,8 +16,9 @@ export class ExpressMiddlewareAdapter {
       };
 
       try {
-        middlewareFunc(aplicationRequest, next);
+        middlewareFunc(aplicationRequest);
         expressRequest.headers = aplicationRequest.headers;
+        next();
       } catch (middlewareError) {
         return this.expressHttpErrorAdapter.handleHTTPError(expressResponse, middlewareError);
       }

@@ -40,7 +40,7 @@ describe('ExpressMiddlewareAdapter', () => {
 
   it('Should convert from express request to application request', () => {
     expect.assertions(2);
-    const interceptor = (appRequest: IApplicationRequest, next: Function) => {
+    const interceptor = (appRequest: IApplicationRequest) => {
       expect(appRequest).toEqual({
         headers: {
           Authorization: 'token',
@@ -50,7 +50,6 @@ describe('ExpressMiddlewareAdapter', () => {
         },
         params: {},
       });
-      expect(next).toBeDefined();
     };
     const expressMiddleware = expressMiddlewareAdapter.middlewareAdapter(interceptor);
 
@@ -64,15 +63,16 @@ describe('ExpressMiddlewareAdapter', () => {
       params: {},
     };
     const response = {};
+    const next = jest.fn();
 
-    expressMiddleware(request, response, () => {});
+    expressMiddleware(request, response, next);
+    expect(next).toHaveBeenCalled();
   });
 
   it('Should run the next function', () => {
     const tNext = jest.fn();
-    const interceptor = (appRequest: IApplicationRequest, next: Function) => {
-      next();
-    };
+    const interceptor = jest.fn();
+
     const expressMiddleware = expressMiddlewareAdapter.middlewareAdapter(interceptor);
 
     expressMiddleware({}, {}, tNext);
