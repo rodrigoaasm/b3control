@@ -1,31 +1,25 @@
 import { OperationEntity } from '@entities/operation/';
 import { BadRequestError, NotFoundError } from '@domain-error/custom-error';
-
-import { IOperationRepository } from '@domain-ports/repositories/operation-repository-interface';
 import { IAssetRepository } from '@domain-ports/repositories/asset-repository-interface';
 import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 import { IUserRepository } from '@domain-ports/repositories/user-repository-interface';
-
-import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
-
 import { IUnitOfWorkFactory } from '@domain-ports/factories/unit-of-work-factory-interface';
 import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
 import { ISubmitOperationInput, ISubmitOperationUseCase } from './submit-operation-interfaces';
 
 export class SubmitOperationUseCase implements ISubmitOperationUseCase {
   constructor(
-    private operationRepository: IOperationRepository,
     private assetRepository: IAssetRepository,
     private userRepository: IUserRepository,
-    private positionRepository: IPositionRepository,
     private operationFactory: IOperationFactory,
     private positionFactory: IPositionFactory,
-    private unitOfWorkFactory: IUnitOfWorkFactory,
+    private storageUnitOfWorkFactory: IUnitOfWorkFactory,
   ) {
   }
 
   public async submit(submitOperationInput: ISubmitOperationInput) : Promise<OperationEntity> {
     let submittedOperation;
+    const databaseUoW = await this.storageUnitOfWorkFactory.make();
 
     const {
       value, userId, quantity, type, assetCode, createdAt,
@@ -46,7 +40,7 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
     const asset = await this.assetRepository.findByCode(assetCode);
     if (!asset) throw NotFoundError('Asset not found');
 
-    let userAssetCurrentPosition = await this.positionRepository
+    let userAssetCurrentPosition = await databaseUoW.getPositionRepository()
       .getUserCurrentPosition(user.id, asset.id);
     const quantityForPositions = type === 'sale' ? quantity * -1 : quantity;
     if (!userAssetCurrentPosition) {
@@ -62,12 +56,12 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
     }
 
     const operation = this.operationFactory.make(value, quantity, type, asset, user, createdAt);
-    const unitOfWork = this.unitOfWorkFactory.make();
-    await unitOfWork.start();
-    await unitOfWork.complete(async () => {
-      await this.positionRepository
+
+    await databaseUoW.runTransaction(async () => {
+      await databaseUoW.getPositionRepository()
         .saveUserCurrentPosition(userAssetCurrentPosition);
-      submittedOperation = await this.operationRepository.save(operation);
+      submittedOperation = await databaseUoW.getOperationRepository()
+        .save(operation);
     });
 
     return submittedOperation;

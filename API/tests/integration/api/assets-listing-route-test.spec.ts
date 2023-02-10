@@ -31,6 +31,20 @@ describe('GET /assets', () => {
       .then((response) => {
         expect(response.body).toEqual([
           {
+            _code: 'TEST13',
+            _social: 'Teste',
+            _logo: '',
+            _category: 'general',
+            _id: expect.any(Number),
+          },
+          {
+            _code: 'TEST12',
+            _social: 'Teste',
+            _logo: '',
+            _category: 'general',
+            _id: expect.any(Number),
+          },
+          {
             _code: 'TEST11',
             _social: 'Teste',
             _logo: '',

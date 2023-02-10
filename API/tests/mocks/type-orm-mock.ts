@@ -44,6 +44,10 @@ const createConnectionMock = (mockParentRepository: any): any => {
     createQueryBuilder: (): QueryBuilderMock => connectionMock.queryBuilder,
     createQueryRunner: (): QueryRunnerMock => connectionMock.queryRunner,
     getRepository: () => mockParentRepository,
+    close: jest.fn(),
+    manager: {
+      transaction: jest.fn().mockImplementation(async (f: Function) => { await f({}); }),
+    },
   };
   return connectionMock;
 };

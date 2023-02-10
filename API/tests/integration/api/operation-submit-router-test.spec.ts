@@ -4,6 +4,17 @@ import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
 import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 import PostgresQueryExec from '@test-setup/postgres-query-exec';
+import { OperationFactory } from '@entities/operation';
+import DateHandlerUtil from '@utils/date-handler-util';
+
+// Mock OperationRepository
+const { OperationRepository } = jest.requireActual('@external/datasource/relational/repositories/operation-repository');
+const mockApp = {
+  mockOperationRepository: undefined,
+};
+jest.mock('@external/datasource/relational/repositories/operation-repository', () => ({
+  OperationRepository: jest.fn().mockImplementation(() => mockApp.mockOperationRepository),
+}));
 
 describe('POST /operation', () => {
   let app: IApp;
@@ -25,6 +36,13 @@ describe('POST /operation', () => {
     await postgresDataSetup.init();
     await postgresDataSetup.up();
     postgresQueryExec = new PostgresQueryExec(postgresDataSetup);
+
+    // mock
+    mockApp.mockOperationRepository = new OperationRepository(
+      postgresDataSetup.getConnection(),
+      new OperationFactory(new DateHandlerUtil()),
+    );
+    mockApp.mockOperationRepository.save = jest.fn(mockApp.mockOperationRepository.save);
 
     // create app
     app = await createApp(postgresDataSetup.getConnection());
@@ -214,6 +232,8 @@ describe('POST /operation', () => {
   });
 
   it('Should return an internal server error response and not keep log of the new position when the transaction fails', (done) => {
+    mockApp.mockOperationRepository.save.mockRejectedValueOnce(new Error('Database Error'));
+
     request(app.api)
       .post('/operation')
       .send({
@@ -225,6 +245,10 @@ describe('POST /operation', () => {
       .expect('Content-Type', /json/)
       .then(async (response) => {
         expect(response.status).toEqual(500);
+        expect(response.body).toEqual({
+          message: 'There is an error in transaction',
+          status: 'DATABASE_ERROR',
+        });
         const currentPosition = await postgresQueryExec.getUserCurrentPosition('TEST13', postgresDataSetup.registeredUsers[0].id);
         expect(currentPosition).toHaveLength(0);
         done();

@@ -1,4 +1,11 @@
+import { IOperationRepository } from './repositories/operation-repository-interface';
+import { IPositionRepository } from './repositories/position-repository-interface';
+
 export interface IUnitOfWork {
-  start(): Promise<void>;
-  complete(work: () => void): Promise<void>;
+  runTransaction(work: Function): Promise<void>;
+
+  getOperationRepository(): IOperationRepository;
+  getPositionRepository(): IPositionRepository;
+
+  kill(): void;
 }

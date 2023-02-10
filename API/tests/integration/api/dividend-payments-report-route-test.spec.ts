@@ -82,7 +82,7 @@ describe('GET /report/dividendpayments/...', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((response) => {
-        expect(response.body.assets.length).toEqual(3);
+        expect(response.body.assets.length).toEqual(5);
         response.body.assets.forEach((asset: any) => {
           expect(asset.items.length).toEqual(6);
           asset.items.forEach((item: any) => {
@@ -136,7 +136,7 @@ describe('GET /report/dividendpayments/...', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((response) => {
-        expect(response.body.assets.length).toEqual(3);
+        expect(response.body.assets.length).toEqual(5);
         checkPaymentCalculations(response, 1);
         done();
       })
@@ -154,7 +154,7 @@ describe('GET /report/dividendpayments/...', () => {
       .expect(200)
       .then((response) => {
         // Checks the amount of assets
-        expect(response.body.assets.length).toEqual(3);
+        expect(response.body.assets.length).toEqual(5);
         expect(response.body.categories.length).toEqual(2);
         checkPaymentCalculations(response, diffInMonths);
         done();
@@ -192,7 +192,7 @@ describe('GET /report/dividendpayments/...', () => {
       .expect(200)
       .then((response) => {
         // Checks the amount of assets
-        expect(response.body.assets.length).toEqual(3);
+        expect(response.body.assets.length).toEqual(5);
         response.body.assets.forEach((asset) => {
           expect(asset.items.length).toEqual(2);
         });
@@ -249,7 +249,7 @@ describe('GET /report/dividendpayments/...', () => {
       .expect(200)
       .then((response) => {
         // Checks the amount of assets
-        expect(response.body.assets.length).toEqual(3);
+        expect(response.body.assets.length).toEqual(5);
         expect(response.body.categories.length).toEqual(2);
         checkPaymentCalculations(response, 2);
         done();

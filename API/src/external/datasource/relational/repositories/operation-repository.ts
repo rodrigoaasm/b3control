@@ -1,15 +1,20 @@
 import { IOperationRepository } from '@domain-ports/repositories/operation-repository-interface';
 import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 import { OperationEntity } from '@entities/operation';
-import { Connection, Repository } from 'typeorm';
+import { Connection, EntityManager, Repository } from 'typeorm';
 import { OperationModel } from '@external/datasource/relational/models';
 import { UserEntity } from '@entities/user';
+import { ITypeORMRepository } from './typeorm-repositories-interface';
 
-export class OperationRepository implements IOperationRepository {
+export class OperationRepository implements IOperationRepository, ITypeORMRepository {
   private repo: Repository<OperationModel>;
 
   constructor(connection: Connection, private operationFactory: IOperationFactory) {
     this.repo = connection.getRepository(OperationModel);
+  }
+
+  setTransactionManager(transactionManager: EntityManager) {
+    this.repo = transactionManager.getRepository(OperationModel);
   }
 
   async save(operation: OperationEntity): Promise<OperationEntity> {

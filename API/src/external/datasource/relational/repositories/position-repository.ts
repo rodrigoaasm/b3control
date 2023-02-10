@@ -1,4 +1,6 @@
-import { Connection, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  Connection, EntityManager, Repository, SelectQueryBuilder,
+} from 'typeorm';
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { PositionEntity } from '@entities/position';
 import {
@@ -8,6 +10,7 @@ import { IPositionFactory } from '@domain-ports/factories/position-factory-inter
 import { AssetEntity } from '@entities/asset/asset-entity';
 import { UserEntity } from '@entities/user';
 import { AssetCategory } from '@entities/asset';
+import { ITypeORMRepository } from './typeorm-repositories-interface';
 
 export interface IPositionQueryRaw {
   id ?: string,
@@ -27,7 +30,7 @@ export interface IPositionQueryRaw {
   user_updatedAt: string,
 }
 
-export class PositionRepository implements IPositionRepository {
+export class PositionRepository implements IPositionRepository, ITypeORMRepository {
   private connection : Connection;
 
   private positionRepo : Repository<UserCurrentPositionModel>;
@@ -35,6 +38,10 @@ export class PositionRepository implements IPositionRepository {
   constructor(connection: Connection, private positionFactory: IPositionFactory) {
     this.connection = connection;
     this.positionRepo = connection.getRepository(UserCurrentPositionModel);
+  }
+
+  setTransactionManager(transactionManager: EntityManager) {
+    this.positionRepo = transactionManager.getRepository(UserCurrentPositionModel);
   }
 
   async saveUserCurrentPosition(userCurrentPosition: PositionEntity): Promise<void> {

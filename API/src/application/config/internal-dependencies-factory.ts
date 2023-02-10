@@ -1,7 +1,6 @@
 import { Connection } from 'typeorm';
 
 import { OperationFactory } from '@entities/operation/operation-factory';
-import { OperationRepository } from '@external/datasource/relational/repositories/operation-repository';
 import { AssetRepository } from '@external/datasource/relational/repositories/asset-repository';
 import { PositionRepository } from '@external/datasource/relational/repositories/position-repository';
 import { SubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-usecase';
@@ -53,10 +52,11 @@ export class InternalDependenciesFactory {
     const operationFactory = new OperationFactory(dateHandlerUtil);
     const positionFactory = new PositionFactory(dateHandlerUtil);
     const dividendPaymentFactory = new DividendPaymentFactory(dateHandlerUtil);
-    const relationalUnitOfWorkFactory = new RelationalUnitOfWorkFactory(connection);
+    const relationalUnitOfWorkFactory = new RelationalUnitOfWorkFactory(
+      connection, operationFactory, positionFactory,
+    );
 
     // Repositories
-    const operationRepository = new OperationRepository(connection, operationFactory);
     const assetRepository = new AssetRepository(connection);
     const positionRepository = new PositionRepository(connection, positionFactory);
     const userRepository = new UserRepository(connection);
@@ -66,10 +66,8 @@ export class InternalDependenciesFactory {
 
     // Use cases
     const submitOperationUseCase = new SubmitOperationUseCase(
-      operationRepository,
       assetRepository,
       userRepository,
-      positionRepository,
       operationFactory,
       positionFactory,
       relationalUnitOfWorkFactory,

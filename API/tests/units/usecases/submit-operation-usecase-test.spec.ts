@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { AssetCategory, AssetEntity } from '@entities/asset';
+import { AssetEntity } from '@entities/asset';
 import { SubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-usecase';
 import { IOperationFactory } from '@domain-ports/factories/operation-factory-interface';
 
@@ -13,6 +13,7 @@ import { ISignInResult, IUserRepository } from '@domain-ports/repositories/user-
 import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
 import { PositionEntity } from '@entities/position';
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
+import { IUnitOfWork } from '@domain-ports/unit-work-interface';
 
 class OperationFactoryMock implements IOperationFactory {
   constructor(private date: Date) {}
@@ -36,14 +37,6 @@ class PositionFactoryMock implements IPositionFactory {
   }
 }
 
-const mockUnitOfWork = {
-  start: jest.fn(),
-  complete: jest.fn().mockImplementation((work: Function) => work()),
-};
-const unitOfWorkFactory = {
-  make: () => mockUnitOfWork,
-};
-
 const date = new Date();
 const user = new UserEntity('jbfjbkglkbnlknglkb', 'user', date, date);
 
@@ -65,6 +58,8 @@ class UserRepositoryMock implements IUserRepository {
 class PositionRepositoryMock implements IPositionRepository {
   getAssetTimeseries = jest.fn();
 
+  setTransactionManager = jest.fn();
+
   getUserCurrentPositions = jest.fn();
 
   getUserCurrentPosition = jest.fn();
@@ -75,14 +70,26 @@ class PositionRepositoryMock implements IPositionRepository {
 describe('Submit Operation Use Case', () => {
   let submitOperationService: SubmitOperationUseCase;
   let positionRepositoryMock: PositionRepositoryMock;
+  let operationRepositoryMock: OperationRepositoryMock;
+  let mockUnitOfWork: IUnitOfWork;
 
   beforeEach(() => {
     positionRepositoryMock = new PositionRepositoryMock();
+    operationRepositoryMock = new OperationRepositoryMock();
+
+    mockUnitOfWork = {
+      runTransaction: jest.fn().mockImplementation((work: Function) => work()),
+      getPositionRepository: () => positionRepositoryMock,
+      getOperationRepository: () => operationRepositoryMock,
+      kill: jest.fn(),
+    };
+    const unitOfWorkFactory = {
+      make: () => mockUnitOfWork,
+    };
+
     submitOperationService = new SubmitOperationUseCase(
-      new OperationRepositoryMock(),
       new AssetRepositoryMock(),
       new UserRepositoryMock(),
-      positionRepositoryMock,
       new OperationFactoryMock(date),
       new PositionFactoryMock(date),
       unitOfWorkFactory,
@@ -164,7 +171,7 @@ describe('Submit Operation Use Case', () => {
   });
 
   it('Should no register an operation when the transaction failed', async () => {
-    mockUnitOfWork.complete.mockRejectedValueOnce(new Error('Database error'));
+    mockUnitOfWork.runTransaction = jest.fn().mockRejectedValueOnce(new Error('Database error'));
     positionRepositoryMock.getUserCurrentPosition.mockResolvedValueOnce({
       quantity: 100,
     });
