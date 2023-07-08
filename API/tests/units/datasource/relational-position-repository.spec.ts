@@ -1,7 +1,7 @@
 import { PositionRepository, IPositionQueryRaw } from '@external/datasource/relational/repositories/position-repository';
-import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
+import { IPositionFactory, IPositionFactoryMakeInput } from '@domain-ports/factories/position-factory-interface';
 import { AssetEntity } from '@entities/asset';
-import { PositionEntity } from '@entities/position';
+import { PositionEntity, UserPositionEntity } from '@entities/position';
 
 import createConnectionMock from '@test-mocks/type-orm-mock';
 import { UserEntity } from '@entities/user';
@@ -13,16 +13,14 @@ const connectionMock = createConnectionMock(mockRepositoryTypeOrm);
 
 class PositionFactory implements IPositionFactory {
   // eslint-disable-next-line class-methods-use-this
-  make(
-    asset: AssetEntity,
-    user: UserEntity,
-    quantity: number,
-    price: number,
-    date: Date,
-    average?: number,
-    id?: number,
-  ): PositionEntity {
-    return new PositionEntity(asset, user, quantity, date, price, average, id);
+  make<T extends PositionEntity>(args: IPositionFactoryMakeInput): T {
+    const {
+      asset, user, quantity, date, price, averageBuyPrice, investmentValue, id,
+    } = args;
+
+    return new UserPositionEntity(
+      asset, user, quantity, new Date(date), price, averageBuyPrice, investmentValue, id,
+    ) as unknown as T;
   }
 }
 
@@ -52,7 +50,8 @@ describe('Relational - Position Repository', () => {
       user_name: user.name,
       user_createdAt: user.createdAt.toISOString(),
       user_updatedAt: user.updatedAt.toISOString(),
-      average_buy_price: null,
+      average_buy_price: '10',
+      investment_value: '2200',
     };
     positionRawInTimeseries = {
       date: beginDate.toISOString(),
@@ -67,7 +66,8 @@ describe('Relational - Position Repository', () => {
       user_name: user.name,
       user_createdAt: user.createdAt.toISOString(),
       user_updatedAt: user.updatedAt.toISOString(),
-      average_buy_price: null,
+      average_buy_price: '15.00',
+      investment_value: '3300,00',
     };
     positionRepository = new PositionRepository(
       connectionMock as any, new PositionFactory(),
@@ -97,9 +97,10 @@ describe('Relational - Position Repository', () => {
           _createdAt: user.createdAt,
           _updatedAt: user.updatedAt,
         },
+        _price: 15,
         _quantity: 220,
-        _price: 15.00,
-        _averageBuyPrice: 0,
+        _averageBuyPrice: 10,
+        _investmentValue: 2200,
       }]);
     });
 
@@ -135,8 +136,9 @@ describe('Relational - Position Repository', () => {
           _updatedAt: user.updatedAt,
         },
         _quantity: 220,
-        _price: 15.00,
-        _averageBuyPrice: 0,
+        _price: 15,
+        _investmentValue: 2200,
+        _averageBuyPrice: 10,
       });
     });
 
@@ -180,7 +182,8 @@ describe('Relational - Position Repository', () => {
           _price: 15.00,
           _quantity: 220,
           _user: user,
-          _averageBuyPrice: 0,
+          _averageBuyPrice: 15.00,
+          _investmentValue: NaN,
         },
       ]);
     });
@@ -211,8 +214,9 @@ describe('Relational - Position Repository', () => {
           },
           _price: 15.00,
           _quantity: 220,
+          _investmentValue: NaN,
           _user: user,
-          _averageBuyPrice: 0,
+          _averageBuyPrice: 15.00,
         },
       ]);
     });
@@ -245,7 +249,8 @@ describe('Relational - Position Repository', () => {
           _price: 15.00,
           _quantity: 220,
           _user: user,
-          _averageBuyPrice: 0,
+          _averageBuyPrice: 15.00,
+          _investmentValue: NaN,
         },
       ]);
     });
@@ -274,8 +279,9 @@ describe('Relational - Position Repository', () => {
           },
           _price: 15.00,
           _quantity: 220,
+          _averageBuyPrice: 15,
+          _investmentValue: NaN,
           _user: user,
-          _averageBuyPrice: 0,
         },
       ]);
     });
@@ -290,11 +296,12 @@ describe('Relational - Position Repository', () => {
 
   describe('saveUserCurrentPosition()', () => {
     it('Should save the user current position', async () => {
-      const userCurrentPosition = new PositionEntity(
+      const userCurrentPosition = new UserPositionEntity(
         new AssetEntity(1, 'TEST11', '', '', 'stock'),
         user,
         4,
         beginDate,
+        0,
         0,
         0,
         1,
@@ -319,6 +326,8 @@ describe('Relational - Position Repository', () => {
           category: 'stock',
         },
         quantity: 4,
+        average_buy_price: 0,
+        investment_value: 0,
         createdAt: beginDate,
         updatedAt: expect.any(Date),
       }]);
@@ -326,11 +335,12 @@ describe('Relational - Position Repository', () => {
 
     it('Should throw an error', async () => {
       expect.assertions(1);
-      const userCurrentPosition = new PositionEntity(
+      const userCurrentPosition = new UserPositionEntity(
         new AssetEntity(1, 'TEST11', '', '', 'stock'),
         user,
         4,
         beginDate,
+        0,
         0,
         0,
         1,

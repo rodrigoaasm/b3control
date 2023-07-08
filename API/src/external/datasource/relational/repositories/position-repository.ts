@@ -2,7 +2,7 @@ import {
   Connection, EntityManager, Repository, SelectQueryBuilder,
 } from 'typeorm';
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
-import { PositionEntity } from '@entities/position';
+import { PositionEntity, UserPositionEntity } from '@entities/position';
 import {
   OperationModel, AssetModel, AssetQuoteModel, UserModel, UserCurrentPositionModel,
 } from '@external/datasource/relational/models/';
@@ -29,6 +29,7 @@ export interface IPositionQueryRaw {
   user_createdAt: string,
   user_updatedAt: string,
   average_buy_price: string,
+  investment_value: string,
 }
 
 export class PositionRepository implements IPositionRepository, ITypeORMRepository {
@@ -45,7 +46,7 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
     this.positionRepo = transactionManager.getRepository(UserCurrentPositionModel);
   }
 
-  async saveUserCurrentPosition(userCurrentPosition: PositionEntity): Promise<void> {
+  async saveUserCurrentPosition(userCurrentPosition: UserPositionEntity): Promise<void> {
     const user: UserModel = {
       id: userCurrentPosition.user.id,
       name: userCurrentPosition.user.name,
@@ -67,37 +68,58 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
       quantity: userCurrentPosition.quantity,
       createdAt: userCurrentPosition.date,
       updatedAt: new Date(),
+      average_buy_price: userCurrentPosition.averageBuyPrice,
+      investment_value: userCurrentPosition.investmentValue,
       id: userCurrentPosition.id,
     };
 
     await this.positionRepo.save(userCurrentPositionModel);
   }
 
-  private formatPosition(positionRaw: IPositionQueryRaw): PositionEntity {
-    const asset = new AssetEntity(
+  private static extractUser(positionRaw: IPositionQueryRaw): UserEntity {
+    return new UserEntity(
+      positionRaw.user_id,
+      positionRaw.user_name,
+      new Date(positionRaw.user_createdAt),
+      new Date(positionRaw.user_updatedAt),
+    );
+  }
+
+  private static extractAsset(positionRaw: IPositionQueryRaw): AssetEntity {
+    return new AssetEntity(
       Number(positionRaw.asset_id),
       positionRaw.asset_code,
       positionRaw.asset_social,
       positionRaw.asset_logo,
       positionRaw.asset_category as AssetCategory,
     );
+  }
 
-    const user = new UserEntity(
-      positionRaw.user_id,
-      positionRaw.user_name,
-      new Date(positionRaw.user_createdAt),
-      new Date(positionRaw.user_updatedAt),
-    );
+  private toPosition(positionRaw: IPositionQueryRaw): PositionEntity {
+    return this.positionFactory.make<PositionEntity>({
+      clazzName: 'PositionEntity',
+      asset: PositionRepository.extractAsset(positionRaw),
+      user: PositionRepository.extractUser(positionRaw),
+      quantity: positionRaw.quantity ? Number(positionRaw.quantity) : 0,
+      date: positionRaw.created_at ? new Date(positionRaw.created_at) : new Date(positionRaw.date),
+      price: Number(positionRaw.price),
+      averageBuyPrice: positionRaw.average_buy_price ? Number(positionRaw.average_buy_price) : 0,
+      investmentValue: Number(positionRaw.investment_value),
+    });
+  }
 
-    return this.positionFactory.make(
-      asset,
-      user,
-      positionRaw.quantity ? Number(positionRaw.quantity) : 0,
-      Number(positionRaw.price),
-      positionRaw.created_at ? new Date(positionRaw.created_at) : new Date(positionRaw.date),
-      positionRaw.average_buy_price ? Number(positionRaw.average_buy_price) : 0,
-      positionRaw.id ? Number(positionRaw.id) : undefined,
-    );
+  private toUserPosition(positionRaw: IPositionQueryRaw): UserPositionEntity {
+    return this.positionFactory.make<UserPositionEntity>({
+      clazzName: 'UserPositionEntity',
+      asset: PositionRepository.extractAsset(positionRaw),
+      user: PositionRepository.extractUser(positionRaw),
+      quantity: positionRaw.quantity ? Number(positionRaw.quantity) : 0,
+      price: Number(positionRaw.price),
+      date: positionRaw.created_at ? new Date(positionRaw.created_at) : new Date(positionRaw.date),
+      averageBuyPrice: positionRaw.average_buy_price ? Number(positionRaw.average_buy_price) : 0,
+      investmentValue: Number(positionRaw.investment_value),
+      id: positionRaw.id ? Number(positionRaw.id) : undefined,
+    });
   }
 
   private createLastQuoteQuery(): SelectQueryBuilder<any> {
@@ -112,6 +134,8 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
       .select([
         'ucp.id as id',
         'ucp.quantity as quantity',
+        'ucp.average_buy_price as average_buy_price',
+        'ucp.investment_value as investment_value',
         'ucp.created_at as created_at',
         'ucp.updated_at as updated_at',
         'u.id as user_id',
@@ -140,7 +164,7 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
       .andWhere('a.id = :assetId', { assetId })
       .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
       .getRawOne();
-    return positionRaw ? this.formatPosition(positionRaw) : positionRaw;
+    return positionRaw ? this.toUserPosition(positionRaw) : positionRaw;
   }
 
   async getUserCurrentPositions(userId: string): Promise<PositionEntity[]> {
@@ -150,7 +174,7 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
       .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
       .getRawMany();
 
-    return positionRaws.map(this.formatPosition.bind(this));
+    return positionRaws.map(this.toUserPosition.bind(this));
   }
 
   async getAssetTimeseries(
@@ -203,7 +227,7 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
     mainQuery = mainQuery.orderBy('s.id, sq.date', 'ASC');
     const datasetReports = await mainQuery.getRawMany();
 
-    return datasetReports.map(this.formatPosition.bind(this));
+    return datasetReports.map(this.toPosition.bind(this));
   }
 }
 

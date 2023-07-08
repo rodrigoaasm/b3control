@@ -11,7 +11,7 @@ export class PostgresQueryExec {
 
   getUserCurrentPosition(assetCode: string, userId: string): Promise<UserCurrentPositionModel[]> {
     return this.connection.createQueryBuilder()
-      .select(['ucp.id', 'ucp.quantity'])
+      .select(['ucp.id', 'ucp.quantity', 'ucp.investment_value', 'ucp.average_buy_price'])
       .from(UserCurrentPositionModel, 'ucp')
       .innerJoin(UserModel, 'u', 'u.id = ucp.user_id')
       .innerJoin(AssetModel, 'a', 'a.id = ucp.asset_id')

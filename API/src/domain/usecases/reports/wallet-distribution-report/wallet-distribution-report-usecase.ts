@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
-import { PositionEntity } from '@entities/position';
+import { UserPositionEntity } from '@entities/position/';
 import { IReportInput } from '../report-interfaces';
 import {
   IWalletDistributionUseCase,
@@ -21,7 +21,7 @@ export class WalletDistributionReportUseCase implements IWalletDistributionUseCa
     const categories = new Map<string, ICategoryCurrentPosition>();
     const currentPositions = await this.walletRepository.getUserCurrentPositions(userId);
 
-    currentPositions.forEach((positionEntity: PositionEntity) => {
+    currentPositions.forEach((positionEntity: UserPositionEntity) => {
       assets.push({
         _quantity: positionEntity.quantity,
         _price: positionEntity.price,

@@ -25,7 +25,7 @@ describe('POST /operation', () => {
   const requestBody = {
     assetCode: 'TEST11',
     type: 'buy',
-    value: 20.18,
+    value: 4036,
     quantity: 200,
     createdAt: '2021-07-03T13:22:22.000',
   };
@@ -65,6 +65,36 @@ describe('POST /operation', () => {
   });
 
   it('Should submit successfully when user current position already exists', (done) => {
+    postgresQueryExec.getUserCurrentPosition('TEST4', postgresDataSetup.registeredUsers[0].id).then((initialPositions) => {
+      request(app.api)
+        .post('/operation')
+        .send({
+          ...requestBody,
+          assetCode: 'TEST4',
+        })
+        .set('Authorization', `Bearer ${accessTokens[0]}`)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .then(async (response) => {
+          expect(response.status).toEqual(201);
+          const currentPositions = await postgresQueryExec.getUserCurrentPosition('TEST4', postgresDataSetup.registeredUsers[0].id);
+          expect(currentPositions).toHaveLength(1);
+          expect(currentPositions[0].quantity)
+            .toEqual(requestBody.quantity + initialPositions[0].quantity);
+          expect(currentPositions[0].investment_value)
+            .toEqual(requestBody.value + initialPositions[0].investment_value);
+          expect(currentPositions[0].average_buy_price)
+            .toEqual(Number(((requestBody.value + initialPositions[0].investment_value)
+              / (requestBody.quantity + initialPositions[0].quantity)).toFixed(3)));
+          done();
+        })
+        .catch((error) => {
+          done(error);
+        });
+    });
+  });
+
+  it('Should submit successfully when user current position already exists with quatity = 0', (done) => {
     request(app.api)
       .post('/operation')
       .send({
@@ -77,7 +107,10 @@ describe('POST /operation', () => {
         expect(response.status).toEqual(201);
         const currentPositions = await postgresQueryExec.getUserCurrentPosition('TEST11', postgresDataSetup.registeredUsers[0].id);
         expect(currentPositions).toHaveLength(1);
-        expect(currentPositions[0].quantity).toEqual(200);
+        expect(currentPositions[0].quantity).toEqual(requestBody.quantity);
+        expect(currentPositions[0].investment_value).toEqual(requestBody.value);
+        expect(currentPositions[0].average_buy_price)
+          .toEqual(requestBody.value / requestBody.quantity);
         done();
       })
       .catch((error) => {

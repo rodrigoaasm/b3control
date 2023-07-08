@@ -22,6 +22,12 @@ export class UserCurrentPositionModel {
   @Column()
   public quantity: number;
 
+  @Column()
+  public investment_value: number;
+
+  @Column()
+  public average_buy_price: number;
+
   @Column({ name: 'created_at' })
   public createdAt : Date;
 

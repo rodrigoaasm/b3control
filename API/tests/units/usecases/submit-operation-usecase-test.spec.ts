@@ -10,7 +10,7 @@ import AssetRepositoryMock from '@test-mocks/asset-repository-mock';
 import { OperationType, OperationEntity } from '@entities/operation';
 import { UserEntity } from '@entities/user';
 import { ISignInResult, IUserRepository } from '@domain-ports/repositories/user-repository-interface';
-import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
+import { IPositionFactory, IPositionFactoryMakeInput } from '@domain-ports/factories/position-factory-interface';
 import { PositionEntity } from '@entities/position';
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { IUnitOfWork } from '@domain-ports/unit-work-interface';
@@ -29,11 +29,11 @@ class OperationFactoryMock implements IOperationFactory {
 class PositionFactoryMock implements IPositionFactory {
   constructor(private date: Date) {}
 
-  make(
-    asset: AssetEntity, user: UserEntity, quantity: number,
-    price: number, date: Date, averageBuyPrice: number = 0, id: number = 1,
-  ): PositionEntity {
-    return new PositionEntity(asset, user, quantity, this.date, price, averageBuyPrice, id);
+  make<T extends PositionEntity>(args: IPositionFactoryMakeInput): T {
+    const {
+      asset, user, quantity, price, date, averageBuyPrice, id,
+    } = args;
+    return new PositionEntity(asset, user, quantity, this.date, price, averageBuyPrice, id) as T;
   }
 }
 

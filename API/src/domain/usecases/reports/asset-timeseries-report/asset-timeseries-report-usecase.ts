@@ -1,5 +1,5 @@
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
-import { PositionEntity } from '@entities/position/position-entity';
+import { PositionEntity } from '@entities/position/';
 import { IDateValidatorAdapter } from '@domain-ports/adapters/date-validator-adapter-interface';
 import { BadRequestError } from '@domain-error/custom-error';
 import {

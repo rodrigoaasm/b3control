@@ -5,6 +5,7 @@ import { IOperationFactory } from '@domain-ports/factories/operation-factory-int
 import { IUserRepository } from '@domain-ports/repositories/user-repository-interface';
 import { IUnitOfWorkFactory } from '@domain-ports/factories/unit-of-work-factory-interface';
 import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
+import { PositionEntity } from '@entities/position';
 import { ISubmitOperationInput, ISubmitOperationUseCase } from './submit-operation-interfaces';
 
 export class SubmitOperationUseCase implements ISubmitOperationUseCase {
@@ -40,18 +41,31 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
     const asset = await this.assetRepository.findByCode(assetCode);
     if (!asset) throw NotFoundError('Asset not found');
 
-    let userAssetCurrentPosition = await databaseUoW.getPositionRepository()
+    let userAssetCrtPosition = await databaseUoW.getPositionRepository()
       .getUserCurrentPosition(user.id, asset.id);
     const quantityForPositions = type === 'sale' ? quantity * -1 : quantity;
-    if (!userAssetCurrentPosition) {
-      userAssetCurrentPosition = this.positionFactory.make(
-        asset, user, quantityForPositions, 0, new Date(),
-      );
+    if (!userAssetCrtPosition) {
+      userAssetCrtPosition = this.positionFactory.make<PositionEntity>({
+        clazzName: 'UserPositionEntity',
+        asset,
+        user,
+        quantity: quantityForPositions,
+        date: new Date(),
+        price: 0,
+        averageBuyPrice: value / quantity,
+        investmentValue: value,
+      });
     } else {
-      userAssetCurrentPosition.quantity += quantityForPositions;
+      userAssetCrtPosition.quantity += quantityForPositions;
+
+      if (type === 'buy') {
+        userAssetCrtPosition.investmentValue += value;
+        userAssetCrtPosition
+          .averageBuyPrice = userAssetCrtPosition.investmentValue / userAssetCrtPosition.quantity;
+      }
     }
 
-    if (userAssetCurrentPosition.quantity < 0 && type === 'sale') {
+    if (userAssetCrtPosition.quantity < 0 && type === 'sale') {
       throw BadRequestError('The quantity to sell is greater than the current position');
     }
 
@@ -59,7 +73,7 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
 
     await databaseUoW.runTransaction(async () => {
       await databaseUoW.getPositionRepository()
-        .saveUserCurrentPosition(userAssetCurrentPosition);
+        .saveUserCurrentPosition(userAssetCrtPosition);
       submittedOperation = await databaseUoW.getOperationRepository()
         .save(operation);
     });

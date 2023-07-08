@@ -27,13 +27,27 @@ export class PositionRepositoryMock implements IPositionRepository {
   }
 
   private positions: Array<PositionEntity> = [
-    this.factory.make(assets[0], defaultUser, 200, 20, new Date('2021-01-31T00:00:00.000Z')),
-    this.factory.make(assets[2], defaultUser, 100, 10, new Date('2021-01-31T00:00:00.000Z')),
-    this.factory.make(assets[0], defaultUser, 200, 20, new Date('2021-02-28T00:00:00.000Z')),
-    this.factory.make(assets[1], defaultUser, 150, 10, new Date('2021-02-28T00:00:00.000Z')),
-    this.factory.make(assets[2], defaultUser, 50, 12, new Date('2021-02-28T00:00:00.000Z')),
-    this.factory.make(assets[0], defaultUser, 240, 10, new Date('2021-03-30T00:00:00.000Z')),
-    this.factory.make(assets[1], defaultUser, 140, 10, new Date('2021-03-30T00:00:00.000Z')),
+    this.factory.make<PositionEntity>({
+      clazzName: 'PositionEntity', asset: assets[0], user: defaultUser, quantity: 200, price: 20, date: new Date('2021-01-31T00:00:00.000Z'),
+    }),
+    this.factory.make<PositionEntity>({
+      clazzName: 'PositionEntity', asset: assets[2], user: defaultUser, quantity: 100, price: 10, date: new Date('2021-01-31T00:00:00.000Z'),
+    }),
+    this.factory.make<PositionEntity>({
+      clazzName: 'PositionEntity', asset: assets[0], user: defaultUser, quantity: 200, price: 20, date: new Date('2021-02-28T00:00:00.000Z'),
+    }),
+    this.factory.make<PositionEntity>({
+      clazzName: 'PositionEntity', asset: assets[1], user: defaultUser, quantity: 150, price: 10, date: new Date('2021-02-28T00:00:00.000Z'),
+    }),
+    this.factory.make<PositionEntity>({
+      clazzName: 'PositionEntity', asset: assets[2], user: defaultUser, quantity: 50, price: 12, date: new Date('2021-02-28T00:00:00.000Z'),
+    }),
+    this.factory.make<PositionEntity>({
+      clazzName: 'PositionEntity', asset: assets[0], user: defaultUser, quantity: 240, price: 10, date: new Date('2021-03-30T00:00:00.000Z'),
+    }),
+    this.factory.make<PositionEntity>({
+      clazzName: 'PositionEntity', asset: assets[1], user: defaultUser, quantity: 140, price: 10, date: new Date('2021-03-30T00:00:00.000Z'),
+    }),
   ];
 
   // eslint-disable-next-line class-methods-use-this
