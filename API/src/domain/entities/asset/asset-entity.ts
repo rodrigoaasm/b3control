@@ -28,8 +28,12 @@ export class AssetEntity {
       throw EntityConstructionError('It was not possible create the stock object!\n Stock code not found.');
     }
 
-    if (category !== 'stock' && category !== 'general' && category !== 'current') {
-      throw EntityConstructionError("It was not possible create the stock object!\n The category is invalid! Expect 'stock' or 'general'.");
+    if (category !== 'stock'
+      && category !== 'FII'
+      && category !== 'current'
+      && category !== 'ETF'
+      && category !== 'international-stock') {
+      throw EntityConstructionError("It was not possible create the stock object!\n The category is invalid! Expect 'stock' or 'FII'.");
     }
 
     this._id = id;

@@ -23,9 +23,9 @@ describe('GET /report/assettimeline/...', () => {
   correctedValues.set('TEST3-2020-02-28T17:00:00.000Z', 800);
   correctedValues.set('TEST3-2020-03-30T17:00:00.000Z', 320);
 
-  correctedValues.set('general-2020-01-31T17:00:00.000Z', 960);
-  correctedValues.set('general-2020-02-28T17:00:00.000Z', 640);
-  correctedValues.set('general-2020-03-30T17:00:00.000Z', 0);
+  correctedValues.set('FII-2020-01-31T17:00:00.000Z', 960);
+  correctedValues.set('FII-2020-02-28T17:00:00.000Z', 640);
+  correctedValues.set('FII-2020-03-30T17:00:00.000Z', 0);
 
   correctedValues.set('stock-2020-01-31T17:00:00.000Z', 480);
   correctedValues.set('stock-2020-02-28T17:00:00.000Z', 2200);
@@ -288,9 +288,9 @@ describe('GET /report/assettimeline/...', () => {
         checkAssetCalculations(response, 3);
 
         const correctedValuesForTwoCodesCase = new Map();
-        correctedValuesForTwoCodesCase.set('general-2020-01-31T17:00:00.000Z', 960);
-        correctedValuesForTwoCodesCase.set('general-2020-02-28T17:00:00.000Z', 640);
-        correctedValuesForTwoCodesCase.set('general-2020-03-30T17:00:00.000Z', 0);
+        correctedValuesForTwoCodesCase.set('FII-2020-01-31T17:00:00.000Z', 960);
+        correctedValuesForTwoCodesCase.set('FII-2020-02-28T17:00:00.000Z', 640);
+        correctedValuesForTwoCodesCase.set('FII-2020-03-30T17:00:00.000Z', 0);
 
         correctedValuesForTwoCodesCase.set('stock-2020-01-31T17:00:00.000Z', 0);
         correctedValuesForTwoCodesCase.set('stock-2020-02-28T17:00:00.000Z', 1400);

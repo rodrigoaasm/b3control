@@ -9,7 +9,7 @@ import { WalletDistributionReportUseCase } from '@usecases/reports/wallet-distri
 
 const currentDate = new Date();
 const user = new UserEntity('userid', 'test_user', currentDate, currentDate);
-const test11 = new AssetEntity(1, 'TEST11', '', '', 'general');
+const test11 = new AssetEntity(1, 'TEST11', '', '', 'FII');
 const test4 = new AssetEntity(2, 'TEST4', '', '', 'stock');
 const test3 = new AssetEntity(3, 'TEST3', '', '', 'stock');
 
@@ -35,24 +35,27 @@ class WalletRepositoryMock implements IPositionRepository {
         test11,
         user,
         100,
-        11.5,
         currentDate,
+        11.5,
+        0,
         12,
       ),
       new PositionEntity(
         test4,
         user,
         100,
-        12.0,
         currentDate,
+        12.0,
+        0,
         13,
       ),
       new PositionEntity(
         test3,
         user,
         100,
-        13.0,
         currentDate,
+        13.0,
+        0,
         14,
       ),
     ] as Array<PositionEntity>);
@@ -106,7 +109,7 @@ describe('Wallet Distribution Report UseCase ', () => {
         {
           _value: 1150,
           _date: currentDate,
-          _category: 'general',
+          _category: 'FII',
         },
         {
           _value: 2500,

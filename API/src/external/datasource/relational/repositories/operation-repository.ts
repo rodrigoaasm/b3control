@@ -23,6 +23,7 @@ export class OperationRepository implements IOperationRepository, ITypeORMReposi
       type: operation.type,
       value: operation.value,
       quantity: operation.quantity,
+      price: operation.value / operation.quantity,
       user: {
         id: operation.user.id,
         name: operation.user.name,

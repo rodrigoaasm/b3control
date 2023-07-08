@@ -135,19 +135,19 @@ export class PostgresDataSetup {
         code: 'TEST13',
         social: 'Teste',
         logo: '',
-        category: 'general',
+        category: 'FII',
       },
       {
         code: 'TEST12',
         social: 'Teste',
         logo: '',
-        category: 'general',
+        category: 'FII',
       },
       {
         code: 'TEST11',
         social: 'Teste',
         logo: '',
-        category: 'general',
+        category: 'FII',
       },
       {
         code: 'TEST4',
@@ -171,7 +171,8 @@ export class PostgresDataSetup {
         createdAt: new Date('2020-01-01T13:00:00.000Z'),
         quantity: 80,
         type: 'buy',
-        value: 10.00,
+        price: 10.00,
+        value: 800,
         user: this.registeredUsers[0],
       },
       {
@@ -179,7 +180,8 @@ export class PostgresDataSetup {
         createdAt: new Date('2020-02-02T13:00:00.000Z'),
         quantity: -40,
         type: 'sale',
-        value: 15.00,
+        price: 15.00,
+        value: 600,
         user: this.registeredUsers[0],
       },
       {
@@ -187,7 +189,8 @@ export class PostgresDataSetup {
         createdAt: new Date('2020-03-02T13:00:00.000Z'),
         quantity: -40,
         type: 'sale',
-        value: 15.00,
+        price: 15.00,
+        value: 600,
         user: this.registeredUsers[0],
       },
       {
@@ -195,7 +198,8 @@ export class PostgresDataSetup {
         createdAt: new Date('2020-02-01T13:00:00.000Z'),
         quantity: 100,
         type: 'buy',
-        value: 10.00,
+        price: 10.00,
+        value: 1000,
         user: this.registeredUsers[0],
       },
       {
@@ -203,7 +207,8 @@ export class PostgresDataSetup {
         createdAt: new Date('2020-03-02T13:00:00.000Z'),
         quantity: -40,
         type: 'sale',
-        value: 15.00,
+        price: 15.00,
+        value: 600,
         user: this.registeredUsers[0],
       },
       {
@@ -211,7 +216,8 @@ export class PostgresDataSetup {
         createdAt: new Date('2020-01-02T13:00:00.000Z'),
         quantity: 40,
         type: 'buy',
-        value: 15.00,
+        price: 15.00,
+        value: 600,
         user: this.registeredUsers[0],
       },
       {
@@ -219,7 +225,8 @@ export class PostgresDataSetup {
         createdAt: new Date('2020-02-02T13:00:00.000Z'),
         quantity: 40,
         type: 'buy',
-        value: 15.00,
+        price: 15.00,
+        value: 600,
         user: this.registeredUsers[0],
       },
       {
@@ -227,7 +234,8 @@ export class PostgresDataSetup {
         createdAt: new Date('2020-03-02T13:00:00.000Z'),
         quantity: -40,
         type: 'sale',
-        value: 15.00,
+        price: 15.00,
+        value: 600,
         user: this.registeredUsers[0],
       },
     ];

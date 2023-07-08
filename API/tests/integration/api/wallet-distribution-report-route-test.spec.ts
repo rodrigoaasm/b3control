@@ -46,7 +46,7 @@ describe('GET /report/walletstatus', () => {
           assets: [
             {
               _asset: {
-                _category: 'general',
+                _category: 'FII',
                 _code: 'TEST11',
                 _id: expect.any(Number),
                 _logo: '',
@@ -86,7 +86,7 @@ describe('GET /report/walletstatus', () => {
           ],
           categories: [
             {
-              _category: 'general',
+              _category: 'FII',
               _date: expect.any(String),
               _value: 0,
             },

@@ -14,14 +14,17 @@ export class PositionEntity {
 
   private _price : number;
 
+  private _averageBuyPrice: number;
+
   private _date : Date;
 
   constructor(
     asset: AssetEntity,
     user: UserEntity,
     quantity: number,
-    price: number | undefined,
     date: Date,
+    price: number | undefined,
+    averageBuyPrice: number | undefined,
     id: number | undefined,
   ) {
     try {
@@ -31,6 +34,7 @@ export class PositionEntity {
       this.quantity = quantity;
       this.price = price;
       this.date = date;
+      this.averageBuyPrice = averageBuyPrice;
     } catch (error) {
       throw EntityConstructionError(error.message);
     }
@@ -78,6 +82,17 @@ export class PositionEntity {
     }
 
     this._quantity = quantity;
+  }
+
+  get averageBuyPrice() {
+    return this._averageBuyPrice;
+  }
+
+  set averageBuyPrice(averageBuyPrice: number) {
+    if (!Number.isNaN(Number(averageBuyPrice)) && Number(averageBuyPrice) < 0) {
+      throw EntityError("It was not possible set a average buy price in the position object!\n The value of the field 'averageBuyPrice' is not accept");
+    }
+    this._averageBuyPrice = Number(Number(averageBuyPrice).toFixed(3));
   }
 
   get price() {

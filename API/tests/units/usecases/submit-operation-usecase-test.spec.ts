@@ -31,9 +31,9 @@ class PositionFactoryMock implements IPositionFactory {
 
   make(
     asset: AssetEntity, user: UserEntity, quantity: number,
-    price: number, date: Date, id: number = 1,
+    price: number, date: Date, averageBuyPrice: number = 0, id: number = 1,
   ): PositionEntity {
-    return new PositionEntity(asset, user, quantity, price, this.date, id);
+    return new PositionEntity(asset, user, quantity, this.date, price, averageBuyPrice, id);
   }
 }
 
@@ -114,6 +114,7 @@ describe('Submit Operation Use Case', () => {
         _logo: '',
         _social: 'Teste',
       },
+      _averageBuyPrice: 0,
       _date: date,
       _id: 1,
       _price: 0,

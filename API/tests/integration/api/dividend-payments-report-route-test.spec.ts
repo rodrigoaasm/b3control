@@ -31,10 +31,10 @@ describe('GET /report/dividendpayments/...', () => {
   correctedValues.set('TEST3-2021-03-01T03:00:00.000Z', 5);
   correctedValues.set(`TEST3-${currentMonth.toISOString()}`, 10);
 
-  correctedValues.set('general-2021-01-01T03:00:00.000Z', 7);
-  correctedValues.set('general-2021-02-01T03:00:00.000Z', 7);
-  correctedValues.set('general-2021-03-01T03:00:00.000Z', 7);
-  correctedValues.set(`general-${currentMonth.toISOString()}`, 12);
+  correctedValues.set('FII-2021-01-01T03:00:00.000Z', 7);
+  correctedValues.set('FII-2021-02-01T03:00:00.000Z', 7);
+  correctedValues.set('FII-2021-03-01T03:00:00.000Z', 7);
+  correctedValues.set(`FII-${currentMonth.toISOString()}`, 12);
 
   correctedValues.set('stock-2021-01-01T03:00:00.000Z', 5);
   correctedValues.set('stock-2021-02-01T03:00:00.000Z', 0);

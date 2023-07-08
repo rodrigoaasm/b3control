@@ -14,9 +14,15 @@ const connectionMock = createConnectionMock(mockRepositoryTypeOrm);
 class PositionFactory implements IPositionFactory {
   // eslint-disable-next-line class-methods-use-this
   make(
-    asset: AssetEntity, user: UserEntity, quantity: number, price: number, date: Date, id?: number,
+    asset: AssetEntity,
+    user: UserEntity,
+    quantity: number,
+    price: number,
+    date: Date,
+    average?: number,
+    id?: number,
   ): PositionEntity {
-    return new PositionEntity(asset, user, quantity, price, date, id);
+    return new PositionEntity(asset, user, quantity, date, price, average, id);
   }
 }
 
@@ -46,6 +52,7 @@ describe('Relational - Position Repository', () => {
       user_name: user.name,
       user_createdAt: user.createdAt.toISOString(),
       user_updatedAt: user.updatedAt.toISOString(),
+      average_buy_price: null,
     };
     positionRawInTimeseries = {
       date: beginDate.toISOString(),
@@ -60,6 +67,7 @@ describe('Relational - Position Repository', () => {
       user_name: user.name,
       user_createdAt: user.createdAt.toISOString(),
       user_updatedAt: user.updatedAt.toISOString(),
+      average_buy_price: null,
     };
     positionRepository = new PositionRepository(
       connectionMock as any, new PositionFactory(),
@@ -91,6 +99,7 @@ describe('Relational - Position Repository', () => {
         },
         _quantity: 220,
         _price: 15.00,
+        _averageBuyPrice: 0,
       }]);
     });
 
@@ -127,6 +136,7 @@ describe('Relational - Position Repository', () => {
         },
         _quantity: 220,
         _price: 15.00,
+        _averageBuyPrice: 0,
       });
     });
 
@@ -170,6 +180,7 @@ describe('Relational - Position Repository', () => {
           _price: 15.00,
           _quantity: 220,
           _user: user,
+          _averageBuyPrice: 0,
         },
       ]);
     });
@@ -201,6 +212,7 @@ describe('Relational - Position Repository', () => {
           _price: 15.00,
           _quantity: 220,
           _user: user,
+          _averageBuyPrice: 0,
         },
       ]);
     });
@@ -233,6 +245,7 @@ describe('Relational - Position Repository', () => {
           _price: 15.00,
           _quantity: 220,
           _user: user,
+          _averageBuyPrice: 0,
         },
       ]);
     });
@@ -262,6 +275,7 @@ describe('Relational - Position Repository', () => {
           _price: 15.00,
           _quantity: 220,
           _user: user,
+          _averageBuyPrice: 0,
         },
       ]);
     });
@@ -280,8 +294,9 @@ describe('Relational - Position Repository', () => {
         new AssetEntity(1, 'TEST11', '', '', 'stock'),
         user,
         4,
-        0,
         beginDate,
+        0,
+        0,
         1,
       );
 
@@ -315,8 +330,9 @@ describe('Relational - Position Repository', () => {
         new AssetEntity(1, 'TEST11', '', '', 'stock'),
         user,
         4,
-        0,
         beginDate,
+        0,
+        0,
         1,
       );
       mockRepositoryTypeOrm.save.mockRejectedValueOnce(new Error('Database error'));

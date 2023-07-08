@@ -16,6 +16,7 @@ export class PositionFactory implements IPositionFactory {
     quantity: number,
     price: number,
     date: Date | string,
+    averageBuyPrice: number | undefined = undefined,
     id: number | undefined = undefined,
   ) : PositionEntity {
     if (!date || !this.dateValidatorAdapter.validate(date)) {
@@ -28,8 +29,9 @@ export class PositionFactory implements IPositionFactory {
       asset,
       user,
       Number(quantity),
-      Number(price),
       validDate as Date,
+      price,
+      !Number.isNaN(Number(averageBuyPrice)) ? Number(averageBuyPrice) : 0,
       id,
     );
     return position;

@@ -14,11 +14,11 @@ describe('Paper Factory', () => {
     });
   });
 
-  it('Should make a generic asset', async () => {
-    const asset = new AssetEntity(1, 'TEST11', 'Test', '', 'general');
+  it('Should make a FII asset', async () => {
+    const asset = new AssetEntity(1, 'TEST11', 'Test', '', 'FII');
 
     expect(asset).toEqual({
-      _category: 'general',
+      _category: 'FII',
       _id: 1,
       _code: 'TEST11',
       _social: 'Test',

@@ -85,7 +85,7 @@ describe('Asset Timeseries Report UseCase', () => {
 
     const test3 = {
       name: 'TEST3',
-      category: 'general',
+      category: 'FII',
       items: [
         {
           quantity: 100,
@@ -126,8 +126,8 @@ describe('Asset Timeseries Report UseCase', () => {
       ],
     };
 
-    const generalCategory = {
-      name: 'general',
+    const FIICategory = {
+      name: 'FII',
       items: [
         {
           quantity: 100,
@@ -154,7 +154,7 @@ describe('Asset Timeseries Report UseCase', () => {
       ],
       categories: [
         stockCategory,
-        generalCategory,
+        FIICategory,
       ],
     });
   });

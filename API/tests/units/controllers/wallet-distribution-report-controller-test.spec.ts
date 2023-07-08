@@ -20,7 +20,7 @@ const output = {
       _price: 12,
       _value: 1200,
       _date: new Date(),
-      _asset: new AssetEntity(1, 'TEST11', 'teste', '', 'general'),
+      _asset: new AssetEntity(1, 'TEST11', 'teste', '', 'FII'),
     },
   ],
   categories: [
@@ -36,7 +36,7 @@ const output = {
       _price: 12,
       _value: 1200,
       _date: new Date(),
-      _category: 'general',
+      _category: 'FII',
     },
   ],
 } as IWalletDistributionOutput;

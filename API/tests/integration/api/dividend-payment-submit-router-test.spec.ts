@@ -54,7 +54,7 @@ describe('POST /dividendpayment', () => {
         expect(response.body._createdAt).toEqual('2021-07-03T13:22:22.000Z');
         expect(response.body._asset._code).toEqual('TEST11');
         expect(response.body._asset._social).toEqual('Teste');
-        expect(response.body._asset._category).toEqual('general');
+        expect(response.body._asset._category).toEqual('FII');
         done();
       })
       .catch((error) => {

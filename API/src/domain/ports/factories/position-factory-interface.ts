@@ -4,5 +4,5 @@ import { UserEntity } from '@entities/user';
 
 export interface IPositionFactory {
   make(asset: AssetEntity, user: UserEntity, quantity : number, price : number,
-    date : Date, id?: number | undefined): PositionEntity;
+    date : Date, averageBuyPrice?: number | undefined, id?: number | undefined): PositionEntity;
 }

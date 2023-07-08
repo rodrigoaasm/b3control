@@ -97,7 +97,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
 
     const test3 = {
       name: 'TEST3',
-      category: 'general',
+      category: 'FII',
       items: [
         {
           date: new Date('2021-01-31T00:00:00.000Z'),
@@ -132,8 +132,8 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
       ],
     };
 
-    const generalCategory = {
-      name: 'general',
+    const FIICategory = {
+      name: 'FII',
       items: [
         {
           date: new Date('2021-01-31T00:00:00.000Z'),
@@ -160,7 +160,7 @@ describe('Dividend Payments Timeseries Report UseCase', () => {
       ],
       categories: [
         stockCategory,
-        generalCategory,
+        FIICategory,
       ],
     });
   });

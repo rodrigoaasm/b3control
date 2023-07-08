@@ -28,6 +28,7 @@ export interface IPositionQueryRaw {
   user_name: string,
   user_createdAt: string,
   user_updatedAt: string,
+  average_buy_price: string,
 }
 
 export class PositionRepository implements IPositionRepository, ITypeORMRepository {
@@ -91,9 +92,10 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
     return this.positionFactory.make(
       asset,
       user,
-      Number(positionRaw.quantity),
+      positionRaw.quantity ? Number(positionRaw.quantity) : 0,
       Number(positionRaw.price),
       positionRaw.created_at ? new Date(positionRaw.created_at) : new Date(positionRaw.date),
+      positionRaw.average_buy_price ? Number(positionRaw.average_buy_price) : 0,
       positionRaw.id ? Number(positionRaw.id) : undefined,
     );
   }
@@ -161,6 +163,11 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
       .from(OperationModel, 'op')
       .where('op.created_at <= sq.date and op.asset_id = sq.asset_id and op.user = :userId', { userId });
 
+    const averageBuyPriceQuery = this.connection.createQueryBuilder()
+      .select('round( (sum(op.value)/sum(op.quantity) )::numeric, 2) as value')
+      .from(OperationModel, 'op')
+      .where('op.type = \'buy\' and op.created_at <= sq.date and op.asset_id = sq.asset_id and op.user = :userId', { userId });
+
     mainQuery = mainQuery.select([
       'sq.date as date',
       's.id as asset_id',
@@ -174,6 +181,7 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
       'u.createdAt as user_createdAt',
       'u.updatedAt as user_updatedAt',
       `(${positionQuery.getQuery()}) as quantity`,
+      `(${averageBuyPriceQuery.getQuery()}) as average_buy_price`,
     ])
       .from(AssetQuoteModel, 'sq')
       .innerJoin(AssetModel, 's', 's.id = sq.asset_id')

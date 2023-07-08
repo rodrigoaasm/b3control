@@ -18,6 +18,9 @@ export class OperationModel {
   public value : number;
 
   @Column()
+  public price: number;
+
+  @Column()
   public quantity : number;
 
   @Column()

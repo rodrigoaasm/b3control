@@ -13,7 +13,7 @@ export default class DividendPaymentRepositoryMock implements IDividendPaymentRe
 
     new AssetEntity(1, 'TEST11', '', '', 'stock'),
     new AssetEntity(2, 'TEST4', '', '', 'stock'),
-    new AssetEntity(3, 'TEST3', '', '', 'general'),
+    new AssetEntity(3, 'TEST3', '', '', 'FII'),
   ];
 
   private payments: Array<any> = [
