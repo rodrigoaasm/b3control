@@ -76,6 +76,80 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
     await this.positionRepo.save(userCurrentPositionModel);
   }
 
+  async getUserCurrentPosition(userId: string, assetId: number)
+    : Promise<UserPositionEntity | undefined> {
+    const lastQuoteQuery = this.createLastQuoteQuery();
+    const positionRaw = await this.createQueryBaseForUserCurrentPositions()
+      .where('u.id = :userId', { userId })
+      .andWhere('a.id = :assetId', { assetId })
+      .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
+      .getRawOne();
+    return positionRaw ? this.toUserPosition(positionRaw) : positionRaw;
+  }
+
+  async getUserCurrentPositions(userId: string): Promise<PositionEntity[]> {
+    const lastQuoteQuery = this.createLastQuoteQuery();
+    const positionRaws = await this.createQueryBaseForUserCurrentPositions()
+      .where('u.id = :userId', { userId })
+      .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
+      .getRawMany();
+
+    return positionRaws.map(this.toUserPosition.bind(this));
+  }
+
+  async getAssetTimeseries(
+    userId: string, codes: string[], begin: Date, end: Date,
+  ): Promise<PositionEntity[]> {
+    let mainQuery = this.connection.createQueryBuilder();
+
+    const positionQuery = this.connection.createQueryBuilder()
+      .select('sum(op.quantity) as value')
+      .from(OperationModel, 'op')
+      .where('op.created_at <= sq.date and op.asset_id = sq.asset_id and op.user = :userId', { userId });
+
+    const averageBuyPriceQuery = this.connection.createQueryBuilder()
+      .select('round( (sum(op.value)/sum(op.quantity) )::numeric, 2) as value')
+      .from(OperationModel, 'op')
+      .where('op.type = \'buy\' and op.created_at <= sq.date and op.asset_id = sq.asset_id and op.user = :userId', { userId });
+
+    mainQuery = mainQuery.select([
+      'sq.date as date',
+      's.id as asset_id',
+      's.code as asset_code',
+      's.social as asset_social',
+      's.logo as asset_logo',
+      's.category as asset_category',
+      'sq.price as price',
+      'u.id as user_id',
+      'u.name as user_name',
+      'u.createdAt as user_createdAt',
+      'u.updatedAt as user_updatedAt',
+      `(${positionQuery.getQuery()}) as quantity`,
+      `(${averageBuyPriceQuery.getQuery()}) as average_buy_price`,
+    ])
+      .from(AssetQuoteModel, 'sq')
+      .innerJoin(AssetModel, 's', 's.id = sq.asset_id')
+      .innerJoin(UserModel, 'u', 'u.id = :userId', { userId })
+      .where('u.id = :userId', { userId });
+
+    if (begin) {
+      mainQuery = mainQuery.andWhere('sq.date >= :startDate', { startDate: begin });
+    }
+
+    if (end) {
+      mainQuery = mainQuery.andWhere('sq.date <= :endDate', { endDate: end });
+    }
+
+    if (codes.length > 0) {
+      mainQuery = mainQuery.andWhere('s.code in (:...codes)', { codes });
+    }
+
+    mainQuery = mainQuery.orderBy('s.id, sq.date', 'ASC');
+    const datasetReports = await mainQuery.getRawMany();
+
+    return datasetReports.map(this.toPosition.bind(this));
+  }
+
   private static extractUser(positionRaw: IPositionQueryRaw): UserEntity {
     return new UserEntity(
       positionRaw.user_id,
@@ -154,80 +228,6 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
       .innerJoin(UserModel, 'u', 'u.id = ucp.user_id')
       .innerJoin(AssetModel, 'a', 'a.id = ucp.asset_id')
       .innerJoin(AssetQuoteModel, 'aq', 'a.id = aq.asset_id');
-  }
-
-  async getUserCurrentPosition(userId: string, assetId: number)
-    : Promise<PositionEntity | undefined> {
-    const lastQuoteQuery = this.createLastQuoteQuery();
-    const positionRaw = await this.createQueryBaseForUserCurrentPositions()
-      .where('u.id = :userId', { userId })
-      .andWhere('a.id = :assetId', { assetId })
-      .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
-      .getRawOne();
-    return positionRaw ? this.toUserPosition(positionRaw) : positionRaw;
-  }
-
-  async getUserCurrentPositions(userId: string): Promise<PositionEntity[]> {
-    const lastQuoteQuery = this.createLastQuoteQuery();
-    const positionRaws = await this.createQueryBaseForUserCurrentPositions()
-      .where('u.id = :userId', { userId })
-      .andWhere(`aq.date = (${lastQuoteQuery.getQuery()})`)
-      .getRawMany();
-
-    return positionRaws.map(this.toUserPosition.bind(this));
-  }
-
-  async getAssetTimeseries(
-    userId: string, codes: string[], begin: Date, end: Date,
-  ): Promise<PositionEntity[]> {
-    let mainQuery = this.connection.createQueryBuilder();
-
-    const positionQuery = this.connection.createQueryBuilder()
-      .select('sum(op.quantity) as value')
-      .from(OperationModel, 'op')
-      .where('op.created_at <= sq.date and op.asset_id = sq.asset_id and op.user = :userId', { userId });
-
-    const averageBuyPriceQuery = this.connection.createQueryBuilder()
-      .select('round( (sum(op.value)/sum(op.quantity) )::numeric, 2) as value')
-      .from(OperationModel, 'op')
-      .where('op.type = \'buy\' and op.created_at <= sq.date and op.asset_id = sq.asset_id and op.user = :userId', { userId });
-
-    mainQuery = mainQuery.select([
-      'sq.date as date',
-      's.id as asset_id',
-      's.code as asset_code',
-      's.social as asset_social',
-      's.logo as asset_logo',
-      's.category as asset_category',
-      'sq.price as price',
-      'u.id as user_id',
-      'u.name as user_name',
-      'u.createdAt as user_createdAt',
-      'u.updatedAt as user_updatedAt',
-      `(${positionQuery.getQuery()}) as quantity`,
-      `(${averageBuyPriceQuery.getQuery()}) as average_buy_price`,
-    ])
-      .from(AssetQuoteModel, 'sq')
-      .innerJoin(AssetModel, 's', 's.id = sq.asset_id')
-      .innerJoin(UserModel, 'u', 'u.id = :userId', { userId })
-      .where('u.id = :userId', { userId });
-
-    if (begin) {
-      mainQuery = mainQuery.andWhere('sq.date >= :startDate', { startDate: begin });
-    }
-
-    if (end) {
-      mainQuery = mainQuery.andWhere('sq.date <= :endDate', { endDate: end });
-    }
-
-    if (codes.length > 0) {
-      mainQuery = mainQuery.andWhere('s.code in (:...codes)', { codes });
-    }
-
-    mainQuery = mainQuery.orderBy('s.id, sq.date', 'ASC');
-    const datasetReports = await mainQuery.getRawMany();
-
-    return datasetReports.map(this.toPosition.bind(this));
   }
 }
 

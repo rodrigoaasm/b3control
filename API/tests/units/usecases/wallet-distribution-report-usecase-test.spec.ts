@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { AssetEntity } from '@entities/asset';
-import { PositionEntity } from '@entities/position';
+import { PositionEntity, UserPositionEntity } from '@entities/position';
 import { UserEntity } from '@entities/user';
 import { IWalletDistributionOutput } from '@usecases/reports/wallet-distribution-report/wallet-distribution-report-interface';
 import { WalletDistributionReportUseCase } from '@usecases/reports/wallet-distribution-report/wallet-distribution-report-usecase';
@@ -14,7 +14,7 @@ const test4 = new AssetEntity(2, 'TEST4', '', '', 'stock');
 const test3 = new AssetEntity(3, 'TEST3', '', '', 'stock');
 
 class WalletRepositoryMock implements IPositionRepository {
-  getUserCurrentPosition(userId: string, assetId: number): Promise<PositionEntity> {
+  getUserCurrentPosition(userId: string, assetId: number): Promise<UserPositionEntity> {
     throw new Error('Method not implemented.');
   }
 

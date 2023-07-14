@@ -5,7 +5,10 @@ import { IOperationFactory } from '@domain-ports/factories/operation-factory-int
 import { IUserRepository } from '@domain-ports/repositories/user-repository-interface';
 import { IUnitOfWorkFactory } from '@domain-ports/factories/unit-of-work-factory-interface';
 import { IPositionFactory } from '@domain-ports/factories/position-factory-interface';
-import { PositionEntity } from '@entities/position';
+import { UserPositionEntity } from '@entities/position';
+import { IUnitOfWork } from '@domain-ports/unit-work-interface';
+import { UserEntity } from '@entities/user';
+import { AssetEntity } from '@entities/asset';
 import { ISubmitOperationInput, ISubmitOperationUseCase } from './submit-operation-interfaces';
 
 export class SubmitOperationUseCase implements ISubmitOperationUseCase {
@@ -18,15 +21,11 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
   ) {
   }
 
-  public async submit(submitOperationInput: ISubmitOperationInput) : Promise<OperationEntity> {
-    let submittedOperation;
-    const databaseUoW = await this.storageUnitOfWorkFactory.make();
-
+  private static _validateSubmit(submitOperationInput: ISubmitOperationInput): void {
     const {
-      value, userId, quantity, type, assetCode, createdAt,
+      value, quantity, type, assetCode, createdAt,
     } = submitOperationInput;
 
-    // Validation inputs
     if (!(value && quantity && type && assetCode && createdAt)) {
       throw BadRequestError('A required attr was not found');
     }
@@ -34,18 +33,23 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
     if (Number.isNaN(Number(quantity)) || Number(quantity) <= 0) {
       throw BadRequestError('Quantity is invalid');
     }
+  }
 
-    const user = await this.userRepository.findUser(userId);
-    if (!user) throw NotFoundError('User not found');
-
-    const asset = await this.assetRepository.findByCode(assetCode);
-    if (!asset) throw NotFoundError('Asset not found');
-
-    let userAssetCrtPosition = await databaseUoW.getPositionRepository()
+  private async _handlePosition(
+    databaseUoW:IUnitOfWork,
+    value: number,
+    quantity: number,
+    type: string,
+    user: UserEntity,
+    asset: AssetEntity,
+  ): Promise<UserPositionEntity> {
+    let uAssetCrtPosition = await databaseUoW.getPositionRepository()
       .getUserCurrentPosition(user.id, asset.id);
+
     const quantityForPositions = type === 'sale' ? quantity * -1 : quantity;
-    if (!userAssetCrtPosition) {
-      userAssetCrtPosition = this.positionFactory.make<PositionEntity>({
+
+    if (!uAssetCrtPosition) {
+      uAssetCrtPosition = this.positionFactory.make<UserPositionEntity>({
         clazzName: 'UserPositionEntity',
         asset,
         user,
@@ -56,24 +60,47 @@ export class SubmitOperationUseCase implements ISubmitOperationUseCase {
         investmentValue: value,
       });
     } else {
-      userAssetCrtPosition.quantity += quantityForPositions;
+      uAssetCrtPosition.quantity += quantityForPositions;
 
       if (type === 'buy') {
-        userAssetCrtPosition.investmentValue += value;
-        userAssetCrtPosition
-          .averageBuyPrice = userAssetCrtPosition.investmentValue / userAssetCrtPosition.quantity;
+        uAssetCrtPosition.investmentValue += value;
+        uAssetCrtPosition
+          .averageBuyPrice = uAssetCrtPosition.investmentValue / uAssetCrtPosition.quantity;
+      } else {
+        uAssetCrtPosition.investmentValue
+        += uAssetCrtPosition.averageBuyPrice * quantityForPositions;
       }
     }
 
-    if (userAssetCrtPosition.quantity < 0 && type === 'sale') {
+    if (uAssetCrtPosition.quantity < 0 && type === 'sale') {
       throw BadRequestError('The quantity to sell is greater than the current position');
     }
 
-    const operation = this.operationFactory.make(value, quantity, type, asset, user, createdAt);
+    return uAssetCrtPosition;
+  }
 
+  public async submit(submitOperationInput: ISubmitOperationInput) : Promise<OperationEntity> {
+    SubmitOperationUseCase._validateSubmit(submitOperationInput);
+
+    const {
+      value, userId, quantity, type, assetCode, createdAt,
+    } = submitOperationInput;
+    const databaseUoW = this.storageUnitOfWorkFactory.make();
+
+    const user = await this.userRepository.findUser(userId);
+    if (!user) throw NotFoundError('User not found');
+
+    const asset = await this.assetRepository.findByCode(assetCode);
+    if (!asset) throw NotFoundError('Asset not found');
+
+    const uAssetCrtPosition = await this._handlePosition(
+      databaseUoW, value, quantity, type, user, asset,
+    );
+
+    const operation = this.operationFactory.make(value, quantity, type, asset, user, createdAt);
+    let submittedOperation: OperationEntity;
     await databaseUoW.runTransaction(async () => {
-      await databaseUoW.getPositionRepository()
-        .saveUserCurrentPosition(userAssetCrtPosition);
+      await databaseUoW.getPositionRepository().saveUserCurrentPosition(uAssetCrtPosition);
       submittedOperation = await databaseUoW.getOperationRepository()
         .save(operation);
     });

@@ -64,7 +64,7 @@ describe('POST /operation', () => {
     app = null;
   });
 
-  it('Should submit successfully when user current position already exists', (done) => {
+  it('Should submit buy operation when user current position already exists', (done) => {
     postgresQueryExec.getUserCurrentPosition('TEST4', postgresDataSetup.registeredUsers[0].id).then((initialPositions) => {
       request(app.api)
         .post('/operation')
@@ -94,7 +94,7 @@ describe('POST /operation', () => {
     });
   });
 
-  it('Should submit successfully when user current position already exists with quatity = 0', (done) => {
+  it('Should submit buy operation when user current position already exists with quatity = 0', (done) => {
     request(app.api)
       .post('/operation')
       .send({
@@ -118,7 +118,7 @@ describe('POST /operation', () => {
       });
   });
 
-  it('Should submit successfully when the user current position does not exist', (done) => {
+  it('Should submit buy operation when the user current position does not exist', (done) => {
     request(app.api)
       .post('/operation')
       .send({
@@ -138,6 +138,40 @@ describe('POST /operation', () => {
       .catch((error) => {
         done(error);
       });
+  });
+
+  it('Should submit sale operation when the user current position does not exist', (done) => {
+    postgresQueryExec.getUserCurrentPosition('TEST4', postgresDataSetup.registeredUsers[0].id).then((initialPositions) => {
+      request(app.api)
+        .post('/operation')
+        .send({
+          ...requestBody,
+          value: 2000,
+          quantity: 50,
+          type: 'sale',
+          assetCode: 'TEST4',
+        })
+        .set('Authorization', `Bearer ${accessTokens[0]}`)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .then(async (response) => {
+          expect(response.status).toEqual(201);
+          const currentPositions = await postgresQueryExec.getUserCurrentPosition('TEST4', postgresDataSetup.registeredUsers[0].id);
+          expect(currentPositions).toHaveLength(1);
+          expect(currentPositions[0].quantity).toEqual(initialPositions[0].quantity - 50);
+          expect(currentPositions[0].average_buy_price)
+            .toEqual(initialPositions[0].average_buy_price);
+          expect(currentPositions[0].investment_value)
+            .toEqual(Number(
+              (initialPositions[0].investment_value - (initialPositions[0].average_buy_price * 50))
+                .toFixed(3),
+            ));
+          done();
+        })
+        .catch((error) => {
+          done(error);
+        });
+    });
   });
 
   it('Should return a BadRequest response when the request body is empty', (done) => {
