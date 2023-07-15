@@ -2,10 +2,11 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "outDir": "build",
+    "outDir": "dist",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "baseUrl": ".",
+    "skipLibCheck": true,
     "paths": {
       "@entities/*": ["./src/domain/entities/*"],
       "@domain-ports/*": ["./src/domain/ports/*"],
@@ -28,6 +29,7 @@
     "tests/mocks/operation-repository-mock.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "webpack.config.js"
   ]
 }

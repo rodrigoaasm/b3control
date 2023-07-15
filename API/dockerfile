@@ -1,0 +1,32 @@
+FROM node:18-alpine3.15 as buider
+## Builder container
+
+## Prod directory
+WORKDIR /app/b3control/api
+COPY package.json package.json
+COPY package-lock.json package-lock.json
+RUN npm install --omit=dev
+
+## TS builder directory
+WORKDIR /tmp/b3control/api
+COPY package.json package.json
+COPY package-lock.json package-lock.json
+COPY webpack.config.js webpack.config.js
+COPY tsconfig.json tsconfig.json
+RUN npm install
+
+COPY ./src/ src/
+COPY .env .env
+RUN npm run build
+
+## JS Application container
+FROM node:18-alpine3.15
+
+COPY --from=buider /app/b3control/api/ /app/b3control/api/
+COPY --from=buider /tmp/b3control/api/dist/ /app/b3control/api/dist/src/
+COPY --from=buider /tmp/b3control/api/.env /app/b3control/api/.env
+
+EXPOSE 4000
+
+WORKDIR /app/b3control/api/
+CMD ["npm", "run", "start"]

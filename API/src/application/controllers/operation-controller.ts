@@ -1,4 +1,4 @@
-import { IApplicationRequest, IApplicationResponse } from 'src/application/types';
+import { IApplicationRequest, IApplicationResponse } from '@application/types';
 import { ISubmitOperationUseCase, ISubmitOperationInput } from '@usecases/submit-operation/submit-operation-interfaces';
 
 export class OperationController {

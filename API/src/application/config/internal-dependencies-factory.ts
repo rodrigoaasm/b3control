@@ -5,7 +5,7 @@ import { AssetRepository } from '@external/datasource/relational/repositories/as
 import { PositionRepository } from '@external/datasource/relational/repositories/position-repository';
 import { SubmitOperationUseCase } from '@usecases/submit-operation/submit-operation-usecase';
 import { AssetTimeSeriesReportUseCase } from '@usecases/reports/asset-timeseries-report/asset-timeseries-report-usecase';
-import { OperationController } from 'src/application/controllers/operation-controller';
+import { OperationController } from '@controllers/operation-controller';
 import { AssetTimeseriesReportController } from '@controllers/asset-timeseries-report-controller';
 import { PositionFactory } from '@entities/position';
 import { DividendPaymentFactory } from '@entities/dividend-payment';
