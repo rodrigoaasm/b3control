@@ -22,11 +22,11 @@ export class UserCurrentPositionModel {
   @Column()
   public quantity: number;
 
-  @Column()
-  public investment_value: number;
+  @Column({ name: 'investment_value' })
+  public investmentValue: number;
 
-  @Column()
-  public average_buy_price: number;
+  @Column({ name: 'average_buy_price' })
+  public averageBuyPrice: number;
 
   @Column({ name: 'created_at' })
   public createdAt : Date;

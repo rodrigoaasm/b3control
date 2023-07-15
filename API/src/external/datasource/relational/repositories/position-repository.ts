@@ -68,8 +68,8 @@ export class PositionRepository implements IPositionRepository, ITypeORMReposito
       quantity: userCurrentPosition.quantity,
       createdAt: userCurrentPosition.date,
       updatedAt: new Date(),
-      average_buy_price: userCurrentPosition.averageBuyPrice,
-      investment_value: userCurrentPosition.investmentValue,
+      averageBuyPrice: userCurrentPosition.averageBuyPrice,
+      investmentValue: userCurrentPosition.investmentValue,
       id: userCurrentPosition.id,
     };
 

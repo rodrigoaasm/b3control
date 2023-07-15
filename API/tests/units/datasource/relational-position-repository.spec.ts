@@ -326,8 +326,8 @@ describe('Relational - Position Repository', () => {
           category: 'stock',
         },
         quantity: 4,
-        average_buy_price: 0,
-        investment_value: 0,
+        averageBuyPrice: 0,
+        investmentValue: 0,
         createdAt: beginDate,
         updatedAt: expect.any(Date),
       }]);

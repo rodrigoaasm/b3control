@@ -81,10 +81,10 @@ describe('POST /operation', () => {
           expect(currentPositions).toHaveLength(1);
           expect(currentPositions[0].quantity)
             .toEqual(requestBody.quantity + initialPositions[0].quantity);
-          expect(currentPositions[0].investment_value)
-            .toEqual(requestBody.value + initialPositions[0].investment_value);
-          expect(currentPositions[0].average_buy_price)
-            .toEqual(Number(((requestBody.value + initialPositions[0].investment_value)
+          expect(currentPositions[0].investmentValue)
+            .toEqual(requestBody.value + initialPositions[0].investmentValue);
+          expect(currentPositions[0].averageBuyPrice)
+            .toEqual(Number(((requestBody.value + initialPositions[0].investmentValue)
               / (requestBody.quantity + initialPositions[0].quantity)).toFixed(3)));
           done();
         })
@@ -108,8 +108,8 @@ describe('POST /operation', () => {
         const currentPositions = await postgresQueryExec.getUserCurrentPosition('TEST11', postgresDataSetup.registeredUsers[0].id);
         expect(currentPositions).toHaveLength(1);
         expect(currentPositions[0].quantity).toEqual(requestBody.quantity);
-        expect(currentPositions[0].investment_value).toEqual(requestBody.value);
-        expect(currentPositions[0].average_buy_price)
+        expect(currentPositions[0].investmentValue).toEqual(requestBody.value);
+        expect(currentPositions[0].averageBuyPrice)
           .toEqual(requestBody.value / requestBody.quantity);
         done();
       })
@@ -159,11 +159,11 @@ describe('POST /operation', () => {
           const currentPositions = await postgresQueryExec.getUserCurrentPosition('TEST4', postgresDataSetup.registeredUsers[0].id);
           expect(currentPositions).toHaveLength(1);
           expect(currentPositions[0].quantity).toEqual(initialPositions[0].quantity - 50);
-          expect(currentPositions[0].average_buy_price)
-            .toEqual(initialPositions[0].average_buy_price);
-          expect(currentPositions[0].investment_value)
+          expect(currentPositions[0].averageBuyPrice)
+            .toEqual(initialPositions[0].averageBuyPrice);
+          expect(currentPositions[0].investmentValue)
             .toEqual(Number(
-              (initialPositions[0].investment_value - (initialPositions[0].average_buy_price * 50))
+              (initialPositions[0].investmentValue - (initialPositions[0].averageBuyPrice * 50))
                 .toFixed(3),
             ));
           done();
