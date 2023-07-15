@@ -11,7 +11,7 @@ import { OperationType, OperationEntity } from '@entities/operation';
 import { UserEntity } from '@entities/user';
 import { ISignInResult, IUserRepository } from '@domain-ports/repositories/user-repository-interface';
 import { IPositionFactory, IPositionFactoryMakeInput } from '@domain-ports/factories/position-factory-interface';
-import { PositionEntity } from '@entities/position';
+import { PositionEntity, UserPositionEntity } from '@entities/position';
 import { IPositionRepository } from '@domain-ports/repositories/position-repository-interface';
 import { IUnitOfWork } from '@domain-ports/unit-work-interface';
 
@@ -31,9 +31,11 @@ class PositionFactoryMock implements IPositionFactory {
 
   make<T extends PositionEntity>(args: IPositionFactoryMakeInput): T {
     const {
-      asset, user, quantity, price, date, averageBuyPrice, id,
+      asset, user, quantity, price, date, averageBuyPrice, investmentValue, id,
     } = args;
-    return new PositionEntity(asset, user, quantity, this.date, price, averageBuyPrice, id) as T;
+    return new UserPositionEntity(
+      asset, user, quantity, this.date, price, averageBuyPrice, investmentValue, id,
+    ) as unknown as T;
   }
 }
 
@@ -99,7 +101,7 @@ describe('Submit Operation Use Case', () => {
   it('Should register an operation when there is no current position', async () => {
     const submitedOperation = await submitOperationService.submit({
       userId: user.id,
-      value: 15.95,
+      value: 1595.00,
       quantity: 200,
       type: 'buy',
       assetCode: 'TEST11',
@@ -114,10 +116,11 @@ describe('Submit Operation Use Case', () => {
         _logo: '',
         _social: 'Teste',
       },
-      _averageBuyPrice: 0,
+      _averageBuyPrice: 7.975,
+      _investmentValue: 1595.00,
       _date: date,
-      _id: 1,
       _price: 0,
+      _id: undefined,
       _quantity: 200,
       _user: {
         _createdAt: date,
@@ -143,11 +146,13 @@ describe('Submit Operation Use Case', () => {
   it('Should register an operation when there is a current position', async () => {
     positionRepositoryMock.getUserCurrentPosition.mockResolvedValueOnce({
       quantity: 100,
+      investmentValue: 1000,
+      averageBuyPrice: 10,
     });
 
     const submitedOperation = await submitOperationService.submit({
       userId: user.id,
-      value: 15.95,
+      value: 1595,
       quantity: 200,
       type: 'buy',
       assetCode: 'TEST11',
@@ -156,6 +161,8 @@ describe('Submit Operation Use Case', () => {
 
     expect(positionRepositoryMock.saveUserCurrentPosition.mock.calls[0]).toEqual([{
       quantity: 300,
+      averageBuyPrice: 8.65,
+      investmentValue: 2595,
     }]);
 
     expect(submitedOperation.id).toEqual(1);
