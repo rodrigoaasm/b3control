@@ -5,6 +5,8 @@ export interface IPositionReport {
   price : number;
   date : Date;
   value : number;
+  averageBuyPrice: number;
+  profitability: number;
 }
 
 export interface IAssetTimeSeriesReportUseCase

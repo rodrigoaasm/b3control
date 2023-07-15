@@ -4,38 +4,44 @@ import { IApp, createApp } from '@application/app';
 import { PostgresDataSetup } from '@test-setup/postgres-data-setup';
 import { JWTHandlerAdapter } from '@external/adapters/jwt-handler-adapter';
 
+type AssetResult = {
+  value: number;
+  profitability: number;
+};
+
 describe('GET /report/assettimeline/...', () => {
   let app: IApp;
   let postgresDataSetup: PostgresDataSetup;
   let accessTokens: Array<string>;
 
   // results
-  const correctedValues = new Map<string, number>();
-  correctedValues.set('TEST11-2020-01-31T17:00:00.000Z', 960);
-  correctedValues.set('TEST11-2020-02-28T17:00:00.000Z', 640);
-  correctedValues.set('TEST11-2020-03-30T17:00:00.000Z', 0);
+  const correctedValues = new Map<string, AssetResult>();
+  correctedValues.set('TEST11-2020-01-31T17:00:00.000Z', { value: 960, profitability: 20 });
+  correctedValues.set('TEST11-2020-02-28T17:00:00.000Z', { value: 640, profitability: 60 });
+  correctedValues.set('TEST11-2020-03-30T17:00:00.000Z', { value: 0, profitability: 0 });
 
-  correctedValues.set('TEST4-2020-01-31T17:00:00.000Z', 0);
-  correctedValues.set('TEST4-2020-02-28T17:00:00.000Z', 1400);
-  correctedValues.set('TEST4-2020-03-30T17:00:00.000Z', 720);
+  correctedValues.set('TEST4-2020-01-31T17:00:00.000Z', { value: 0, profitability: 0 });
+  correctedValues.set('TEST4-2020-02-28T17:00:00.000Z', { value: 1400, profitability: 40 });
+  correctedValues.set('TEST4-2020-03-30T17:00:00.000Z', { value: 720, profitability: 20 });
 
-  correctedValues.set('TEST3-2020-01-31T17:00:00.000Z', 480);
-  correctedValues.set('TEST3-2020-02-28T17:00:00.000Z', 800);
-  correctedValues.set('TEST3-2020-03-30T17:00:00.000Z', 320);
+  correctedValues.set('TEST3-2020-01-31T17:00:00.000Z', { value: 480, profitability: -20 });
+  correctedValues.set('TEST3-2020-02-28T17:00:00.000Z', { value: 800, profitability: -33.333 });
+  correctedValues.set('TEST3-2020-03-30T17:00:00.000Z', { value: 320, profitability: -46.667 });
 
-  correctedValues.set('FII-2020-01-31T17:00:00.000Z', 960);
-  correctedValues.set('FII-2020-02-28T17:00:00.000Z', 640);
-  correctedValues.set('FII-2020-03-30T17:00:00.000Z', 0);
+  correctedValues.set('FII-2020-01-31T17:00:00.000Z', { value: 960, profitability: 20 });
+  correctedValues.set('FII-2020-02-28T17:00:00.000Z', { value: 640, profitability: 60 });
+  correctedValues.set('FII-2020-03-30T17:00:00.000Z', { value: 0, profitability: 0 });
 
-  correctedValues.set('stock-2020-01-31T17:00:00.000Z', 480);
-  correctedValues.set('stock-2020-02-28T17:00:00.000Z', 2200);
-  correctedValues.set('stock-2020-03-30T17:00:00.000Z', 1040);
+  correctedValues.set('stock-2020-01-31T17:00:00.000Z', { value: 480, profitability: -20 });
+  correctedValues.set('stock-2020-02-28T17:00:00.000Z', { value: 2200, profitability: 0 });
+  correctedValues.set('stock-2020-03-30T17:00:00.000Z', { value: 1040, profitability: -13.333 });
 
   function checkAssetCalculations(response: any, nAssetPositions: number): any {
     response.body.assets.forEach((asset: any) => {
       expect(asset.items.length).toEqual(nAssetPositions);
       asset.items.forEach((position: any) => {
-        expect(position.value).toEqual(correctedValues.get(`${asset.name}-${position.date}`));
+        expect(position.value).toEqual(correctedValues.get(`${asset.name}-${position.date}`).value);
+        expect(position.profitability).toEqual(correctedValues.get(`${asset.name}-${position.date}`).profitability);
       });
     });
   }
@@ -49,7 +55,8 @@ describe('GET /report/assettimeline/...', () => {
     response.body.categories.forEach((category: any) => {
       expect(category.items.length).toEqual(nCategoriesPositions);
       category.items.forEach((position: any) => {
-        expect(position.value).toEqual(correctedValues.get(`${category.name}-${position.date}`));
+        expect(position.value).toEqual(correctedValues.get(`${category.name}-${position.date}`).value);
+        expect(position.profitability).toEqual(correctedValues.get(`${category.name}-${position.date}`).profitability);
       });
     });
   }
@@ -287,20 +294,21 @@ describe('GET /report/assettimeline/...', () => {
         expect(response.body.categories.length).toEqual(2);
         checkAssetCalculations(response, 3);
 
-        const correctedValuesForTwoCodesCase = new Map();
-        correctedValuesForTwoCodesCase.set('FII-2020-01-31T17:00:00.000Z', 960);
-        correctedValuesForTwoCodesCase.set('FII-2020-02-28T17:00:00.000Z', 640);
-        correctedValuesForTwoCodesCase.set('FII-2020-03-30T17:00:00.000Z', 0);
+        const correctedValuesForTwoCodesCase = new Map<string, AssetResult>();
+        correctedValuesForTwoCodesCase.set('FII-2020-01-31T17:00:00.000Z', { value: 960, profitability: 20 });
+        correctedValuesForTwoCodesCase.set('FII-2020-02-28T17:00:00.000Z', { value: 640, profitability: 60 });
+        correctedValuesForTwoCodesCase.set('FII-2020-03-30T17:00:00.000Z', { value: 0, profitability: 0 });
 
-        correctedValuesForTwoCodesCase.set('stock-2020-01-31T17:00:00.000Z', 0);
-        correctedValuesForTwoCodesCase.set('stock-2020-02-28T17:00:00.000Z', 1400);
-        correctedValuesForTwoCodesCase.set('stock-2020-03-30T17:00:00.000Z', 720);
+        correctedValuesForTwoCodesCase.set('stock-2020-01-31T17:00:00.000Z', { value: 0, profitability: 0 });
+        correctedValuesForTwoCodesCase.set('stock-2020-02-28T17:00:00.000Z', { value: 1400, profitability: 40 });
+        correctedValuesForTwoCodesCase.set('stock-2020-03-30T17:00:00.000Z', { value: 720, profitability: 20 });
 
         // Checks Categories calculations
         response.body.categories.forEach((category: any) => {
           expect(category.items.length).toEqual(3);
           category.items.forEach((position: any) => {
-            expect(position.value).toEqual(correctedValuesForTwoCodesCase.get(`${category.name}-${position.date}`));
+            expect(position.value).toEqual(correctedValuesForTwoCodesCase.get(`${category.name}-${position.date}`).value);
+            expect(position.profitability).toEqual(correctedValuesForTwoCodesCase.get(`${category.name}-${position.date}`).profitability);
           });
         });
 
